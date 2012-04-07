@@ -1,5 +1,8 @@
 define ['jquery'], ($) ->
   class Autocomplete
-    greet : ->
-      alert 'Hola'
+      constructor : ->
+          alert 'Autocompleter'
+
+      greet : ->
+          alert 'Hola'
 

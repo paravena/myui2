@@ -4,28 +4,27 @@ define ['jquery'], ($) ->
             @message = options.message ? null
             @parentElement = $(options.parent)
             @type = options.type ? 'info'
-            @render();
-            @onMouseMoveHandler = event =>
-                x = Event.pointerX(event) + 10
-                y = Event.pointerY(event) + 10
+            @render()
+            @parentElement.mouseout => @hide()
+            @parentElement.mousemove (event) =>
+                x = event.pageX + 10
+                y = event.pageY + 10
                 @show(x, y)
-            @parentElement.observe("mousemove", @onMouseMoveHandler)
-            @onMouseOutHandler = event => @hide()
-            @parentElement.observe("mouseout", @onMouseOutHandler)
 
         render : ->
-            toolTipId = "#{@parentElement.id}_tooltip"
+            id = @parentElement.attr('id')
+            toolTipId = "#{id}_tooltip"
             html = []
             html.push "<div id=\"#{toolTipId}\" class=\"my-tooltip my-tooltip-#{@type} shadow\" style=\"display:none\">"
             html.push "<div class=\"my-tooltip-inner\">"
             html.push @message
             html.push "</div>"
             html.push "</div>"
-            document.body.insert(html.join(""))
-            @tooltip = $(toolTipId)
+            $(document.body).append(html.join(""))
+            @tooltip = $('#'+toolTipId)
 
         show : (x, y) ->
-            @tooltip.setStyle({
+            @tooltip.css({
                 position: 'absolute'
                 top : y + 'px'
                 left: x + 'px'
@@ -36,8 +35,8 @@ define ['jquery'], ($) ->
             @tooltip.hide()
 
         remove : ->
-            Event.stopObserving(this.parentElement, "mousemove", @onMouseMoveHandler)
-            Event.stopObserving(this.parentElement, "mouseout", @onMouseOutHandler)
+            @parentElement.unbind 'mousemove'
+            @parentElement.unbind 'mouseout'
             try
                 @tooltip.remove()
             catch e

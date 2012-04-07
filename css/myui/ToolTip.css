@@ -1,0 +1,25 @@
+.my-tooltip {
+    font-size: 11px;
+    position: absolute;
+    padding: 2px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    z-index: 10000;
+}
+
+.my-tooltip-error {
+    color: #000;
+    background: url('images/cancel.png') no-repeat 3px 3px #ccc;
+    border: #f00 solid 1px;
+}
+
+.my-tooltip-info {
+    color: #000;
+    background: url('images/info.png') no-repeat 3px 3px #ff9;
+    border: #000 solid 1px;
+}
+
+.my-tooltip-inner {
+    padding: 1px 1px 1px 25px;
+}

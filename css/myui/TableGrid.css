@@ -1,0 +1,493 @@
+.my-tablegrid {
+    font-family: helvetica, arial, freesans, clean, sans-serif;
+    font-size: 11px;
+}
+
+/* Title definition */
+.my-tablegrid-header-title {
+    border-top: solid 1px #ccc;
+    border-left: solid 1px #ccc;
+    border-right: solid 1px #ccc;
+    background-color: #eee;
+    font-weight: bold;
+    color: #333;
+    text-shadow: 1px 1px 0 white;
+}
+
+ /* Toolbar buttons */
+.my-tablegrid-toolbar {
+    border-top: solid 1px #ccc;
+    border-left: solid 1px #ccc;
+    border-right: solid 1px #ccc;
+    background-color: #eee;
+}
+
+a.toolbar-button {
+    display: inline-block;
+    padding:  2px;
+    float: left;
+    text-decoration: none;
+    border: 1px solid #bbb;
+    border-bottom-color: #999;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    background: url('images/bg-btn.gif') repeat-x scroll 0 0 #ddd;
+    box-shadow: 0 1px 0 #f8f8f8;
+    -wekbit-box-shadow: 0 1px 0 #f8f8f8;
+    -moz-box-shadow: 0 1px 0 #f8f8f8;
+}
+
+a.toolbar-button:hover {
+    background-position: 0 -6px;
+    border: 1px solid #999;
+    border-bottom-color: #666;
+}
+
+div.toolbar-separator  {
+    float: left;
+    width: 0;
+    height: 100%;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid white;
+    margin: 0 5px;
+}
+
+a.toolbar-button span.icon {
+    display: inline-block;
+    vertical-align: bottom;
+    width: 16px;
+    height: 16px;
+    margin-left: 3px;
+}
+
+span.add-button {
+    background: url(images/sprite-icons.png) -64px -16px;
+    top: 1px;
+    margin-right: 1px;
+    margin-bottom: 0;
+    position: relative;
+}
+
+span.delete-button {
+    background: url(images/sprite-icons.png) -80px -16px;
+    top: 1px;
+    margin-right: 1px;
+    margin-bottom: 0;
+    position: relative;
+}
+
+span.save-button {
+    background: url(images/save.png) left center no-repeat;
+}
+
+a.toolbar-button span.text {
+    padding: 3px;
+    text-shadow: 1px 1px 0 white;
+    color: #333;
+    line-height: 16px;
+    vertical-align: middle;
+    font-weight: bold;
+}
+
+/* Setting button */
+div.my-tablegrid-setting-button {
+    position: absolute;
+    top: 3px;
+    width: 16px;
+    height: 16px;
+    z-index: 100;
+    padding: 1px;
+    border: 1px solid #bbb;
+    border-bottom-color: #999;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    background: url('images/bg-btn.gif') repeat-x scroll 0 0 #ddd;
+}
+
+div.my-tablegrid-setting-button div.icon {
+    background: url(images/sprite-icons.png) -30px -64px;
+    top: 2px;
+    margin-right: 1px;
+    margin-bottom: 0;
+    position: relative;
+}
+
+div.my-tablegrid-setting-button:hover {
+    background-position: 0 -6px;
+    border: 1px solid #999;
+    border-bottom-color: #666;
+}
+
+/* Header definition */
+div.my-tablegrid-header-row  {
+    background: #ccc url(images/hrow.gif) repeat-x;
+    border-top: solid 1px #ccc;
+    border-left: solid 1px #ccc;
+    border-right: solid 1px #ccc;
+    cursor: default;
+}
+
+table.my-tablegrid-header-row-table {
+    padding: 0;
+    color: black;
+    text-align: left;
+}
+
+th.my-tablegrid-header-cell {
+    border: 1px solid transparent;
+    border-right-color: #ddd;
+    border-bottom-color: #ddd;
+    color: #696969;
+    text-shadow: 1px 1px 0 #ddd;
+}
+
+th div.my-tablegrid-inner-header-cell {
+    position: relative;
+    white-space: nowrap;
+    font-size: 11px;
+    height: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+div.my-tablegrid-header-separator {
+    cursor: col-resize !important;
+    cursor: w-resize;
+    overflow: hidden;
+    background-color: transparent;
+}
+
+div.my-tablegrid-header-button {
+    position: absolute;
+    background: url(images/ddn.png) center no-repeat;
+    border-left: solid #ddd 1px;
+    visibility: hidden;
+    z-index: 50;
+}
+
+div.my-tablegrid-column-move-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    width: 9px;
+    height: 9px;
+    background: url(images/col-move-top.gif) center no-repeat transparent;
+    visibility: hidden
+}
+
+div.my-tablegrid-column-move-bottom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    width:  9px;
+    height: 9px;
+    background: url(images/col-move-bottom.gif) center no-repeat transparent;
+    visibility: hidden
+}
+
+ /* Body definition */
+div.my-tablegrid-body {
+    border: solid 1px #ccc;
+    border-top: solid 1px #eee;
+}
+
+table.my-tablegrid-body-table {
+    table-layout: fixed;
+    position: relative;
+    z-index: 0;
+}
+
+table.my-tablegrid-body-table td  {
+    border-bottom: solid 1px #ddd;
+    padding: 0;
+}
+
+td.my-tablegrid-cell {
+    border-left: 1px solid transparent;
+    /*border-left: 1px solid transparent;*/
+    border-right: 1px solid #ddd;
+}
+
+td div.my-tablegrid-inner-cell {
+    position: relative;
+    white-space: nowrap;
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+tr.hightlight {
+    background-color: #eef;
+}
+
+tr.focus {
+    background-color: #e6d7f5;
+}
+
+td.focus {
+    /*border-left: solid 1px #90c;*/
+}
+
+td.focus div.my-tablegrid-inner-cell {
+    background-color: #90c;
+    color: white;
+}
+
+td div.more {
+   background: url(images/more.gif) no-repeat right bottom;
+}
+
+div.my-tablegrid-resize-marker {
+    cursor: col-resize !important;
+    cursor: w-resize;
+    position: absolute;
+    width: 2px;
+    background-color: transparent;
+    z-index : 300;
+}
+
+div.dragColumn {
+    position: absolute;
+    background: url(images/hrow.gif) repeat-x;
+    padding: 3px;
+    z-index: 0;
+    border: solid 1px #ccc;
+    visibility: hidden;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+div.drop-no {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 16px;
+    height: 16px;
+    background: url(images/no.gif) no-repeat center;
+}
+
+div.drop-yes {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 16px;
+    height: 16px;
+    background: url(images/yes.gif) no-repeat center;
+}
+
+/***********************************************
+ * Cell Input Definition
+ ***********************************************/
+input.mtgInputCheckbox {
+    height: 12px;
+}
+
+input.mtgInputRadio {
+    height: 12px;
+}
+
+input.my-tablegrid-textfield {
+    position: relative;
+    font-size: 11px;
+    vertical-align: top;
+    height: 16px;
+    background-color: white;
+    outline: none;
+    padding: 2px 3px;
+    border: 1px solid #609;
+}
+
+div.my-tablegrid-browse-button {
+    position: absolute;
+    top: 0;
+    right : 0;
+    background: #ccc url(images/magb.png) no-repeat 1px 1px;
+    width: 20px;
+    height: 22px;
+    margin: 0;
+    border: solid #609 1px;
+    border-left-style: none;
+
+}
+
+div.my-tablegrid-menu {
+    position: absolute;
+    width: 130px;
+    overflow: auto;
+    background: #ddd url(images/menu.gif) repeat-y;
+    z-index: 100;
+    visibility : hidden;
+    border: 1px solid #609;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+div.my-tablegrid-menu ul {
+    margin: 3px;
+    padding: 0;
+}
+
+div.my-tablegrid-menu ul li {
+    position: relative;
+    list-style-type: none;
+    padding: 0;
+}
+
+a.my-tablegrid-menu-item {
+    position: relative;
+    display: block;
+    color: black;
+    text-decoration: none;
+    cursor: default;
+    font-weight: bold;
+    line-height: 20px;
+}
+
+a.my-tablegrid-menu-item:hover {
+    background-color: #90c;
+    text-decoration: none;
+    color: white;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.my-tablegrid-menu-item-icon {
+    position: absolute;
+    top:0;
+    left:0;
+    margin: 2px;
+    padding: 0;
+}
+
+span.my-tablegrid-menu-item-checkbox {
+    margin: 0;
+    padding: 0;
+}
+
+span.sort-ascending-icon {
+    background: url(images/sort_ascending.png) no-repeat transparent;
+    width: 16px;
+    height: 16px;
+}
+
+span.sort-descending-icon {
+    background: url(images/sort_descending.png) no-repeat transparent;
+    width: 16px;
+    height: 16px;
+}
+
+/* Pager Definition */
+div.my-tablegrid-pager {
+    background-color: #eee;
+    border-left: solid 1px #ccc;
+    border-right: solid 1px #ccc;
+    border-bottom: solid 1px #ccc;
+    cursor: default;
+    padding: 2px;
+    text-shadow: 1px 1px 0 white;
+}
+
+input.my-tablegrid-page-input {
+    font-size: 11px;
+    width: 25px;
+    margin: 0;
+}
+
+span.my-tablegrid-pager-message {
+    float: left;
+    padding: 2px;
+}
+
+table.my-tablegrid-pager-table {
+    float: right;
+    font-size: 11px;
+    margin: 0;
+}
+
+table.my-tablegrid-pager-table td {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+a.my-tablegrid-pager-control {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+div.my-tablegrid-pager-loader {
+    background: url(images/mtg-loader.gif) center no-repeat transparent;
+    width: 16px;
+    height: 16px;
+}
+
+div.first-page {
+    background: url(images/first.gif) center no-repeat transparent;
+    width: 16px;
+    height: 16px;
+}
+
+div.first-page-disabled {
+    background: url(images/first-disabled.gif) center no-repeat transparent;
+    width: 16px;
+    height: 16px;
+}
+
+div.previous-page {
+    background: url(images/prev.gif) center no-repeat transparent;
+    width: 16px;
+    height: 16px;
+}
+
+div.previous-page-disabled {
+    background: url(images/prev-disabled.gif) center no-repeat transparent;
+    width: 16px;
+    height: 16px;
+}
+
+div.next-page {
+    background: url(images/next.gif) center no-repeat transparent;
+    width: 16px;
+    height: 16px;
+}
+
+div.next-page-disabled {
+    background: url(images/next-disabled.gif) center no-repeat transparent;
+    width: 16px;
+    height: 16px;
+}
+
+div.last-page {
+    background: url(images/last.gif) center no-repeat transparent;
+    width: 16px;
+    height: 16px;
+}
+
+div.last-page-disabled {
+    background: url(images/last-disabled.gif) center no-repeat transparent;
+    width: 16px;
+    height: 16px;
+}
+
+div.my-tablegrid-pager-separator {
+    background: url(images/y-sep.png) center no-repeat transparent;
+    width: 2px;
+    height: 13px;
+}
+
+span.my-tablegrid-sort-asc-icon {
+    background: url(images/sort-arrow-asc.png) center no-repeat transparent;
+}
+
+span.my-tablegrid-sort-desc-icon {
+    background: url(images/sort-arrow-desc.png) center no-repeat transparent;
+}
+
+div.modified-cell {
+    background : url(images/m.png) no-repeat 0 0;
+}
