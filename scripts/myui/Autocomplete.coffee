@@ -1,4 +1,20 @@
 define ['jquery', 'myui/TextField'], ($, TextField) ->
+  Event =
+      KEY_BACKSPACE: 8
+      KEY_TAB:       9
+      KEY_RETURN:   13
+      KEY_ESC:      27
+      KEY_LEFT:     37
+      KEY_UP:       38
+      KEY_RIGHT:    39
+      KEY_DOWN:     40
+      KEY_DELETE:   46
+      KEY_HOME:     36
+      KEY_END:      35
+      KEY_PAGEUP:   33
+      KEY_PAGEDOWN: 34
+      KEY_INSERT:   45
+
   class Autocomplete extends TextField
       constructor : (options) ->
           @baseInitialize(options)
@@ -263,7 +279,7 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
           @getUpdatedChoices()
 
       onHover : (event) -> # TODO review this code
-          element = Event.findElement(event, 'LI')
+          element = $(event.target).closest('LI')[0]
           if (@index isnt element.autocompleteIndex)
               @index = element.autocompleteIndex
               @_renderList()
@@ -277,7 +293,7 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
       _renderList : ->
           if this.index is undefined then @index = 0
           if @entryCount > 0
-              for i in [0..@entryCount]
+              for i in [0...@entryCount]
                   if @index is i
                       $(@_getEntry(i)).addClass('selected')
                   else
@@ -341,7 +357,7 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
               nodes = $(selectedElement).select('.' + this.options.select) || []; #TODO Check this
               if nodes.length > 0 then value = Element.collectTextNodes(nodes[0], @options.select)
           else
-              value = Element.collectTextNodesIgnoreClass(selectedElement, 'informal');
+              value = Element.collectTextNodesIgnoreClass(selectedElement, 'informal'); #TODO check this
 
           bounds = @getTokenBounds()
 
@@ -355,7 +371,7 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
               @element.value = value
 
           @oldElementValue = @element.value
-          @element.value = Element.collectTextNodesIgnoreClass(selectedElement, 'informal')
+          @element.value = Element.collectTextNodesIgnoreClass(selectedElement, 'informal') #TODO check this
           @oldElementValue = @element.value
           @validate()
           @element.focus()
@@ -364,9 +380,9 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
 
       updateChoices : (choices) ->
           if !@changed && @hasFocus
-              @update.innerHTML = choices
+              @update.html(choices)
               Element.cleanWhitespace(@update) #TODO check this
-              Element.cleanWhitespace(@update.down())
+              Element.cleanWhitespace(@update.down()) #TODO check this
               if @update.firstChild and @update.down().childNodes
                   @entryCount = @update.down().childNodes.length
                   for i  in [0...@entryCount]
