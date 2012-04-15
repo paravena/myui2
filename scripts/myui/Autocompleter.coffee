@@ -1,4 +1,4 @@
-define ['jquery', 'myui/TextField'], ($, TextField) ->
+define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
   Event =
       KEY_BACKSPACE: 8
       KEY_TAB:       9
@@ -15,7 +15,7 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
       KEY_PAGEDOWN: 34
       KEY_INSERT:   45
 
-  class Autocomplete extends TextField
+  class Autocompleter extends TextField
       constructor : (options) ->
           @baseInitialize(options)
 
@@ -55,8 +55,8 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
               @options.onShow = (element, update) =>
                   $(update).css('position', 'absolute')
                   p = $(element).offset()
-                  vh = document.viewport.getHeight() #view port height
-                  vst = document.viewport.getScrollOffsets().top # view port scrolling top
+                  vh = $(window).height() #view port height
+                  vst = $(window).scrollTop() # view port scrolling top
                   rh = vh + vst - p.top - $(element).height() #remaining height
                   uh = (@entryCount * 22) + 6
                   offsetTop = p.top
@@ -143,21 +143,19 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
                   return "<ul>" + result.join('') + "</ul>"
 
           if typeof(@options.tokens) is 'string'
-              @options.tokens = new Array(this.options.tokens)
+              @options.tokens = new Array(@options.tokens)
 
           # Force carriage returns as token delimiters anyway
-          unless @options.tokens.include('\n')
-              @options.tokens.push('\n')
+          unless '\n' in @options.tokens
+              @options.tokens.push '\n'
 
-          this.observer = null
+          @observer = null
           if @element then @render(@element)
-
-          return
 
       render : (input) ->
           super(input)
           @element = $(input)
-          @id = element.attr('id')
+          @id = @element.attr('id')
           @oldElementValue = @element.val()
           @elementWidth = @element.width()
           @options.paramName ?= @element.name;
@@ -166,7 +164,7 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
           @container = $('#' + @id + '_container');
           @onBlurHandler = (event) => @onBlur(event)
           $(document).click @onBlurHandler
-          @onKeyPressHandler = (event) => @_onKeyPres(event)
+          @onKeyPressHandler = (event) => @_onKeyPress(event)
           @element.keydown @onKeyPressHandler
 
       show : ->
@@ -183,7 +181,7 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
 
           if @options.url
               parameters = @options.parameters;
-              parameters[@options.finderParamName] = this.getToken()
+              parameters[@options.finderParamName] = @getToken()
               if @options.getParameters
                   moreParams = @options.getParameters()
                   for p of moreParams
@@ -192,7 +190,7 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
               @startIndicator();
               $.ajax(@options.url, {
                   complete: (response) =>
-                      @options.items = response
+                      @options.items = $.parseJSON(response.responseText)
                       @stopIndicator()
                       @updateChoices @options.selector()
                   ,
@@ -203,10 +201,10 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
               @updateChoices @options.selector()
 
       onBlur : (event) ->
-          target = Event.findElement(event)
-          ancestor = this.container;
+          target = $(event.target)
+          ancestor = @container;
           blurFlg = true;
-          if target.descendantOf(ancestor) then blurFlg = false
+          if target.closest(ancestor).length > 0 then blurFlg = false # is descendant of ?
           if blurFlg
               @hide()
               @hasFocus = false
@@ -242,56 +240,57 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
               switch event.keyCode
                   when Event.KEY_TAB, Event.KEY_RETURN
                       @selectEntry()
-                      event.stop()
+                      event.stopPropagation()
                   when Event.KEY_ESC
                       @hide()
                       @active = false
-                      event.stop()
-                      return false
+                      event.stopPropagation()
+                      return
                   when Event.KEY_LEFT, Event.KEY_RIGHT
                       return false
                   when Event.KEY_UP
                       @markPrevious()
                       @_renderList()
-                      event.stop()
-                      return false
+                      event.stopPropagation()
+                      return
                   when Event.KEY_DOWN
                       @markNext()
                       @_renderList()
-                      event.stop()
-                      return false
+                      event.stopPropagation()
+                      return
           else if event.keyCode is Event.KEY_TAB or
                   event.keyCode is Event.KEY_RETURN or
                   event.keyCode is Event.KEY_DOWN or
-                  (Prototype.Browser.WebKit > 0 && event.keyCode is 0)
+                  ($.browser.WebKit > 0 and event.keyCode is 0)
               return false
 
           @changed = true
           @hasFocus = true
 
           clearTimeout @observer if @observe
-          #@observer = setTimeout(=> @onObserverEvent(), @options.frequency * 1000)
-          return false
+          onObserverEventHandler = => @onObserverEvent()
+          @observer = setTimeout(onObserverEventHandler, @options.frequency * 1000)
+          return true
 
       activate : ->
           @changed = false
           @hasFocus = true
           @getUpdatedChoices()
 
-      onHover : (event) -> # TODO review this code
+      onHover : (event) ->
           element = $(event.target).closest('LI')[0]
           if (@index isnt element.autocompleteIndex)
               @index = element.autocompleteIndex
               @_renderList()
 
       onClick : (event) ->
-          element = Event.findElement(event, 'LI')
+          element = $(event.target).closest('LI')[0]
           @index = element.autocompleteIndex
           @selectEntry()
           @hide()
 
       _renderList : ->
-          if this.index is undefined then @index = 0
+          if @index is undefined then @index = 0
           if @entryCount > 0
               for i in [0...@entryCount]
                   if @index is i
@@ -320,7 +319,7 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
           @_syncScroll(@_getEntry(@index), true)
 
       _getEntry : (index) ->
-          return @update.firstChild.childNodes[index]
+          return $('LI', @update)[index]
 
 
       _syncScroll : (entry, bottomFlg) ->
@@ -331,16 +330,13 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
           unless bottomFlg
               @update.scrollTop = entry.offsetTop
           else
-              @update.scrollTop = entry.offsetTop - (updateHeight - entry.height() - 5)
+              @update.scrollTop = entry.offsetTop - (updateHeight - $(entry).height() - 5)
 
       getCurrentEntry : ->
           return @_getEntry(@index)
 
-
-
       selectEntry : ->
           @updateElement(@getCurrentEntry())
-
 
       getValue : ->
           return @oldElementValue
@@ -353,44 +349,43 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
               return
 
           value = '';
+
           if @options.select
-              nodes = $(selectedElement).select('.' + this.options.select) || []; #TODO Check this
-              if nodes.length > 0 then value = Element.collectTextNodes(nodes[0], @options.select)
+              nodes = $(@options.select, selectedElement) || []; #TODO Check this
+              if nodes.length > 0 then value = @collectTextNodes(nodes[0], @options.select)
           else
-              value = Element.collectTextNodesIgnoreClass(selectedElement, 'informal'); #TODO check this
+              value = @collectTextNodesIgnoreClass(selectedElement, 'informal')
 
           bounds = @getTokenBounds()
 
           if bounds[0] isnt -1
-              newValue = @element.value.substr(0, bounds[0])
-              whitespace = @element.value.substr(bounds[0]).match(/^\s+/)
+              newValue = @element.val().substr(0, bounds[0])
+              whitespace = @element.val().substr(bounds[0]).match(/^\s+/)
               if (whitespace)
                   newValue += whitespace[0]
-              @element.value = newValue + value + this.element.value.substr(bounds[1])
+              @element.val(newValue + value + @element.val().substr(bounds[1]))
           else
-              @element.value = value
+              @element.val(value)
 
-          @oldElementValue = @element.value
-          @element.value = Element.collectTextNodesIgnoreClass(selectedElement, 'informal') #TODO check this
-          @oldElementValue = @element.value
+          @oldElementValue = @element.val()
+          @element.val(@collectTextNodesIgnoreClass(selectedElement, 'informal'))
+          @oldElementValue = @element.val()
           @validate()
           @element.focus()
-          if (this.options.afterUpdate)
-              this.options.afterUpdate(this.element, selectedElement)
+          if (@options.afterUpdate)
+              @options.afterUpdate(@element, selectedElement)
 
       updateChoices : (choices) ->
           if !@changed && @hasFocus
               @update.html(choices)
-              Element.cleanWhitespace(@update) #TODO check this
-              Element.cleanWhitespace(@update.down()) #TODO check this
-              if @update.firstChild and @update.down().childNodes
-                  @entryCount = @update.down().childNodes.length
-                  for i  in [0...@entryCount]
-                      entry = @_getEntry(i)
-                      entry.autocompleteIndex = i
-                      @addObservers(entry)
-              else
-                  @entryCount = 0
+              @cleanWhitespace(@update) #TODO check this
+              @cleanWhitespace(@update.children().first()) #TODO check this
+              i = 0
+              entries = $('LI', @update)
+              @entryCount = entries.length
+              for entry in entries
+                  entry.autocompleteIndex = i++
+                  @addObservers(entry)
 
               @stopIndicator()
               if @index is undefined then @index = 0
@@ -416,27 +411,27 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
               @active = false
               @hide()
 
-          @oldElementValue = @element.value
+          @oldElementValue = @element.val()
 
       getToken : ->
           bounds = @getTokenBounds()
-          return $.trim(@element.value.substring(bounds[0], bounds[1]))
+          return $.trim(@element.val().substring(bounds[0], bounds[1]))
 
 
       getTokenBounds : ->
           if @tokenBounds isnt null then return @tokenBounds
-          value = @element.value
+          value = @element.val()
           if $.trim(value) is '' then return [-1, 0]
           diff = @getFirstDifferencePos(value, @oldElementValue)
-          offset = (diff == @oldElementValue.length ? 1 : 0) # TODO check this
+          offset = if diff is @oldElementValue.length then 1 else 0
           prevTokenPos = -1
           nextTokenPos = value.length
           index = 0
-          l = this.options.tokens.length
+          l = @options.tokens.length
           while (index < l)
-              tp = value.lastIndexOf(this.options.tokens[index], diff + offset - 1)
+              tp = value.lastIndexOf(@options.tokens[index], diff + offset - 1)
               if tp > prevTokenPos then prevTokenPos = tp
-              tp = value.indexOf(this.options.tokens[index], diff + offset)
+              tp = value.indexOf(@options.tokens[index], diff + offset)
               if -1 != tp && tp < nextTokenPos then nextTokenPos = tp
               ++index
           return (@tokenBounds = [prevTokenPos + 1, nextTokenPos])
@@ -464,3 +459,38 @@ define ['jquery', 'myui/TextField'], ($, TextField) ->
               else
                   break
           return result
+
+      collectTextNodesIgnoreClass : (element, className) ->
+          arr = for node in $(element).contents()
+              if node.nodeType is 3
+                  node.nodeValue
+              else if !$(node).hasClass className
+                  @collectTextNodesIgnoreClass node, className
+              else
+
+          @flatten(arr).join('')
+
+      collectTextNodes : (element) ->
+          arr = for node in $(element).contents()
+              if node.nodeType is 3
+                  node.nodeValue
+              else if node.hasChildNodes()
+                  @collectTextNodes node
+
+      flatten : (array) ->
+          flattened = []
+          for element in array
+              if element instanceof Array
+                  flattened = flattened.concat @flatten element
+              else
+                  flattened.push element
+          flattened
+
+      cleanWhitespace: (element) ->
+          node = element.firstChild
+          while (node)
+              nextNode = node.nextSibling
+              if node.nodeType == 3 && !/\S/.test(node.nodeValue)
+                  element.removeChild(node)
+              node = nextNode
+          return element
