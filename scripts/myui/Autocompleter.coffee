@@ -57,14 +57,14 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
                   p = $(element).offset()
                   vh = $(window).height() #view port height
                   vst = $(window).scrollTop() # view port scrolling top
-                  rh = vh + vst - p.top - $(element).height() #remaining height
+                  rh = vh + vst - p.top - $(element).outerHeight() #remaining height
                   uh = (@entryCount * 22) + 6
                   offsetTop = p.top
                   offsetLeft = p.left
                   scrollTop = 0
                   if @tableGrid
                       scrollTop = @tableGrid.bodyDiv.scrollTop
-                  topPos = $(element).height() + offsetTop - scrollTop + 2
+                  topPos = $(element).outerHeight() + offsetTop - scrollTop
                   scrollLeft = 0
                   if @tableGrid
                       scrollLeft = @tableGrid.bodyDiv.scrollLeft
@@ -348,13 +348,7 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
               @options.updateElement(selectedElement)
               return
 
-          value = '';
-
-          if @options.select
-              nodes = $(@options.select, selectedElement) || []; #TODO Check this
-              if nodes.length > 0 then value = @collectTextNodes(nodes[0], @options.select)
-          else
-              value = @collectTextNodesIgnoreClass(selectedElement, 'informal')
+          value = $(selectedElement).not('informal').text()
 
           bounds = @getTokenBounds()
 
@@ -368,7 +362,7 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
               @element.val(value)
 
           @oldElementValue = @element.val()
-          @element.val(@collectTextNodesIgnoreClass(selectedElement, 'informal'))
+          @element.val(value)
           @oldElementValue = @element.val()
           @validate()
           @element.focus()
@@ -378,8 +372,6 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
       updateChoices : (choices) ->
           if !@changed && @hasFocus
               @update.html(choices)
-              @cleanWhitespace(@update) #TODO check this
-              @cleanWhitespace(@update.children().first()) #TODO check this
               i = 0
               entries = $('LI', @update)
               @entryCount = entries.length
@@ -400,7 +392,6 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
       addObservers : (element) ->
           $(element).mouseover => @onHover
           $(element).click => @onClick
-
 
       onObserverEvent : ->
           @changed = false
@@ -460,37 +451,3 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
                   break
           return result
 
-      collectTextNodesIgnoreClass : (element, className) ->
-          arr = for node in $(element).contents()
-              if node.nodeType is 3
-                  node.nodeValue
-              else if !$(node).hasClass className
-                  @collectTextNodesIgnoreClass node, className
-              else
-
-          @flatten(arr).join('')
-
-      collectTextNodes : (element) ->
-          arr = for node in $(element).contents()
-              if node.nodeType is 3
-                  node.nodeValue
-              else if node.hasChildNodes()
-                  @collectTextNodes node
-
-      flatten : (array) ->
-          flattened = []
-          for element in array
-              if element instanceof Array
-                  flattened = flattened.concat @flatten element
-              else
-                  flattened.push element
-          flattened
-
-      cleanWhitespace: (element) ->
-          node = element.firstChild
-          while (node)
-              nextNode = node.nextSibling
-              if node.nodeType == 3 && !/\S/.test(node.nodeValue)
-                  element.removeChild(node)
-              node = nextNode
-          return element
