@@ -279,13 +279,13 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
 
       onHover : (event) ->
           element = $(event.target).closest('LI')[0]
-          if (@index isnt element.autocompleteIndex)
-              @index = element.autocompleteIndex
+          if @index isnt $(element).data('autocompleteIndex')
+              @index = $(element).data('autocompleteIndex')
               @_renderList()
 
       onClick : (event) ->
           element = $(event.target).closest('LI')[0]
-          @index = element.autocompleteIndex
+          @index = $(element).data('autocompleteIndex')
           @selectEntry()
           @hide()
 
@@ -341,7 +341,6 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
       getValue : ->
           return @oldElementValue
 
-
       updateElement : (selectedElement) ->
           # if an updateElement method is provided
           if @options.updateElement
@@ -375,9 +374,7 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
               i = 0
               entries = $('LI', @update)
               @entryCount = entries.length
-              for entry in entries
-                  entry.autocompleteIndex = i++
-                  @addObservers(entry)
+              @addObservers(entries)
 
               @stopIndicator()
               if @index is undefined then @index = 0
@@ -389,9 +386,11 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
                   @_renderList()
 
 
-      addObservers : (element) ->
-          $(element).mouseover => @onHover
-          $(element).click => @onClick
+      addObservers : (entries) ->
+          entries.mouseover => @onHover
+          entries.click => @onClick
+          entries.each (index, entry) ->
+              $(entry).data('autocompleteIndex', index)
 
       onObserverEvent : ->
           @changed = false
@@ -450,4 +449,3 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
               else
                   break
           return result
-
