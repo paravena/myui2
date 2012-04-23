@@ -25,11 +25,13 @@ define ['jquery', 'cs!myui/ToolTip', 'myui/i18n'], ($, ToolTip, i18n) ->
             @options.align = 'right' if @options.type is 'number'
             @input.css('textAlign', @options.align)
 
-            $(input).focus =>
-                $(input).val('') if @options.initialText != null and @input.val() is $.trim(@options.initialText)
+            $(input).focus (event) => @onFocus(event)
 
             # registering validate handler
             $(input).blur => @validate()
+
+        onFocus : ->
+            @input.val('') if @options.initialText != null and @input.val() is $.trim(@options.initialText)
 
         decorate : (element) ->
             $(element).attr('tabIndex', @options.tabIndex) if @options.tabIndex

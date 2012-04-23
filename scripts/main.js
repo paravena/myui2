@@ -1,4 +1,4 @@
-require(['jquery','cs!myui/Autocompleter'], function($, Autocompleter) {
+require(['jquery', 'cs!myui/TextField', 'cs!myui/Autocompleter', 'cs!myui/ComboBox'], function($, TextField, Autocompleter, ComboBox) {
     $(document).ready(function(){
         /*
         new TextField({input: '#name',
@@ -14,7 +14,7 @@ require(['jquery','cs!myui/Autocompleter'], function($, Autocompleter) {
             }
         });
         */
-        new Autocompleter({
+        window.comboBox = new ComboBox({
             input : '#name',
             url : 'get_manufacturers_list.php',
             indicator : 'ai',

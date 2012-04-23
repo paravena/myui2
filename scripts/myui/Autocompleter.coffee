@@ -170,6 +170,9 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
       show : ->
           @options.onShow @element, @update
 
+      onFocus : (event) ->
+          super(event)
+          @tokenBounds = null
 
       getItems : ->
           return @options.items
@@ -214,7 +217,7 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
           width = $(element).width()
           height = $(element).height()
           $(element).css({width: (width - 8) + 'px'})
-          $(element).wrap('div') # auto complete container
+          $(element).wrap('<div></div>') # auto complete container
           container = $(element).parent()
           container.addClass('my-autocompleter')
           container.attr('id', @id + '_container')
@@ -407,9 +410,8 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
           bounds = @getTokenBounds()
           return $.trim(@element.val().substring(bounds[0], bounds[1]))
 
-
       getTokenBounds : ->
-          if @tokenBounds isnt null then return @tokenBounds
+          return @tokenBounds if @tokenBounds
           value = @element.val()
           if $.trim(value) is '' then return [-1, 0]
           diff = @getFirstDifferencePos(value, @oldElementValue)
