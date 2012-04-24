@@ -390,8 +390,8 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
 
 
       addObservers : (entries) ->
-          entries.mouseover => @onHover
-          entries.click => @onClick
+          entries.mouseover (event) => @onHover(event)
+          entries.click (event) => @onClick(event)
           entries.each (index, entry) ->
               $(entry).data('autocompleteIndex', index)
 
