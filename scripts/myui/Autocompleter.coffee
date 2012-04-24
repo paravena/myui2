@@ -264,7 +264,7 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
           else if event.keyCode is Event.KEY_TAB or
                   event.keyCode is Event.KEY_RETURN or
                   event.keyCode is Event.KEY_DOWN or
-                  ($.browser.WebKit > 0 and event.keyCode is 0)
+                  ($.browser.WebKit and event.keyCode is 0)
               return false
 
           @changed = true
@@ -307,6 +307,10 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
               @active = false
               @hide()
 
+
+      _getEntry : (index) ->
+          return $('LI', @update)[index]
+
       markPrevious : ->
           if @index > 0
               @index--;
@@ -321,19 +325,15 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
               @index = 0
           @_syncScroll(@_getEntry(@index), true)
 
-      _getEntry : (index) ->
-          return $('LI', @update)[index]
-
-
       _syncScroll : (entry, bottomFlg) ->
           updateHeight = @update.height()
-          scrollTop = @update.scrollTop # TODO check this
+          scrollTop = @update.scrollTop() # TODO check this
           if entry.offsetTop > scrollTop and entry.offsetTop < (scrollTop + updateHeight - 10)
               return
           unless bottomFlg
-              @update.scrollTop = entry.offsetTop
+              @update.scrollTop(entry.offsetTop)
           else
-              @update.scrollTop = entry.offsetTop - (updateHeight - $(entry).height() - 5)
+              @update.scrollTop(entry.offsetTop - (updateHeight - $(entry).height() - 5))
 
       getCurrentEntry : ->
           return @_getEntry(@index)

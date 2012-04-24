@@ -18,8 +18,9 @@ define ['jquery', 'cs!myui/Autocompleter'], ($, Autocompleter) ->
         showAll : ->
             if !@active
                 unless @update
-                    $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list shadow"></div>')
-                    @update = $('#' + @id+'_update')
+                    @update = $('<div id="'+@id+'_update" class="my-autocompleter-list shadow">&nbsp;</div>')
+                    $(document.body).append(@update)
+
                 @element.focus()
                 @element.select()
                 @hasFocus = true
@@ -33,7 +34,6 @@ define ['jquery', 'cs!myui/Autocompleter'], ($, Autocompleter) ->
             @updateChoices @all()
 
         all : ->
-            console.log @
             currentValue = $(@element).val()
             result = []
             text = ''
@@ -53,7 +53,8 @@ define ['jquery', 'cs!myui/Autocompleter'], ($, Autocompleter) ->
                         items = @options.items = $.parseJSON(response.responseText)
                     ,
                     dataType : 'json',
-                    parameters: parameters
+                    parameters: parameters,
+                    async: false
                 })
 
             listTextPropertyName = @options.listTextPropertyName

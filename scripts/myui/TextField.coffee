@@ -38,7 +38,7 @@ define ['jquery', 'cs!myui/ToolTip', 'myui/i18n'], ($, ToolTip, i18n) ->
             $(element).val @options.initialText if @options.initialText
             width = $(element).width()
             height = $(element).height()
-            $(element).wrap('div')
+            $(element).wrap('<div></div>')
             @container = $(element).parent()
             @container.addClass('my-textfield-container')
             @container.attr('id', @id + '_container')
