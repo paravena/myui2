@@ -1,20 +1,21 @@
 define ['jquery'], ($) ->
     class KeyTable
         constructor : (targetTable, options) ->
-            options ?= {}
+            options = $.extend({
+                idPrefix : '',
+                form : false}, options or {})
+
             if targetTable instanceof TableGrid
                 @_numberOfRows = targetTable.rows.length
                 @_numberOfColumns = targetTable.columnModel.length
                 @_tableGrid = targetTable
-                @_bodyDiv = targetTable.bodyDiv
-                @_targetTable = targetTable.bodyTable
+                @_bodyDiv = $(targetTable.bodyDiv)
+                @_targetTable = $(targetTable.bodyTable)
             else
-                @_targetTable = targetTable # a normal table
+                @_targetTable = $(targetTable) # a normal table
                 @_numberOfRows = @_targetTable.rows.length
                 @_numberOfColumns = options.numberOfColumns or @_targetTable.rows[0].cells.length
 
-
-            @idPrefix = options.idPrefix or ''
             if @_tableGrid then @idPrefix = 'mtgC'+ @_tableGrid._mtgId + '_'
 
             @nBody = @_targetTable.find('tbody') # Cache the tbody node of interest
@@ -28,7 +29,7 @@ define ['jquery'], ($) ->
             @blockKeyCaptureFlg = false
 
             @_nInput = null
-            @_bForm = options.form or false
+            @_bForm = options.form
             @_bInputFocused = false
             @_sFocusClass = 'focus'
             @_xCurrentPos = 0
@@ -56,7 +57,7 @@ define ['jquery'], ($) ->
                 @event.remove[sKey] = @insertRemoveEventTemplate(sKey)
 
             # Loose table focus when click outside the table
-            f_onClick = (event) =>
+            @onClickHandler = (event) =>
                 unless @_nCurrentFocus then return
                 target = event.target
                 ancestor = @_targetTable
@@ -75,15 +76,15 @@ define ['jquery'], ($) ->
                     @releaseKeys()
                     @_nOldFocus = null
 
-            $(document).click f_onClick
+            $(document).click @onClickHandler
 
-            if targetTable instanceof TableGrid then @addMouseBehavior()
+            @addMouseBehavior() if targetTable instanceof TableGrid
 
-            f_onKeyPress = (event) =>
+            @onKeyPressHandler = (event) =>
                 result = @onKeyPress(event)
                 event.stopPropagation() unless result
 
-            $(document).keydown f_onKeyPress
+            $(document).keydown @onKeyPressHandler
 
         addMouseBehavior : ->
             tableGrid = @_tableGrid
@@ -244,7 +245,8 @@ define ['jquery'], ($) ->
                                 @_nInput.focus()
                                 # This timeout is a little nasty - but IE appears to have some asynchronous behaviour for
                                 # focus
-                                setTimeout(() => @_bInputFocused = false, 0)
+                                callback = () => @_bInputFocused = false
+                                setTimeout(callback, 0)
                                 @blockKeyCaptureFlg = false
                                 @blur()
                                 return true
@@ -276,7 +278,8 @@ define ['jquery'], ($) ->
                                 @_nInput.focus()
                                 # This timeout is a little nasty - but IE appears to have some asynchronous behaviour for
                                 # focus
-                                setTimeout(() => @_bInputFocused = false, 0)
+                                callback = () => @_bInputFocused = false
+                                setTimeout(callback, 0)
                                 @blockKeyCaptureFlg = false
                                 @blur()
                                 return true
@@ -380,20 +383,20 @@ define ['jquery'], ($) ->
         # @return  number of events fired
         ###
         eventFire: (sType, nTarget) ->
-            var iFired = 0;
-            var aEvents = this._oaoEvents[sType];
+            iFired = 0
+            aEvents = @_oaoEvents[sType]
             for i in [0...aEvents.length]
                 if aEvents[i].nCell is nTarget
-                    aEvents[i].fn(nTarget);
-                    iFired++;
-            return iFired;
+                    aEvents[i].fn(nTarget)
+                    iFired++
+            return iFired
 
         ###
         # Blur focus from the whole table
         ###
         blur : ->
             #return unless @_nCurrentFocus
-            #@removeFocus(this._nCurrentFocus, onlyCellFlg);
+            #@removeFocus(@_nCurrentFocus, onlyCellFlg)
             #@xCurrentPos = null
             #@yCurrentPos = null
             #@_nCurrentFocus = null
@@ -430,7 +433,7 @@ define ['jquery'], ($) ->
         # @return [x, y] position of the element
         ###
         getCoordsFromCell : (n) ->
-            id = n.id;
+            id = n.id
             coords = id.substring(id.indexOf('_') + 1, id.length).split(',')
             return [
                 parseInt(coords[0]),
@@ -445,7 +448,7 @@ define ['jquery'], ($) ->
         ###
         getCellFromCoords : (x, y) ->
             return $(@idPrefix + x + ',' + y)
-            # return @_targetTable.rows[y].cells[x]; <-- this sadly doesn't work
+            # return @_targetTable.rows[y].cells[x] # <-- this sadly doesn't work
 
         ###
         # Focus on the element that has been clicked on by the user
@@ -485,5 +488,5 @@ define ['jquery'], ($) ->
             @_numberOfRows = numberOfRows
 
         stop : ->
-            $(document).unbind('keydown') # TODO check this
-            $(document).unbind('click') if (@_onClickHandler) # TODO check this
+            $(document).unbind('keydown', @onKeyPressHandler)
+            $(document).unbind('click', @onClickHandler) if (@_onClickHandler)
