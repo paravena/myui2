@@ -664,7 +664,7 @@ define ['jquery', 'cs!myui/TextField'], ($, TextField) ->
         _callback : (name, param) -> # TODO really weird
            @options[name].bind(@targetElement)(param) if @options[name]
 
-        _applyKeyboardBehavior : ->
+        _applyKeyboardBehavior : -> # TODO review this
             i = 0
             numberOfMonths = @options.numberOfMonths
             showWeek = @options.showWeek
