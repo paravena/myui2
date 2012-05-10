@@ -1,4 +1,4 @@
-define ['jquery'], ($) ->
+define ['../jquery'], ($) ->
     math =
         ###
         # Returns the closest number as the result of using i as a multiplication factor
