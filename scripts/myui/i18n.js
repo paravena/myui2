@@ -58,8 +58,12 @@ define(function() {
         try {
             var messages = this[languageCd] || this['EN'];
             if (messages[messageId]) {
-                var template = new Template(messages[messageId]);
-                return template.evaluate(options);
+                var temp = messages[messageId];
+                for (p in options) {
+                    var re = new RegExp('#\{'+p+'\}','g');
+                    temp = temp.replace(re, options[p]);
+                }
+                return temp;
             }
         } catch(e) {
             result = messageId;
