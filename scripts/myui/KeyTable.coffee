@@ -1,4 +1,7 @@
-define ['jquery'], ($) ->
+define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
+
+    eventUtil = $.util.event
+
     class KeyTable
         constructor : (targetTable, options) ->
             options = $.extend({
@@ -13,10 +16,11 @@ define ['jquery'], ($) ->
                 @_targetTable = $(targetTable.bodyTable)
             else
                 @_targetTable = $(targetTable) # a normal table
-                @_numberOfRows = @_targetTable.rows.length
-                @_numberOfColumns = options.numberOfColumns or @_targetTable.rows[0].cells.length
+                @_numberOfRows = @_targetTable.find('tbody > tr').length
+                @_numberOfColumns = options.numberOfColumns or @_targetTable.find('tbody > tr')[0].cells.length
 
-            if @_tableGrid then @idPrefix = 'mtgC'+ @_tableGrid._mtgId + '_'
+            @idPrefix = options.idPrefix
+            @idPrefix = '#mtgC'+ @_tableGrid._mtgId + '-' if @_tableGrid
 
             @nBody = @_targetTable.find('tbody') # Cache the tbody node of interest
             @_xCurrentPos = null
@@ -59,19 +63,11 @@ define ['jquery'], ($) ->
             # Loose table focus when click outside the table
             @onClickHandler = (event) =>
                 unless @_nCurrentFocus then return
-                target = event.target
-                ancestor = @_targetTable
+                element = $(event.target)
                 blurFlg = true
-                element = target
-                if element.parent(ancestor).length > 0 then blurFlg = false
+                blurFlg = false if element.closest(@_targetTable).length > 0
+                blurFlg = false if element.closest('my-autocompleter, my-autocompleter-list, my-datepicker-container').length > 0
                 if blurFlg
-                    while element = element.parent()
-                        if element.hasClass('my-autocompleter') or
-                           element.hasClass('my-autocompleter-list') or
-                           element.hasClass('my-datepicker-container')
-                            blurFlg = false
-                            break
-
                     @removeFocus(@_nCurrentFocus, true)
                     @releaseKeys()
                     @_nOldFocus = null
@@ -209,18 +205,18 @@ define ['jquery'], ($) ->
         # @param event key event
         ###
         onKeyPress : (event) ->
-            return false if @blockFlg or @blockKeyCaptureFlg
+            return false if @blockFlg || !@blockKeyCaptureFlg
             # If a modifier key is pressed (except shift), ignore the event
-            return false if event.metaKey or event.altKey or event.ctrlKey
+            return false if event.metaKey || event.altKey || event.ctrlKey
             x = @_xCurrentPos
             y = @_yCurrentPos
             topLimit = @_topLimit
             # Capture shift+tab to match the left arrow key
-            keyCode = if event.which is Event.KEY_TAB and event.shiftKey then -1 else event.which
+            keyCode = if event.which == eventUtil.KEY_TAB and event.shiftKey then -1 else event.which
             cell = null
             while(true)
                 switch keyCode
-                    when Event.KEY_RETURN # return
+                    when eventUtil.KEY_RETURN # return
                         @eventFire('action', @_nCurrentFocus)
                         return false
                     when Event.KEY_ESC # esc
@@ -228,7 +224,7 @@ define ['jquery'], ($) ->
                             # Only lose focus if there isn't an escape handler on the cell
                             @blur()
                         return false
-                    when -1, Event.KEY_LEFT # left arrow
+                    when -1, eventUtil.KEY_LEFT # left arrow
                         return true if @_bInputFocused
                         if @_xCurrentPos > 0
                             x = @_xCurrentPos - 1
@@ -253,7 +249,7 @@ define ['jquery'], ($) ->
                             else
                                 return false
                         break
-                    when Event.KEY_UP # up arrow
+                    when eventUtil.KEY_UP # up arrow
                         return true if @_bInputFocused
                         if @_yCurrentPos > topLimit
                             x = @_xCurrentPos
@@ -261,7 +257,7 @@ define ['jquery'], ($) ->
                         else
                             return false
                         break
-                    when Event.KEY_TAB, Event.KEY_RIGHT # right arrow
+                    when eventUtil.KEY_TAB, eventUtil.KEY_RIGHT # right arrow
                         return true if @_bInputFocused
                         if @_xCurrentPos < @_numberOfColumns - 1
                             x = @_xCurrentPos + 1
@@ -271,7 +267,7 @@ define ['jquery'], ($) ->
                             y = @_yCurrentPos + 1
                         else
                             # at end of table
-                            if keyCode is Event.KEY_TAB and @_bForm
+                            if keyCode is eventUtil.KEY_TAB and @_bForm
                                 # If we are in a form, return focus to the 'input' element such that tabbing will
                                 # follow correctly in the browser
                                 @_bInputFocused = true
@@ -286,7 +282,7 @@ define ['jquery'], ($) ->
                             else
                                 return false
                         break
-                    when Event.KEY_DOWN # down arrow
+                    when eventUtil.KEY_DOWN # down arrow
                         return true if @_bInputFocused
                         if @_yCurrentPos < @_numberOfRows - 1
                             x = @_xCurrentPos
@@ -298,7 +294,7 @@ define ['jquery'], ($) ->
                         return true
                 # end switch
                 cell = @getCellFromCoords(x, y)
-                if cell.css('display') isnt 'none' and cell.closets('tr')[0].css('display') isnt 'none'
+                if cell.css('display') != 'none' and cell.closest('tr').css('display') != 'none'
                     break
                 else
                     @_xCurrentPos = x
@@ -306,27 +302,26 @@ define ['jquery'], ($) ->
             # end while
             @setFocus(cell)
             @eventFire("focus", cell)
-            return false
+            return true
 
         ###
-        # Set focus on a node, and remove from an old node if needed
+        # Set focus on a cell, and remove from an old cell if needed
         #
         # @param nTarget node we want to focus on
         # @param bAutoScroll should we scroll the view port to the display
         ###
-        setFocus : (nTarget, bAutoScroll) ->
+        setFocus : (cell, bAutoScroll = true) ->
             # If node already has focus, just ignore this call
-            # return if @_nCurrentFocus is nTarget
-            bAutoScroll = true if typeof bAutoScroll is 'undefined'
+            return if @_nCurrentFocus == cell
             # Remove old focus (with blur event if needed)
             @removeFocus(@_nCurrentFocus) unless @_nCurrentFocus is null
             # Add the new class to highlight the focused cell
-            $(nTarget).addClass(@_sFocusClass)
-            $(nTarget).parent('tr').addClass(@_sFocusClass) if $(nTarget).parent('tr')
+            cell.addClass(@_sFocusClass)
+            cell.parent('tr').addClass(@_sFocusClass) if cell.parent('tr')
             # Cache the information that we are interested in
-            aNewPos = @getCoordsFromCell(nTarget)
+            aNewPos = @getCoordsFromCell(cell)
             @_nOldFocus = @_nCurrentFocus
-            @_nCurrentFocus = nTarget
+            @_nCurrentFocus = cell
             @_xCurrentPos = aNewPos[0]
             @_yCurrentPos = aNewPos[1]
             if bAutoScroll and @_bodyDiv
@@ -338,9 +333,9 @@ define ['jquery'], ($) ->
                 iScrollTop = @_bodyDiv.scrollTop()
                 iScrollLeft = @_bodyDiv.scrollLeft()
 
-                iHeight = nTarget.offsetHeight
-                iWidth = nTarget.offsetWidth
-                aiPos = @getPosition(nTarget)
+                iHeight = cell.offsetHeight
+                iWidth = cell.offsetWidth
+                aiPos = @getPosition(cell)
 
                 # Correct viewport positioning for vertical scrolling
                 if aiPos[1]+iHeight > iScrollTop+iViewportHeight
@@ -432,9 +427,9 @@ define ['jquery'], ($) ->
         # @param n TD cell of interest
         # @return [x, y] position of the element
         ###
-        getCoordsFromCell : (n) ->
-            id = n.id
-            coords = id.substring(id.indexOf('_') + 1, id.length).split(',')
+        getCoordsFromCell : (cell) ->
+            id = cell.attr('id')
+            coords = id.substring(id.indexOf('-') + 1, id.length).split('a')
             return [
                 parseInt(coords[0]),
                 parseInt(coords[1])
@@ -447,7 +442,7 @@ define ['jquery'], ($) ->
         # @return TD target
         ###
         getCellFromCoords : (x, y) ->
-            return $(@idPrefix + x + ',' + y)
+            return $(@idPrefix + x + 'a' + y, @nBody)
             # return @_targetTable.rows[y].cells[x] # <-- this sadly doesn't work
 
         ###
@@ -455,7 +450,7 @@ define ['jquery'], ($) ->
         # @param event click event
         ###
         onClick : (event) ->
-            nTarget = $(event.target).closest('TD')
+            nTarget = $(event.target).closest('td')
             if nTarget isnt @_nCurrentFocus
                 @setFocus(nTarget)
                 @captureKeys()

@@ -1,4 +1,4 @@
-define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i18n, TextField) ->
+define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/KeyTable'], ($, Util, i18n, TextField, KeyTable) ->
     dateUtil = $.util.date
     mathUtil = $.util.math
     eventUtil = $.util.event
@@ -62,7 +62,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
             $(element).css {width : (width - 29)+'px'}
             @container = $(element).parent()
             @container.addClass('my-datepicker-container');
-            @container.id = @id + '_container';
+            @container.id = @id + '-container';
             @container.css {width : width + 'px', height: height + 'px'}
             datePickerSelectBtn = $('<div></div>')
             datePickerSelectBtn.addClass 'my-datepicker-select-button'
@@ -159,7 +159,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
             html = []
             html[idx++] = '<a class="toolbar-button prev"><span class="icon" style="margin: 1px 0">&nbsp;</span></a>'
             html[idx++] = '<a class="toolbar-button next"><span class="icon" style="margin: 1px 0">&nbsp;</span></a>'
-            html[idx++] = '<span id="mdpSelectedDate_'+id+'" class="selected-date"></span>'
+            html[idx++] = '<span id="mdpSelectedDate-'+id+'" class="selected-date"></span>'
             headerDiv.append html.join('')
 
 
@@ -205,7 +205,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
                     html[idx++] = '<option value="'+month+'">'+dateUtil.getMonthNames()[month]+'</option>' for month in [0..11]
                     html[idx++] = '</select>';
                 else
-                    html[idx++] = '<span id="mdpMonthLabel_'+@_mdpId+'_'+i+'" class="month-label">'
+                    html[idx++] = '<span id="mdpMonthLabel-'+@_mdpId+'-'+i+'" class="month-label">'
                     html[idx++] = '</span>'
 
 
@@ -215,7 +215,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
                     html[idx++] = '</select>'
                 else
                     html[idx++] = '&nbsp;'
-                    html[idx++] = '<span id="mdpYearLabel_'+@_mdpId+'_'+i+'" class="year-label">'
+                    html[idx++] = '<span id="mdpYearLabel-'+@_mdpId+'-'+i+'" class="year-label">'
                     html[idx++] = '</span>'
 
                 html[idx++] = '</th>'
@@ -241,7 +241,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
             html[idx++] = '<tbody>'
 
             for i in [0...6]
-                html[idx++] = '<tr class="row_' + i + '">'
+                html[idx++] = '<tr class="row-' + i + '">'
                 for j in [0...(7 * numberOfMonths)]
                     if showWeek and j % 7 == 0
                         if j > 0
@@ -253,7 +253,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
                     className = 'day'
                     className += ' weekend' if (j % 7 is 0) or ((j + 1) % 7 is 0)
                     className += ' new-month-separator' if j > 0 and j % 7 is 0 and !showWeek
-                    html[idx++] = '<td id="mdpC'+@_mdpId+'_'+j+','+i+'" class="'+className+'"><div></div></td>'
+                    html[idx++] = '<td id="mdpC'+@_mdpId+'-'+j+'a'+i+'" class="'+className+'"><div></div></td>'
 
                 html[idx++] = '</tr>'
 
@@ -432,7 +432,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
                 @_setSelectBoxValue(@monthSelect, month)
             else
                 for i in [1..numberOfMonths]
-                    $('#mdpMonthLabel_'+@_mdpId+'_'+i).html(dateUtil.getMonthNames()[month])
+                    $('#mdpMonthLabel-'+@_mdpId+'-'+i).html(dateUtil.getMonthNames()[month])
                     if (month + 1) > 11
                         month = 0
                     else
@@ -448,7 +448,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
             else
                 month = @date.getMonth()
                 for i in [1..numberOfMonths]
-                    $('#mdpYearLabel_'+@_mdpId+'_'+i).html(year)
+                    $('#mdpYearLabel-'+@_mdpId+'-'+i).html(year)
                     if (month + 1) > 11
                         month = 0
                         year++
@@ -486,12 +486,19 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
             hoverDate.setMonth(cell.data('month'))
             hoverDate.setDate(cell.data('day'))
             @_updateHeader(dateUtil.format(hoverDate, @options.format))
-            #@keys.setFocus(cell, false)
+            @keys.setFocus(cell, false)
 
         _dayHoverOut : (event) ->
             cell = $(event.target).closest('td')
             cell.removeClass('focus')
             @_updateHeader()
+
+        _dayClick : (event) ->
+            cell = $(event.target).closest('td')
+            @keys.setFocus(cell, false)
+            @keys.captureKeys()
+            @keys.eventFire('focus', cell)
+            @_updateSelectedDate(cell, true)
 
         _clearSelectedClass : ->
             @selectedCell.removeClass('selected') if @selectedCell
@@ -544,7 +551,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
 
         _updateHeader : (text) ->
             text = @dateString() unless text
-            $('#mdpSelectedDate_'+@_mdpId).html(text)
+            $('#mdpSelectedDate-'+@_mdpId).html(text)
 
         clearDate : ->
             return false if @targetElement.is(':disabled') or @targetElement.attr('readonly')
@@ -556,7 +563,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
 
         _updateSelectedDate : (partsOrElement, viaClickFlg) ->
             return if @targetElement.is(':disabled') or @targetElement.attr('readonly')
-            console.log @selectedDate
             selectedDate = @selectedDate
             @setUseTime(false)
             if partsOrElement['day']
@@ -651,7 +657,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
             @_callback('beforeClose')
             $(document).unbind('click', @_closeIfClickedOutHandler)
             @_calendarDiv.remove()
-            #@keys.stop()
+            @keys.stop()
             @keys = null
             @visibleFlg = false
             @_callback('afterClose')
@@ -676,26 +682,22 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
             i = 0
             numberOfMonths = @options.numberOfMonths
             showWeek = @options.showWeek
-            ###
+
             @keys = new KeyTable(@daysTable, {
-                idPrefix : 'mdpC'+@_mdpId+'_',
+                idPrefix : '#mdpC'+@_mdpId+'-',
                 numberOfColumns : numberOfMonths * (showWeek ? 8 : 7)
             })
-            ###
+
             for element in @_calendarDayGrid
                 call = (element) =>
                     if element.hasClass('day')
                         element.mouseenter (event) => @_dayHover(event)
                         element.mouseleave (event) => @_dayHoverOut(event)
-                        element.click (event) =>
-                            #@keys.setFocus(element, false)
-                            #@keys.captureKeys()
-                            #@keys.eventFire('focus', element)
-                            @_updateSelectedDate(element, true)
-                        ###
+                        element.click (event) => @_dayClick(event)
+
                         @keys.event.remove.focus(element)
                         f_focus = (element) =>
-                            td.removeClassName('focus') for td in @_calendarDayGrid
+                            @_calendarDayGrid.removeClass('focus')
                             @_dayHover(element)
 
                         @keys.event.focus(element, f_focus)
@@ -703,15 +705,10 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField'], ($, Util, i
 
                         f_action = (element) => @_updateSelectedDate(element, true)
                         @keys.event.action(element, f_action)
-                        ###
                 call $(element)
-
-            selectedCell = @selectedCell or $('mdpC'+@_mdpId+'_0,0')
-            i = 0
-            while (!selectedCell)
-                selectedCell = $('mdpC'+@_mdpId+'_' +(++i)+',0')
-            ###
+            # Select the first not empty cell
+            selectedCell = @selectedCell or $('td.day:first', @_calendarDiv)
             @keys.setFocus(selectedCell, false)
             @keys.captureKeys()
             @keys.eventFire('focus', selectedCell)
-            ###
+

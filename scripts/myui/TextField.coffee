@@ -24,6 +24,7 @@ define ['jquery', 'cs!myui/ToolTip', 'myui/i18n'], ($, ToolTip, i18n) ->
             @reset()
             @options.align = 'right' if @options.type is 'number'
             @input.css('textAlign', @options.align)
+            @input.attr('autocomplete', 'off');
 
             $(input).focus (event) => @onFocus(event)
 
