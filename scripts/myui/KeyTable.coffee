@@ -29,7 +29,6 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
             @_nOldFocus = null
             @_topLimit = 0
             # Table grid key navigation handling flags
-            @blockFlg = false
             @blockKeyCaptureFlg = false
 
             @_nInput = null
@@ -100,7 +99,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
                 element.click f_click
 
                 f_dblclick = (event) =>
-                    self.eventFire('action', element)
+                    @eventFire('action', element)
 
                 element.dblclick f_dblclick
 
@@ -165,13 +164,14 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         ###
         # Add an event to the internal cache
         #
-        # @param sType type of event to add, given by the available elements in _oaoEvents
-        # @param nTarget cell to add event too
+        # @param eventType type of event to add, given by the available elements in _oaoEvents
+        # @param element cell to add event too
         # @param fn callback function for when triggered
         ###
-        addEvent : (sType, nTarget, fn) ->
-            @_oaoEvents[sType].push({
-                "nCell": nTarget,
+        addEvent : (eventType, element, fn) ->
+            return unless element
+            @_oaoEvents[eventType].push({
+                "nCell": element,
                 "fn": fn
             })
 
@@ -205,7 +205,8 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # @param event key event
         ###
         onKeyPress : (event) ->
-            return false if @blockFlg || !@blockKeyCaptureFlg
+            console.log 'onKeyPress is called'
+            return false unless @blockKeyCaptureFlg
             # If a modifier key is pressed (except shift), ignore the event
             return false if event.metaKey || event.altKey || event.ctrlKey
             x = @_xCurrentPos
@@ -213,12 +214,15 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
             topLimit = @_topLimit
             # Capture shift+tab to match the left arrow key
             keyCode = if event.which == eventUtil.KEY_TAB and event.shiftKey then -1 else event.which
+            console.log "keycode: #{keyCode}"
             cell = null
             while(true)
                 switch keyCode
                     when eventUtil.KEY_RETURN # return
+                        console.log 'enter key was pressed'
+                        console.log 'element.id: ' + @_nCurrentFocus.attr('id')
                         @eventFire('action', @_nCurrentFocus)
-                        return false
+                        return true
                     when Event.KEY_ESC # esc
                         if !@eventFire('esc', @_nCurrentFocus)
                             # Only lose focus if there isn't an escape handler on the cell
@@ -311,19 +315,19 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # @param bAutoScroll should we scroll the view port to the display
         ###
         setFocus : (cell, bAutoScroll = true) ->
-            # If node already has focus, just ignore this call
+            # If cell already has focus, just ignore this call
             return if @_nCurrentFocus == cell
-            # Remove old focus (with blur event if needed)
-            @removeFocus(@_nCurrentFocus) unless @_nCurrentFocus is null
-            # Add the new class to highlight the focused cell
+            # Remove old css focus class (with blur event if needed)
+            @removeFocus(@_nCurrentFocus) unless @_nCurrentFocus
+            # Add the focus css class to highlight the focused cell
             cell.addClass(@_sFocusClass)
             cell.parent('tr').addClass(@_sFocusClass) if cell.parent('tr')
             # Cache the information that we are interested in
-            aNewPos = @getCoordsFromCell(cell)
+            coords = @getCoordsFromCell(cell)
             @_nOldFocus = @_nCurrentFocus
             @_nCurrentFocus = cell
-            @_xCurrentPos = aNewPos[0]
-            @_yCurrentPos = aNewPos[1]
+            @_xCurrentPos = coords[0]
+            @_yCurrentPos = coords[1]
             if bAutoScroll and @_bodyDiv
                 # Scroll the viewport such that the new cell is fully visible in the
                 # rendered window
@@ -377,14 +381,14 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # @param nTarget target table cell
         # @return  number of events fired
         ###
-        eventFire: (sType, nTarget) ->
-            iFired = 0
-            aEvents = @_oaoEvents[sType]
-            for i in [0...aEvents.length]
-                if aEvents[i].nCell is nTarget
-                    aEvents[i].fn(nTarget)
-                    iFired++
-            return iFired
+        eventFire: (eventType, cell) ->
+            console.log 'eventFire is called'
+            aEvents = @_oaoEvents[eventType]
+            for eventElement in aEvents
+                if eventElement['nCell'].has(cell)
+                    eventElement['fn'](cell)
+                    return true
+            return false
 
         ###
         # Blur focus from the whole table
@@ -402,11 +406,11 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # Removes focus from a cell and fire any blur events which are attached
         # @param nTarget cell of interest
         ###
-        removeFocus : (nTarget, onlyCellFlg) ->
-            return unless nTarget
-            nTarget.removeClass(@_sFocusClass)
-            nTarget.parent().removeClass(@_sFocusClass) unless onlyCellFlg
-            @eventFire("blur", nTarget)
+        removeFocus : (cell, onlyCellFlg) ->
+            return unless cell
+            cell.removeClass(@_sFocusClass)
+            cell.parent('tr').removeClass(@_sFocusClass) unless onlyCellFlg
+            @eventFire("blur", cell)
 
         ###
         # Get the position of an object on the rendered page

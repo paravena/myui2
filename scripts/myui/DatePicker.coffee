@@ -110,9 +110,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
             $(parent).append(html.join(''))
             @_calendarDiv = $('#my-datepicker-div'+@_mdpId)
-            @_headerDiv = @_calendarDiv.find('.my-datepicker-header')
-            @_bodyDiv = @_calendarDiv.find('.my-datepicker-body')
-            @_footerDiv = @_calendarDiv.find('.my-datepicker-footer')
+            @_headerDiv = $('.my-datepicker-header', @_calendarDiv)
+            @_bodyDiv = $('.my-datepicker-body', @_calendarDiv)
+            @_footerDiv = $('.my-datepicker-footer', @_calendarDiv)
             @_initHeaderDiv()
             unless @options.embedded
                 @_initButtonsDiv()
@@ -190,7 +190,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             bodyDiv = @_bodyDiv
             numberOfMonths = @options.numberOfMonths
             showWeek = @options.showWeek
-            @_calendarDayGrid = []
             idx = 0
             html = []
             i = 0
@@ -260,9 +259,8 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             html[idx++] = '</tbody>'
             html[idx++] = '</table>'
             bodyDiv.append(html.join(''))
-            @daysTable = bodyDiv.find('table')
-            @_calendarDayGrid = @daysTable.find('td.day')
-
+            @daysTable = $('table', bodyDiv)
+            @_allCells = $('td.day', bodyDiv)
 
         _initButtonsDiv : ->
             footerDiv = @_footerDiv
@@ -408,6 +406,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     beginningYear++
                 else
                     beginningMonth++
+            @_calendarDayGrid = $('td.day', @_bodyDiv)
 
         _getCellByIndex : (index, monthIdx) ->
             numberOfMonths = @options.numberOfMonths
@@ -419,7 +418,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             if numberOfMonths > 1 and row > 0
                 offset += (numberOfMonths - monthIdx) * row * 7
 
-            return $(@_calendarDayGrid[offset])
+            return $(@_allCells[offset])
 
         ###
         # Refresh months and years at header bar area
@@ -478,8 +477,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             else
                 return year in @yearRange()
 
-        _dayHover : (event) ->
-            cell = $(event.target).closest('td')
+        _dayHover : (cell) ->
             cell.addClass('focus')
             hoverDate = new Date(@selectedDate)
             hoverDate.setYear(cell.data('year'))
@@ -488,16 +486,12 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_updateHeader(dateUtil.format(hoverDate, @options.format))
             @keys.setFocus(cell, false)
 
-        _dayHoverOut : (event) ->
-            cell = $(event.target).closest('td')
+        _dayHoverOut : (cell) ->
             cell.removeClass('focus')
             @_updateHeader()
 
-        _dayClick : (event) ->
-            cell = $(event.target).closest('td')
+        _dayClick : (cell) ->
             @keys.setFocus(cell, false)
-            @keys.captureKeys()
-            @keys.eventFire('focus', cell)
             @_updateSelectedDate(cell, true)
 
         _clearSelectedClass : ->
@@ -507,10 +501,12 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             return unless @selectionMade
             @_clearSelectedClass()
             selectedDate = dateUtil.stripTime(@selectedDate)
+            console.log 'selectedDate.stripTime(): ' + selectedDate
             numberOfMonths = @options.numberOfMonths
             beginningDate = dateUtil.stripTime(@date)
             beginningMonth = @date.getMonth()
             beginningYear = @date.getFullYear()
+            console.log '@date: ' + @date
 
             for m in [1..numberOfMonths]
                 beginningDate = new Date(beginningYear, beginningMonth, 1)
@@ -519,6 +515,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 beginningDate.setDate(1 - preDays + dateUtil.getFirstDayOfWeek())
                 setTodayFlg = false
                 daysUntil = dateUtil.daysDistance(beginningDate, selectedDate)
+                console.log 'daysUntil: ' + daysUntil
                 if daysUntil in [0..41] and !setTodayFlg
                     @selectedCell = @_getCellByIndex(daysUntil, m).addClass('selected')
                     setTodayFlg = true
@@ -531,7 +528,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
         dateString : ->
             return if @selectionMade then dateUtil.format(@selectedDate, @options.format) else '&#160;'
-
 
         getValue : ->
             if @input.val() != null and @input.val().trim().length > 0
@@ -561,17 +557,21 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_updateHeader('&#160;')
             @_callback('onchange') if lastValue != @targetElement.val()
 
+        ###
+        # Update selected date from calendar.
+        #
+        ###
         _updateSelectedDate : (partsOrElement, viaClickFlg) ->
             return if @targetElement.is(':disabled') or @targetElement.attr('readonly')
-            selectedDate = @selectedDate
             @setUseTime(false)
+            selectedDate = new Date()
             if partsOrElement['day']
                 selectedDate.setDate(partsOrElement['day'])
                 selectedDate.setYear(partsOrElement['year'])
                 selectedDate.setMonth(partsOrElement['month'])
                 if !isNaN(partsOrElement['hour']) and !isNaN(partsOrElement['minute'])
-                    @selectedDate.setHours(partsOrElement['hour'])
-                    @selectedDate.setMinutes(mathUtil.floorToInterval(partsOrElement['minute'], @options.minuteInterval))
+                    selectedDate.setHours(partsOrElement['hour'])
+                    selectedDate.setMinutes(mathUtil.floorToInterval(partsOrElement['minute'], @options.minuteInterval))
                     @setUseTime(true)
             else if partsOrElement instanceof jQuery
                 selectedDate.setDate(partsOrElement.data('day'))
@@ -657,6 +657,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_callback('beforeClose')
             $(document).unbind('click', @_closeIfClickedOutHandler)
             @_calendarDiv.remove()
+            @keys.releaseKeys()
             @keys.stop()
             @keys = null
             @visibleFlg = false
@@ -667,10 +668,13 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_close() if target.closest(@_calendarDiv).size() == 0 and target.closest(@container).size() == 0
 
         _keyPress : (event) ->
-            if event.which == eventUtil.KEY_DOWN and !@visibleFlg
+            console.log '_keyPress is called'
+            keyCode = event.which
+            if keyCode == eventUtil.KEY_DOWN and !@visibleFlg
                 @show()
                 event.stopPropagation()
-            else if event.which == eventUtil.KEY_ESC and @visibleFlg
+                @keys.captureKeys()
+            else if keyCode == eventUtil.KEY_ESC and @visibleFlg
                 @_close()
                 event.stopPropagation()
             return true
@@ -678,7 +682,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         _callback : (name, param) -> # TODO really weird
            @options[name].bind(@targetElement)(param) if @options[name]
 
-        _applyKeyboardBehavior : -> # TODO review this
+        _applyKeyboardBehavior : ->
             i = 0
             numberOfMonths = @options.numberOfMonths
             showWeek = @options.showWeek
@@ -688,27 +692,35 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 numberOfColumns : numberOfMonths * (showWeek ? 8 : 7)
             })
 
+            f_focus = (element) =>
+                @_calendarDayGrid.removeClass('focus')
+                @_dayHover(element)
+
+            f_action = (element) =>
+                console.log 'Calling action handler'
+                @_updateSelectedDate(element, true)
+
+            f_hover = (event) =>
+                element = $(event.target).closest('td')
+                @_dayHover(element)
+
+            f_hoverOut = (event) =>
+                element = $(event.target).closest('td')
+                @_dayHoverOut(element)
+
+            f_click = (event) =>
+                element = $(event.target).closest('td')
+                @_dayClick(element)
+
             for element in @_calendarDayGrid
-                call = (element) =>
-                    if element.hasClass('day')
-                        element.mouseenter (event) => @_dayHover(event)
-                        element.mouseleave (event) => @_dayHoverOut(event)
-                        element.click (event) => @_dayClick(event)
-
-                        @keys.event.remove.focus(element)
-                        f_focus = (element) =>
-                            @_calendarDayGrid.removeClass('focus')
-                            @_dayHover(element)
-
-                        @keys.event.focus(element, f_focus)
-                        @keys.event.remove.action(element)
-
-                        f_action = (element) => @_updateSelectedDate(element, true)
-                        @keys.event.action(element, f_action)
-                call $(element)
+                $(element).mouseenter f_hover
+                $(element).mouseleave f_hoverOut
+                $(element).click f_click
+                @keys.event.remove.focus $(element)
+                @keys.event.focus $(element), f_focus
+                @keys.event.remove.action $(element)
+                @keys.event.action $(element), f_action
             # Select the first not empty cell
-            selectedCell = @selectedCell or $('td.day:first', @_calendarDiv)
-            @keys.setFocus(selectedCell, false)
-            @keys.captureKeys()
-            @keys.eventFire('focus', selectedCell)
+            selectedCell = @selectedCell or $('td.day:first', @_bodyDiv)
+            @_dayHover(selectedCell)
 

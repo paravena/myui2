@@ -61,20 +61,32 @@ define ['../jquery'], ($) ->
     preferAmericanFormat = true # TODO check this
 
     date =
+        ###
+        # Returns AM/PM time.
+        ###
         getAmPmHour : (date) ->
             hour = date.getHours()
             return 12 if hour == 0
             return hour - 12 if hour > 12
             return hour
 
+        ###
+        # Returns whether is AM or PM time.
+        ###
         getAmPm : (date) ->
             if date.getHours() < 12 then 'AM' else 'PM'
 
+        ###
+        # Trunks a given date removing hour, minutes and seconds.
+        ###
         stripTime : (date) ->
             return new Date(date.getFullYear(), date.getMonth(), date.getDate())
 
+        ###
+        # Returns days distance as an absolute value.
+        ###
         daysDistance : (date1, date2) ->
-            Math.round((date1 - date2) / ONE_DAY)
+            Math.round((date2 - date1) / ONE_DAY)
 
         getDifference : (date1, date2) ->
             date1.getTime() - date2.getTime()
@@ -99,8 +111,9 @@ define ['../jquery'], ($) ->
         isBefore : (date1, date2) ->
             return false if date2 == null
             return date1.getTime() < date2.getTime()
-
+        ###
         # Check if a date object is after another date object
+        ###
         isAfter : (date1, date2) ->
             return false if date2 == null
             return date1.getTime() > date2.getTime()
@@ -129,11 +142,15 @@ define ['../jquery'], ($) ->
         getMonthName : (date) ->
             return MONTH_NAMES[date.getMonth()]
 
+        ###
         # Get the abbreviation of the month for a date
+        ###
         getMonthAbbreviation : (date) ->
             return MONTH_ABBREVIATIONS[date.getMonth()]
 
+        ###
         # Clear all time information in a date object
+        ###
         clearTime : (date) ->
             date.setHours(0)
             date.setMinutes(0)
