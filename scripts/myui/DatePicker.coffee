@@ -478,12 +478,13 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 return year in @yearRange()
 
         _dayHover : (cell) ->
+#            return if !cell.data('year') or !cell.data('month') or !cell.data('day')
             cell.addClass('focus')
             hoverDate = new Date(@selectedDate)
             hoverDate.setYear(cell.data('year'))
             hoverDate.setMonth(cell.data('month'))
             hoverDate.setDate(cell.data('day'))
-            @_updateHeader(dateUtil.format(hoverDate, @options.format))
+            @_updateHeader(dateUtil.format(hoverDate, @options.format)) if dateUtil.isDate(hoverDate)
             @keys.setFocus(cell, false)
 
         _dayHoverOut : (cell) ->

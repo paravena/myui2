@@ -205,8 +205,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # @param event key event
         ###
         onKeyPress : (event) ->
-            console.log 'onKeyPress is called'
+            console.log 'onKeyPress is called ' + @blockKeyCaptureFlg
             return false unless @blockKeyCaptureFlg
+            console.log 'if I see this message I\'m screwed'
             # If a modifier key is pressed (except shift), ignore the event
             return false if event.metaKey || event.altKey || event.ctrlKey
             x = @_xCurrentPos
@@ -311,21 +312,23 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         ###
         # Set focus on a cell, and remove from an old cell if needed
         #
-        # @param nTarget node we want to focus on
+        # @param element cell node we want to focus on
         # @param bAutoScroll should we scroll the view port to the display
         ###
-        setFocus : (cell, bAutoScroll = true) ->
+        setFocus : (element, bAutoScroll = true) ->
             # If cell already has focus, just ignore this call
-            return if @_nCurrentFocus == cell
+            console.log 'cell is ' + element.attr('id')
+            return if @_nCurrentFocus == element
+            element = @_nCurrentFocus if element.attr('id') is undefined and @_nCurrentFocus isnt null
             # Remove old css focus class (with blur event if needed)
             @removeFocus(@_nCurrentFocus) unless @_nCurrentFocus
             # Add the focus css class to highlight the focused cell
-            cell.addClass(@_sFocusClass)
-            cell.parent('tr').addClass(@_sFocusClass) if cell.parent('tr')
+            element.addClass(@_sFocusClass)
+            element.parent('tr').addClass(@_sFocusClass) if element.parent('tr')
             # Cache the information that we are interested in
-            coords = @getCoordsFromCell(cell)
+            coords = @getCoordsFromCell(element)
             @_nOldFocus = @_nCurrentFocus
-            @_nCurrentFocus = cell
+            @_nCurrentFocus = element
             @_xCurrentPos = coords[0]
             @_yCurrentPos = coords[1]
             if bAutoScroll and @_bodyDiv
@@ -337,9 +340,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
                 iScrollTop = @_bodyDiv.scrollTop()
                 iScrollLeft = @_bodyDiv.scrollLeft()
 
-                iHeight = cell.offsetHeight
-                iWidth = cell.offsetWidth
-                aiPos = @getPosition(cell)
+                iHeight = element.offsetHeight
+                iWidth = element.offsetWidth
+                aiPos = @getPosition(element)
 
                 # Correct viewport positioning for vertical scrolling
                 if aiPos[1]+iHeight > iScrollTop+iViewportHeight
@@ -404,13 +407,13 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
 
         ###
         # Removes focus from a cell and fire any blur events which are attached
-        # @param nTarget cell of interest
+        # @param element cell of interest
         ###
-        removeFocus : (cell, onlyCellFlg) ->
-            return unless cell
-            cell.removeClass(@_sFocusClass)
-            cell.parent('tr').removeClass(@_sFocusClass) unless onlyCellFlg
-            @eventFire("blur", cell)
+        removeFocus : (element, onlyCellFlg) ->
+            return unless element
+            element.removeClass(@_sFocusClass)
+            element.parent('tr').removeClass(@_sFocusClass) unless onlyCellFlg
+            @eventFire("blur", element)
 
         ###
         # Get the position of an object on the rendered page
@@ -428,11 +431,12 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         ###
         # Calculates the x and y position in a table from a TD cell
         #
-        # @param n TD cell of interest
+        # @param element cell of interest
         # @return [x, y] position of the element
         ###
-        getCoordsFromCell : (cell) ->
-            id = cell.attr('id')
+        getCoordsFromCell : (element) ->
+            id = element.attr('id')
+            return null if id is undefined
             coords = id.substring(id.indexOf('-') + 1, id.length).split('a')
             return [
                 parseInt(coords[0]),

@@ -88,9 +88,16 @@ define ['../jquery'], ($) ->
         daysDistance : (date1, date2) ->
             Math.round((date2 - date1) / ONE_DAY)
 
+        ###
+        # Returns time difference in milliseconds between date1 and date2.
+        # It is assumed that date1 is greater than date2.
+        ###
         getDifference : (date1, date2) ->
             date1.getTime() - date2.getTime()
 
+        ###
+        # Returns UTC time for a given date.
+        ###
         getUTCTime : (date) ->
             return Date.UTC(date.getFullYear(),
                 date.getMonth(),
@@ -100,14 +107,21 @@ define ['../jquery'], ($) ->
                 date.getSeconds(),
                 date.getMilliseconds())
 
+        ###
+        # Returns UTC time difference between date1 and date2.
+        ###
         getTimeSince : (date1, date2) ->
             date1.getUTCTime() - date2.getUTCTime()
 
+        ###
         # Check if a date string is valid
+        ###
         isValid : (val, format) ->
             return $.parseString(val, format) != null
 
+        ###
         # Check if a date object is before another date object
+        ###
         isBefore : (date1, date2) ->
             return false if date2 == null
             return date1.getTime() < date2.getTime()
@@ -118,27 +132,44 @@ define ['../jquery'], ($) ->
             return false if date2 == null
             return date1.getTime() > date2.getTime()
 
-        # Check if two date objects have equal dates and times
+        ###
+        # Check if two date objects have equal dates and times.
+        ###
         equals : (date1, date2) ->
             return false if date2 == null
             return date1.getTime() == date2.getTime()
 
-        # Check if two date objects have equal dates, disregarding times
+        ###
+        # Verifies if given paramter is a date or not.
+        ###
+        isDate : (date) ->
+            return (null != date) and !isNaN(date) and ("undefined" isnt typeof date.getDate)
+
+
+        ###
+        # Check if two date objects have equal dates, disregarding times.
+        ###
         equalsIgnoreTime : (date1, date2) ->
             return false if date2 == null
             d1 = $.clearTime new Date(date1.getTime())
             d2 = $.clearTime new Date(date2.getTime())
             return d1.getTime() == d2.getTime()
 
+        ###
         # Get the full name of the day for a date
+        ###
         getDayName : (date) ->
             return DAY_NAMES[date.getDay()]
 
+        ###
         # Get the abbreviation of the day for a date
+        ###
         getDayAbbreviation : (date) ->
             return DAY_ABBREVIATIONS[date.getDay()]
 
+        ###
         # Get the full name of the month for a date
+        ###
         getMonthName : (date) ->
             return MONTH_NAMES[date.getMonth()]
 
