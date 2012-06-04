@@ -71,6 +71,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 event.stopPropagation()
                 @show()
 
+        ###
+        # Shows date picker control.
+        ###
         show : ->
             return if @visibleFlg
             @_parseDate()
@@ -84,10 +87,15 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_callback('afterShow')
             @visibleFlg = true
 
+        ###
+        # Returns unique id.
+        ###
         getId : ->
             return @_mdpId
 
-
+        ###
+        # Initializes calendar div structure.
+        ###
         _initCalendarDiv : ->
             idx = 0
             html = []
@@ -124,6 +132,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @setUseTime(@useTimeFlg)
             @_applyKeyboardBehavior()
 
+        ###
+        # Sets calendar absolute position.
+        ###
         _positionCalendarDiv : ->
             return if @options.embedded
             above = false
@@ -146,7 +157,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_calendarDiv.css('top', top_px)
             @_calendarDiv.css('visibility', '')
 
-
+        ###
+        # Initialize calendar header  estructure.
+        ###
         _initHeaderDiv : ->
             headerDiv = @_headerDiv
             id = @_mdpId
@@ -162,7 +175,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             html[idx++] = '<span id="mdpSelectedDate-'+id+'" class="selected-date"></span>'
             headerDiv.append html.join('')
 
-
+        ###
+        # Initialize calendar header behavior.
+        ###
         _initHeaderDivBehavior : ->
             headerDiv = @_headerDiv
             bodyDiv = @_bodyDiv
@@ -185,7 +200,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 @monthSelect.change (event) =>
                     @_navYear $(':selected', @yearSelect).val()
 
-
+        ###
+        # Initialize calendar months table.
+        ###
         _initCalendarGrid : ->
             bodyDiv = @_bodyDiv
             numberOfMonths = @options.numberOfMonths
@@ -262,6 +279,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @daysTable = $('table', bodyDiv)
             @_allCells = $('td.day', bodyDiv)
 
+        ###
+        # Initialize calendar buttons structure.
+        ###
         _initButtonsDiv : ->
             footerDiv = @_footerDiv
             idx = 0
@@ -306,6 +326,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
             footerDiv.append html.join('')
 
+        ###
+        # Initialize buttons behavior
+        ###
         _initButtonDivBehavior : ->
             footerDiv = @_footerDiv
             @hourSelect = footerDiv.find('.hour')
@@ -338,12 +361,18 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     @_close() unless @options.embedded
             return
 
+        ###
+        # Refresh all areas od the calendar.
+        ###
         _refresh : ->
             @_refreshMonthYear()
             @_refreshCalendarGrid()
             @_setSelectedClass()
             @_updateHeader()
 
+        ###
+        # Refresh calendar table, determines month days and position.
+        ###
         _refreshCalendarGrid : ->
             numberOfMonths = @options.numberOfMonths
             showWeek = @options.showWeek
@@ -408,6 +437,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     beginningMonth++
             @_calendarDayGrid = $('td.day', @_bodyDiv)
 
+        ###
+        # Returns cell element that represents a day in calendar estructure.
+        ###
         _getCellByIndex : (index, monthIdx) ->
             numberOfMonths = @options.numberOfMonths
             row = Math.floor(index / 7)
@@ -453,7 +485,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                         year++
                     else
                         month++
-
+        ###
+        # Returns year range
+        ###
         yearRange : ->
             return [@options.yearRange[0]..@options.yearRange[1]] unless @flexibleYearRange()
             currentYear = @date.getFullYear()
@@ -477,8 +511,10 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             else
                 return year in @yearRange()
 
+        ###
+        # Mouseenter handler.
+        ###
         _dayHover : (cell) ->
-#            return if !cell.data('year') or !cell.data('month') or !cell.data('day')
             cell.addClass('focus')
             hoverDate = new Date(@selectedDate)
             hoverDate.setYear(cell.data('year'))
@@ -487,27 +523,37 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_updateHeader(dateUtil.format(hoverDate, @options.format)) if dateUtil.isDate(hoverDate)
             @keys.setFocus(cell, false)
 
+        ###
+        # Mouseleave handler.
+        ###
         _dayHoverOut : (cell) ->
             cell.removeClass('focus')
             @_updateHeader()
 
+        ###
+        # On click handler.
+        ###
         _dayClick : (cell) ->
             @keys.setFocus(cell, false)
             @_updateSelectedDate(cell, true)
 
+        ###
+        # Clears focus of selected class.
+        ###
         _clearSelectedClass : ->
             @selectedCell.removeClass('selected') if @selectedCell
 
+        ###
+        # Sets selected class.
+        ###
         _setSelectedClass : ->
             return unless @selectionMade
             @_clearSelectedClass()
             selectedDate = dateUtil.stripTime(@selectedDate)
-            console.log 'selectedDate.stripTime(): ' + selectedDate
             numberOfMonths = @options.numberOfMonths
             beginningDate = dateUtil.stripTime(@date)
             beginningMonth = @date.getMonth()
             beginningYear = @date.getFullYear()
-            console.log '@date: ' + @date
 
             for m in [1..numberOfMonths]
                 beginningDate = new Date(beginningYear, beginningMonth, 1)
@@ -516,7 +562,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 beginningDate.setDate(1 - preDays + dateUtil.getFirstDayOfWeek())
                 setTodayFlg = false
                 daysUntil = dateUtil.daysDistance(beginningDate, selectedDate)
-                console.log 'daysUntil: ' + daysUntil
                 if daysUntil in [0..41] and !setTodayFlg
                     @selectedCell = @_getCellByIndex(daysUntil, m).addClass('selected')
                     setTodayFlg = true
@@ -527,14 +572,23 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 else
                     beginningMonth++
 
+        ###
+        # Returns selected date applying format.
+        ###
         dateString : ->
             return if @selectionMade then dateUtil.format(@selectedDate, @options.format) else '&#160;'
 
+        ###
+        # Returns input value.
+        ###
         getValue : ->
             if @input.val() != null and @input.val().trim().length > 0
                 return dateUtil.parseString(@input.val(), @options.format)
             return null
 
+        ###
+        # Returns selected date.
+        ###
         _parseDate : ->
             value = @targetElement.val().trim()
             @selectionMade = (value != '')
@@ -546,10 +600,16 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 @date.setYear(year)
             @selectedDate = @date
 
+        ###
+        # Updates calendar header text.
+        ###
         _updateHeader : (text) ->
             text = @dateString() unless text
             $('#mdpSelectedDate-'+@_mdpId).html(text)
 
+        ###
+        # Clears calendar date.
+        ###
         clearDate : ->
             return false if @targetElement.is(':disabled') or @targetElement.attr('readonly')
             lastValue = @targetElement.val()
@@ -560,7 +620,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
         ###
         # Update selected date from calendar.
-        #
         ###
         _updateSelectedDate : (partsOrElement, viaClickFlg) ->
             return if @targetElement.is(':disabled') or @targetElement.attr('readonly')
@@ -604,16 +663,25 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
             return @options.closeOnClick
 
+        ###
+        # Displays given month.
+        ###
         _navMonth : (month) ->
             targetDate = new Date(@date)
             targetDate.setMonth(month)
             return @_navTo(targetDate)
 
+        ###
+        # Displays calendar month and year.
+        ###
         _navYear : (year) ->
             targetDate = new Date(@date)
             targetDate.setYear(year)
             return @_navTo(targetDate)
 
+        ###
+        # Displays month of selected date.
+        ###
         _navTo : (date) ->
             return false unless @validYear(date.getFullYear())
             @date = date
@@ -635,11 +703,17 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 @hourSelect.val('')
                 @minuteSelect.val('')
 
+        ###
+        # Updates input element.
+        ###
         _updateValue : ->
             lastValue = @targetElement.val()
             @targetElement.val(@dateString())
             @_callback('onchange') if lastValue != @targetElement.val()
 
+        ###
+        # Today button click handler.
+        ###
         today : (nowFlg) ->
             date = new Date()
             @date = new Date()
@@ -653,6 +727,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_updateSelectedDate(parts, true)
             @_refresh();
 
+        ###
+        # Close handler.
+        ###
         _close : ->
             return false unless @visibleFlg
             @_callback('beforeClose')
@@ -664,12 +741,17 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @visibleFlg = false
             @_callback('afterClose')
 
+        ###
+        # Close if clicked out handler.
+        ###
         _closeIfClickedOut : (event) ->
             target = $(event.target)
             @_close() if target.closest(@_calendarDiv).size() == 0 and target.closest(@container).size() == 0
 
+        ###
+        # Keydown handler
+        ###
         _keyPress : (event) ->
-            console.log '_keyPress is called'
             keyCode = event.which
             if keyCode == eventUtil.KEY_DOWN and !@visibleFlg
                 @show()
@@ -680,9 +762,15 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 event.stopPropagation()
             return true
 
-        _callback : (name, param) -> # TODO really weird
+        ###
+        # Callback handler.
+        ###
+        _callback : (name, param) ->
            @options[name].bind(@targetElement)(param) if @options[name]
 
+        ###
+        # Apply keyboard behavior.
+        ###
         _applyKeyboardBehavior : ->
             i = 0
             numberOfMonths = @options.numberOfMonths
@@ -690,7 +778,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
             @keys = new KeyTable(@daysTable, {
                 idPrefix : '#mdpC'+@_mdpId+'-',
-                numberOfColumns : numberOfMonths * (showWeek ? 8 : 7)
+                numberOfColumns : numberOfMonths * 7
             })
 
             f_focus = (element) =>
@@ -698,7 +786,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 @_dayHover(element)
 
             f_action = (element) =>
-                console.log 'Calling action handler'
                 @_updateSelectedDate(element, true)
 
             f_hover = (event) =>

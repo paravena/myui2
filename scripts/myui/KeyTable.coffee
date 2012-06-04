@@ -205,9 +205,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # @param event key event
         ###
         onKeyPress : (event) ->
-            console.log 'onKeyPress is called ' + @blockKeyCaptureFlg
             return false unless @blockKeyCaptureFlg
-            console.log 'if I see this message I\'m screwed'
             # If a modifier key is pressed (except shift), ignore the event
             return false if event.metaKey || event.altKey || event.ctrlKey
             x = @_xCurrentPos
@@ -215,13 +213,10 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
             topLimit = @_topLimit
             # Capture shift+tab to match the left arrow key
             keyCode = if event.which == eventUtil.KEY_TAB and event.shiftKey then -1 else event.which
-            console.log "keycode: #{keyCode}"
             cell = null
             while(true)
                 switch keyCode
                     when eventUtil.KEY_RETURN # return
-                        console.log 'enter key was pressed'
-                        console.log 'element.id: ' + @_nCurrentFocus.attr('id')
                         @eventFire('action', @_nCurrentFocus)
                         return true
                     when Event.KEY_ESC # esc
@@ -299,7 +294,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
                         return true
                 # end switch
                 cell = @getCellFromCoords(x, y)
-                if cell.css('display') != 'none' and cell.closest('tr').css('display') != 'none'
+                if cell != null && cell.css('display') != 'none' and cell.closest('tr').css('display') != 'none'
                     break
                 else
                     @_xCurrentPos = x
@@ -317,7 +312,6 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         ###
         setFocus : (element, bAutoScroll = true) ->
             # If cell already has focus, just ignore this call
-            console.log 'cell is ' + element.attr('id')
             return if @_nCurrentFocus == element
             element = @_nCurrentFocus if element.attr('id') is undefined and @_nCurrentFocus isnt null
             # Remove old css focus class (with blur event if needed)
@@ -385,7 +379,6 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # @return  number of events fired
         ###
         eventFire: (eventType, cell) ->
-            console.log 'eventFire is called'
             aEvents = @_oaoEvents[eventType]
             for eventElement in aEvents
                 if eventElement['nCell'].has(cell)
