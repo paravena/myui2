@@ -77,7 +77,8 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
 
             @onKeyPressHandler = (event) =>
                 result = @onKeyPress(event)
-                event.stopPropagation() unless result
+                event.stopPropagation() # unless result
+                event.preventDefault()
 
             $(document).keydown @onKeyPressHandler
 
@@ -313,16 +314,15 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         setFocus : (element, bAutoScroll = true) ->
             # If cell already has focus, just ignore this call
             return if @_nCurrentFocus == element
-            element = @_nCurrentFocus if element.attr('id') is undefined and @_nCurrentFocus isnt null
             # Remove old css focus class (with blur event if needed)
-            @removeFocus(@_nCurrentFocus) unless @_nCurrentFocus
+            @removeFocus(@_nCurrentFocus) if @_nCurrentFocus
             # Add the focus css class to highlight the focused cell
             element.addClass(@_sFocusClass)
-            element.parent('tr').addClass(@_sFocusClass) if element.parent('tr')
+            element.parent('tr').addClass(@_sFocusClass) if element.closest('tr')
             # Cache the information that we are interested in
-            coords = @getCoordsFromCell(element)
             @_nOldFocus = @_nCurrentFocus
             @_nCurrentFocus = element
+            coords = @getCoordsFromCell(element)
             @_xCurrentPos = coords[0]
             @_yCurrentPos = coords[1]
             if bAutoScroll and @_bodyDiv
@@ -402,10 +402,10 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # Removes focus from a cell and fire any blur events which are attached
         # @param element cell of interest
         ###
-        removeFocus : (element, onlyCellFlg) ->
+        removeFocus : (element, onlyCellFlg = true) ->
             return unless element
             element.removeClass(@_sFocusClass)
-            element.parent('tr').removeClass(@_sFocusClass) unless onlyCellFlg
+            element.closest('tr').removeClass(@_sFocusClass) unless onlyCellFlg
             @eventFire("blur", element)
 
         ###
@@ -443,7 +443,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # @return TD target
         ###
         getCellFromCoords : (x, y) ->
-            return $(@idPrefix + x + 'a' + y, @nBody)
+            element = $(@idPrefix + x + 'a' + y, @nBody)
+            return null if element.length == 0
+            return element
             # return @_targetTable.rows[y].cells[x] # <-- this sadly doesn't work
 
         ###
