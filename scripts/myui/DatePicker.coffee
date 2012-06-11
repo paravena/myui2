@@ -265,7 +265,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                         else
                             html[idx++] = '<td class="week-number"><div></div></td>'
 
-
                     className = 'day'
                     className += ' weekend' if (j % 7 is 0) or ((j + 1) % 7 is 0)
                     className += ' new-month-separator' if j > 0 and j % 7 is 0 and !showWeek
@@ -416,6 +415,10 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                         div.removeClass('other')
 
                     if (updateFlg)
+                        {x, y} = @_getCellCoords(i, m)
+                        cell.addClass('day')
+                        cell.addClass('weekend') if (x % 7 is 0) or ((x + 1) % 7 is 0)
+                        cell.attr('id', 'mdpC'+@_mdpId+'-'+x+'a'+y)
                         div.html(day)
                         cell.data('day', day)
                         cell.data('month', month)
@@ -438,9 +441,11 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     beginningMonth++
 
         ###
-        # Returns cell element that represents a day in calendar estructure.
+        # Returns cell array offset
+        # @param index: must be a number between 0 and 42
+        # @param monthIdx: month index
         ###
-        _getCellByIndex : (index, monthIdx) ->
+        _getCellOffset : (index, monthIdx) ->
             numberOfMonths = @options.numberOfMonths
             row = Math.floor(index / 7)
             offset = index
@@ -450,7 +455,24 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             if numberOfMonths > 1 and row > 0
                 offset += (numberOfMonths - monthIdx) * row * 7
 
+            return offset
+
+        ###
+        # Returns cell element that represents a day in calendar estructure.
+        ###
+        _getCellByIndex : (index, monthIdx) ->
+            offset = @_getCellOffset(index, monthIdx)
             return $(@_allCells[offset])
+
+        ###
+        # Returns x, y coords for a given array index
+        ###
+        _getCellCoords : (index, monthIdx) ->
+            numberOfMonths = @options.numberOfMonths
+            offset = @_getCellOffset(index, monthIdx)
+            x = offset % (7 * numberOfMonths)
+            y = Math.floor(index / 7)
+            return {x, y}
 
         ###
         # Refresh months and years at header bar area
