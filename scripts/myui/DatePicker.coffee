@@ -408,13 +408,13 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                         weekCell.removeClass('week-number') if weekCell
 
                     div = cell.children().first() # div element
-                    if (month != beginningMonth)
+                    if month != beginningMonth
                         div.addClass('other')
                         updateFlg = false unless selectOtherMonth
                     else
                         div.removeClass('other')
 
-                    if (updateFlg)
+                    if updateFlg
                         {x, y} = @_getCellCoords(i, m)
                         cell.addClass('day')
                         cell.addClass('weekend') if (x % 7 is 0) or ((x + 1) % 7 is 0)
@@ -654,19 +654,15 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         _updateSelectedDate : (partsOrElement, viaClickFlg) ->
             return if @targetElement.is(':disabled') or @targetElement.attr('readonly')
             @setUseTime(false)
-            selectedDate = new Date()
+            selectedDate = null
             if partsOrElement['day']
-                selectedDate.setDate(partsOrElement['day'])
-                selectedDate.setYear(partsOrElement['year'])
-                selectedDate.setMonth(partsOrElement['month'])
+                selectedDate = new Date(partsOrElement['year'], partsOrElement['month'], partsOrElement['day'])
                 if !isNaN(partsOrElement['hour']) and !isNaN(partsOrElement['minute'])
                     selectedDate.setHours(partsOrElement['hour'])
                     selectedDate.setMinutes(mathUtil.floorToInterval(partsOrElement['minute'], @options.minuteInterval))
                     @setUseTime(true)
             else if partsOrElement instanceof jQuery
-                selectedDate.setDate(partsOrElement.data('day'))
-                selectedDate.setYear(partsOrElement.data('year'))
-                selectedDate.setMonth(partsOrElement.data('month'))
+                selectedDate = new Date(partsOrElement.data('year'), partsOrElement.data('month'), partsOrElement.data('day'))
 
             unless dateUtil.equals(selectedDate, @selectedDate)
                 @selectedDate = selectedDate
@@ -839,6 +835,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     @_keys.event.focus $(element), f_focus
                     @_keys.event.action $(element), f_action
             # Select the first not empty cell
-            selectedCell = @selectedCell or $('td.day:first', @_bodyDiv)
+            selectedCell = $('td.day:first', @_bodyDiv)
             @_dayHover(selectedCell)
 
