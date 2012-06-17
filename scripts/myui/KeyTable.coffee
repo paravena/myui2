@@ -45,19 +45,19 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
             # Notes:    This object contains all the public methods for adding and removing events - these
             #           are dynamically added later on
             ###
-            @event = {remove : {}}
+            @events = {remove : {}}
 
             ###
             # Variable: _oaoEvents
             # Purpose:  Event cache object, one array for each supported event for speed of searching
             # Scope:    KeyTable - private
             ###
-            @_oaoEvents = {"action": [], "esc": [], "focus": [], "blur": []}
+            @_eventsCache = {"action": [], "esc": [], "focus": [], "blur": []}
 
             # Use the template functions to add the event API functions
-            for sKey of @_oaoEvents
-                @event[sKey] = @insertAddEventTemplate(sKey)
-                @event.remove[sKey] = @insertRemoveEventTemplate(sKey)
+            for sKey of @_eventsCache
+                @events[sKey] = @_insertAddEventTemplate(sKey)
+                @events.remove[sKey] = @_insertRemoveEventTemplate(sKey)
 
             # Loose table focus when click outside the table
             @onClickHandler = (event) =>
@@ -95,12 +95,12 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
                 element = @getCellFromCoords(i, y)
                 f_click = (event) =>
                     @onClick(event)
-                    @eventFire('focus', element)
+                    @_eventFire('focus', element)
 
                 element.click f_click
 
                 f_dblclick = (event) =>
-                    @eventFire('action', element)
+                    @_eventFire('action', element)
 
                 element.dblclick f_dblclick
 
@@ -109,7 +109,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # Returns:  function: - template function
         # Inputs:   string:sKey - type of event to detect
         ###
-        insertAddEventTemplate : (sKey) ->
+        _insertAddEventTemplate : (sKey) ->
             ###
             # API function for adding event to cache
             # Notes: This function is (interally) overloaded (in as much as javascript allows for that)
@@ -124,9 +124,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
             ###
             (x, y, z) =>
                 if typeof x is "number" and typeof y is "number" and typeof z is "function"
-                    @addEvent(sKey, @getCellFromCoords(x, y), z)
+                    @_addEvent(sKey, @getCellFromCoords(x, y), z)
                 else if typeof x is "object" and typeof y is "function"
-                    @addEvent(sKey, x, y)
+                    @_addEvent(sKey, x, y)
 
 
         ###
@@ -134,7 +134,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # Returns:  function: - template function
         # Inputs:   string:sKey - type of event to detect
         ###
-        insertRemoveEventTemplate : (sKey) ->
+        _insertRemoveEventTemplate : (sKey) ->
             ###
             # API function for removing event from cache
             # Returns: number of events removed
@@ -152,14 +152,14 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
             (x, y, z) =>
                 if typeof arguments[0] is 'number' and typeof arguments[1] is 'number'
                     if ( typeof arguments[2] is 'function' )
-                        @removeEvent(sKey, @getCellFromCoords(x, y), z)
+                        @_removeEvent(sKey, @getCellFromCoords(x, y), z)
                     else
-                        @removeEvent(sKey, @getCellFromCoords(x, y))
+                        @_removeEvent(sKey, @getCellFromCoords(x, y))
                 else if typeof arguments[0] is 'object'
                     if typeof arguments[1] is 'function'
-                        @removeEvent(sKey, x, y)
+                        @_removeEvent(sKey, x, y)
                     else
-                        @removeEvent(sKey, x)
+                        @_removeEvent(sKey, x)
 
 
         ###
@@ -169,36 +169,31 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # @param element cell to add event too
         # @param fn callback function for when triggered
         ###
-        addEvent : (eventType, element, fn) ->
+        _addEvent : (eventType, element, fn) ->
             return unless element
-            @_oaoEvents[eventType].push({
-                "nCell": element,
+            @_eventsCache[eventType].push({
+                "cell": element,
                 "fn": fn
             })
 
         ###
         # Removes an event from the event cache
         #
-        # @param sType type of event to look for
+        # @param type type of event to look for
         # @param nTarget target table cell
         # @param fn remove function. If not given all handlers of this type will be removed
         # @return number of matching events removed
         ###
-        removeEvent : (sType, nTarget, fn) ->
-            iCorrector = 0
-            i = 0
-            iLen = @_oaoEvents[sType].length
-            while (i < iLen - iCorrector)
-                if typeof fn isnt 'undefined'
-                    if @_oaoEvents[sType][i - iCorrector].nCell is nTarget and @_oaoEvents[sType][i - iCorrector].fn is fn
-                        @_oaoEvents[sType].splice(i - iCorrector, 1)
-                        iCorrector++
-                else
-                    if @_oaoEvents[sType][i].nCell is nTarget
-                        @_oaoEvents[sType].splice(i, 1)
-                        return 1
+        _removeEvent : (type, cell, fn) ->
+            eventsCache = @_eventsCache[type];
+            i = 0 # initial index
+            len = eventsCache.length
+            while (i < len)
+                if eventsCache[i]['cell'].is(cell)
+                    eventsCache.splice(i, 1)
+                    return 1
                 i++
-            return iCorrector
+            return 0
 
         ###
         # Handles key events moving the focus from one cell to another
@@ -218,10 +213,10 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
             while(true)
                 switch keyCode
                     when eventUtil.KEY_RETURN # return
-                        @eventFire('action', @_nCurrentFocus)
+                        @_eventFire 'action', @_nCurrentFocus
                         return true
                     when Event.KEY_ESC # esc
-                        if !@eventFire('esc', @_nCurrentFocus)
+                        if !@_eventFire 'esc', @_nCurrentFocus
                             # Only lose focus if there isn't an escape handler on the cell
                             @blur()
                         return false
@@ -302,7 +297,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
                     @_yCurrentPos = y
             # end while
             @setFocus(cell)
-            @eventFire("focus", cell)
+            @_eventFire "focus", cell
             return true
 
         ###
@@ -378,10 +373,10 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # @param nTarget target table cell
         # @return  number of events fired
         ###
-        eventFire: (eventType, cell) ->
-            aEvents = @_oaoEvents[eventType]
-            for eventElement in aEvents
-                if eventElement['nCell'].has(cell)
+        _eventFire: (eventType, cell) ->
+            eventsCache = @_eventsCache[eventType]
+            for eventElement in eventsCache
+                if eventElement['cell'].is(cell)
                     eventElement['fn'](cell)
                     return true
             return false
@@ -406,7 +401,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
             return unless element
             element.removeClass(@_sFocusClass)
             element.closest('tr').removeClass(@_sFocusClass) unless onlyCellFlg
-            @eventFire("blur", element)
+            @_eventFire("blur", element)
 
         ###
         # Get the position of an object on the rendered page
@@ -453,9 +448,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # @param event click event
         ###
         onClick : (event) ->
-            nTarget = $(event.target).closest('td')
-            if nTarget isnt @_nCurrentFocus
-                @setFocus(nTarget)
+            cell = $(event.target).closest('td')
+            if cell isnt @_nCurrentFocus
+                @setFocus(cell)
                 @captureKeys()
 
         ###

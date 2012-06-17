@@ -141,17 +141,17 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             calendarHeight = @_calendarDiv.height()
             windowTop = $(window).scrollTop()
             windowHeight = $(window).height()
-            e_dim = $(@options.popupBy).offset()
-            e_top = e_dim.top
-            e_top = e_top - @tableGrid.bodyDiv.scrollTop() if @tableGrid
-            e_left = e_dim.left
-            e_left = e_left - @tableGrid.bodyDiv.scrollLeft() if @tableGrid
-            e_height = $(@options.popupBy).height()
-            e_bottom = e_top + e_height
+            dim = $(@options.popupBy).offset()
+            top = dim.top
+            top = top - @tableGrid.bodyDiv.scrollTop() if @tableGrid
+            left = dim.left
+            left = left - @tableGrid.bodyDiv.scrollLeft() if @tableGrid
+            height = $(@options.popupBy).height()
+            bottom = top + height
 
-            above = true if ((e_bottom + calendarHeight) > (windowTop + windowHeight)) and (e_bottom - calendarHeight > windowTop)
-            left_px = e_left + 'px';
-            top_px = if above then (e_top - calendarHeight - 2) else (e_top + e_height + 10) + 'px'
+            above = true if ((bottom + calendarHeight) > (windowTop + windowHeight)) and (bottom - calendarHeight > windowTop)
+            left_px = left + 'px';
+            top_px = if above then (top - calendarHeight - 2) else (top + height + 10) + 'px'
 
             @_calendarDiv.css('left', left_px)
             @_calendarDiv.css('top', top_px)
@@ -223,7 +223,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 else
                     html[idx++] = '<span id="mdpMonthLabel-'+@_mdpId+'-'+i+'" class="month-label">'
                     html[idx++] = '</span>'
-
 
                 if @options.changeYear
                     html[idx++] = '<select class="year">';
@@ -826,14 +825,14 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 $(element).unbind 'mouseenter'
                 $(element).unbind 'mouseleave'
                 $(element).unbind 'click'
-                @_keys.event.remove.focus $(element)
-                @_keys.event.remove.action $(element)
+                @_keys.events.remove.focus $(element)
+                @_keys.events.remove.action $(element)
                 if $(element).hasClass('day')
                     $(element).mouseenter f_hover
                     $(element).mouseleave f_hoverOut
                     $(element).click f_click
-                    @_keys.event.focus $(element), f_focus
-                    @_keys.event.action $(element), f_action
+                    @_keys.events.focus $(element), f_focus
+                    @_keys.events.action $(element), f_action
             # Select the first not empty cell
             selectedCell = $('td.day:first', @_bodyDiv)
             @_dayHover(selectedCell)
