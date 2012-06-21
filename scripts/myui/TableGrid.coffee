@@ -449,7 +449,54 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             # end for
             html[idx++] = '</tr>'
             return html.join('')
-            
+
+        _toggleLoadingOverlay : ->
+            id = @_mtgId
+            overlayDiv = $('#overlayDiv'+id)
+            if overlayDiv.css('visibility') == 'hidden'
+                @_hideMenus()
+                overlayDiv.css('visibility', 'visible')
+            else
+                overlayDiv.css('visibility', 'hidden')
+
+        ###
+        # Applies cell callbacks
+        ###
+        _applyCellCallbacks : ->
+            renderedRows = @renderedRows
+            renderedRowsAllowed = @renderedRowsAllowed
+            beginAtRow = renderedRows - renderedRowsAllowed
+            beginAtRow = 0 if beginAtRow < 0
+            @_applyCellCallbackToRow(j) for j in [beginAtRow...renderedRows]
+
+        _applyCellCallbackToRow : ->
+            id = @_mtgId
+            cm = @columnModel
+            for i in [0...cm.length]
+                editor = cm[i].editor
+                if (editor == 'radio' or editor instanceof TableGrid.CellRadioButton) or
+                   (editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox)
+                    element = $('#mtgInput'+id + '_' + i + ',' + y)
+                    innerElement = $('#mtgIC'+id + '_' + i + ',' + y)
+                    f_handler = (editor, element, innerElement) =>
+                        return ( ->
+                                if editor.selectable is undefined or !editor.selectable
+                                    coords = element.attr('id').substring(element.id.indexOf('_') + 1, element.attr('id').length).split(',')
+                                    x = coords[0];
+                                    y = coords[1];
+                                    value = element.is(':checked')
+                                    value = editor.getValueOf(element.checked) if editor.hasOwnProperty('getValueOf')
+                                    @setValueAt(value, x, y, false);
+                                    @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1  # if doesn't exist in the array the row is registered
+                                )
+                    elementClickHandler = f_handler(editor, element, innerElement)
+                    editor.onClickCallback(element.value, element.checked) if editor.onClickCallback
+                    innerElement.addClass('modified-cell') if editor.selectable is undefined or !editor.selectable
+                    element.click elementClickHandler
+
+        getId : ->
+            return @_mtgId
+
         test: ->
             alert 'test method'
 
