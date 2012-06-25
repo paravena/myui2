@@ -497,6 +497,181 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         getId : ->
             return @_mtgId
 
+        _showLoaderSpinner : ->
+            id = @_mtgId
+            loaderSpinner = $('#mtgLoader'+id)
+            loaderSpinner.show() if(loaderSpinner)
+
+        _hideLoaderSpinner : ->
+            id = @_mtgId
+            loaderSpinner = $('#mtgLoader'+id)
+            loaderSpinner.hide() if(loaderSpinner)
+
+
+        _hideMenus : ->
+            id = @_mtgId
+            hb = $('#mtgHB'+id)
+            hbm = $('#mtgHBM'+id)
+            sm = $('#mtgSM'+id)
+            hb.css('visibility','hidden') if (hb)
+            hbm.css('visibility','hidden') if (hbm)
+            sm.css('visibility','hidden') if (sm)
+
+        ###
+        # Creates the Setting Menu
+        ###
+        _createSettingMenu : ->
+            id = @_mtgId
+            cm = @columnModel
+            bh = @bodyHeight + 30
+            height = if cm.length * 25 > bh then bh else 0
+            html = []
+            idx = 0;
+            if height > 0
+                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu shadow" style="height:'+height+'px">'
+            else
+                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu shadow">'
+            html[idx++] = '<ul>'
+            for i in [0...cm.length]
+                column = cm[i]
+                html[idx++] = '<li>'
+                html[idx++] = '<a href="#" class="my-tablegrid-menu-item">'
+                html[idx++] = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
+                html[idx++] = '<tr><td width="25"><span><input id="'+column.id+'" type="checkbox" checked="'+column.visible+'"></span></td>'
+                html[idx++] = '<td><label for="'+column.id+'">&nbsp;'+ column.title+'</label></td></tr>'
+                html[idx++] = '</table>'
+                html[idx++] = '</a>'
+                html[idx++] = '</li>'
+
+            html[idx++] = '</ul>'
+            html[idx++] = '</div>'
+            return html.join('')
+
+        ###
+        # Applies Setting Menu behavior
+        ###
+        _applySettingMenuBehavior : ->
+            settingMenu = $('#mtgSM' + @_mtgId)
+            settingButton = $('#mtgSB' + @_mtgId)
+          
+            width = settingMenu.width()
+          
+            settingButton.click ->
+                if settingMenu.css('visibility') == 'hidden'
+                    topPos = settingButton.offsetTop  #TODO check this
+                    leftPos = settingButton.offsetLeft #TODO check this
+                    settingMenu.css({
+                        'top' : (topPos + 16) + 'px',
+                        'left' : (leftPos - width + 16) + 'px',
+                        'visibility' : 'visible'
+                    })
+                else
+                    settingMenu.css('visibility', 'hidden')
+
+            miFlg = false
+            settingMenu.mousemove ->
+                miFlg = true
+
+            settingMenu.mouseout (event) ->
+                miFlg = false
+                element = $(event.target)
+                f_timeout = ->
+                    if !element.parent(settingMenu) and !miFlg
+                        settingMenu.css('visibility', 'hidden')
+                setTimeout f_timeout, 500
+            i = 0
+            for checkbox in $('#mtgSM'+@_mtgId + ' input')
+                $(checkbox).click =>
+                   @_toggleColumnVisibility(i++, checkbox.checked)
+
+         ###
+         # Synchronizes horizontal scrolling
+         ###
+        _syncScroll : ->
+            id = @_mtgId
+            keys = @keys
+            bodyDiv = @bodyDiv
+            headerRowDiv = @headerRowDiv
+            bodyTable = @bodyTable
+            renderedRows = @renderedRows
+
+            @scrollLeft = headerRowDiv.scrollLeft = bodyDiv.scrollLeft # TODO check this
+            @scrollTop = bodyDiv.scrollTop # TODO check this
+
+            $('mtgHB' + id).css('visibility', 'hidden')
+
+            if renderedRows < @rows.length and (bodyTable.height() - bodyDiv.scrollTop - 10) < bodyDiv.clientHeight # TODO check this
+                html = @_createTableBody(@rows)
+                bodyTable.find('tbody').append(html)
+                @_addKeyBehavior()
+                @_applyCellCallbacks()
+                keys.addMouseBehavior()
+
+
+        ###
+        # Makes all columns resizable
+        ###
+        _makeAllColumnsResizable : ->
+            id = @_mtgId
+            headerHeight = @headerHeight
+            scrollBarWidth = @scrollBarWidth
+            topPos = 0
+            topPos += @titleHeight if @options.title
+            topPos += @toolbarHeight if (@options.toolbar)
+            columnIndex
+            self = this
+            leftPos = 0
+            for separator in $('.mtgHS' + @_mtgId)
+                separator.mousemove =>
+                    columnIndex = parseInt(separator.attr('id').substring(separator.attr('id').indexOf('_') + 1, separator.attr('id').length))
+                    if columnIndex >= 0
+                        leftPos = $('#mtgHC' + id + '_' + columnIndex).offsetLeft - @scrollLeft
+                        leftPos += $('#mtgHC' + id + '_' + columnIndex).offsetWidth - 1
+                        @resizeMarkerRight.css({
+                            'height' : (@bodyHeight + headerHeight) + 'px',
+                            'top' : (topPos + 2) + 'px',
+                            'left' : leftPos + 'px'
+                        })
+
+            # TODO I need to change this, maybe with jquery++
+            new Draggable(@resizeMarkerRight, {
+                constraint : 'horizontal'
+                onStart : ->
+                    markerHeight = self.bodyHeight + headerHeight + 2
+                    markerHeight = markerHeight - scrollBarWidth + 1 if @_hasHScrollBar()
+                    @resizeMarkerRight.css({
+                        'height' : markerHeight + 'px',
+                        'background-color' : 'dimgray'
+                    })
+
+                    leftPos = $('#mtgHC' + id + '_' + columnIndex).offsetLeft - @scrollLeft
+
+                    @resizeMarkerLeft.css({
+                        'height' : markerHeight + 'px',
+                        'top' : (topPos + 2) + 'px',
+                        'left' : leftPos + 'px',
+                        'background-color' : 'dimgray'
+                    })
+
+                onEnd : ->
+                    newWidth = parseInt(@resizeMarkerRight.css('left')) - parseInt(@resizeMarkerLeft.css('left'))
+                    if newWidth > 0 and columnIndex != null
+                        setTimeout(( ->
+                            @_resizeColumn(columnIndex, newWidth)
+                        ), 0)
+
+                    @resizeMarkerLeft.css({
+                        'backgroundColor' : 'transparent',
+                        'left' : '0'
+                    })
+        
+                    @resizeMarkerRight.css('background-color', 'transparent')
+
+                endeffect : false
+            })
+
+
+
         test: ->
             alert 'test method'
 
