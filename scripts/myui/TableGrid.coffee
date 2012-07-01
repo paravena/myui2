@@ -806,6 +806,146 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                     @targetColumnId = null
                     dragColumn.find('div').addClass('drop-no') # TODO check this
 
+        ###
+        # Moves a column from one position to a new one
+        #
+        # @param fromColumnId initial position
+        # @param toColumnId target position
+        ###
+        _moveColumn : (fromColumnId, toColumnId) ->
+            # Some validations
+            return if fromColumnId == null or toColumnId == null or fromColumnId == toColumnId or (toColumnId + 1 == fromColumnId and fromColumnId == @columnModel.length -1)
+          
+            id = @_mtgId
+            cm = @columnModel
+            keys = @keys
+            renderedRows = @renderedRows
+            numberOfRowsAdded = @newRowsAdded.length
+          
+            $('mtgHB' + id).css('visibility', 'hidden') # in case the cell menu button is visible
+            @_blurCellElement(keys._nCurrentFocus) # in case there is a cell in editing mode
+            keys.blur() # remove the focus of the selected cell
+          
+            removedHeaderCell = null
+            targetHeaderCell = null
+            removedCells = null
+            tr = null
+            targetId = null
+            targetCell = null
+            idx = 0
+            i = 0
+            last = null
+          
+            if toColumnId == 0  # moving to the left to first column
+                removedHeaderCell = $('mtgHC'+id+'_'+fromColumnId).remove()
+                targetHeaderCell = $('mtgHC'+id+'_'+ toColumnId)
+                targetHeaderCell.up().insertBefore(removedHeaderCell, targetHeaderCell)
+              
+                # Moving cell elements
+                removedCells = []
+                idx = 0
+                for element in $('.mtgC' + id + '_' + fromColumnId)
+                    removedCells[idx++] = element.remove()
+
+              
+                if numberOfRowsAdded > 0
+                    for i in [-numberOfRowsAdded...0]
+                        targetCell = $('#mtgC'+id+'_'+toColumnId+','+i)
+                        targetCell.parent().insertBefore(removedCells[i+numberOfRowsAdded], targetCell)
+
+                for i in [numberOfRowsAdded...(renderedRows+numberOfRowsAdded)]
+                    targetCell = $('#mtgC'+id+'_'+toColumnId+','+(i-numberOfRowsAdded))
+                    targetCell.parent().insertBefore(removedCells[i], targetCell)
+
+            else if toColumnId > 0 and toColumnId < cm.length - 1 # moving in between
+                removedHeaderCell = $('#mtgHC' + id + '_' + fromColumnId).remove()
+                targetId = toColumnId + 1
+                targetId-- if targetId == fromColumnId
+                targetHeaderCell = $('mtgHC'+id+'_'+ targetId)
+                targetHeaderCell.up().insertBefore(removedHeaderCell, targetHeaderCell)
+              
+                # Moving cell elements
+                removedCells = []
+                idx = 0
+                for element in $('.mtgC' + id + '_' + fromColumnId)
+                    removedCells[idx++] = element.remove()
+
+                if (numberOfRowsAdded > 0)
+                    for i in [-numberOfRowsAdded...0]
+                        targetCell = $('#mtgC' + id + '_' + targetId +',' + i)
+                        targetCell.parent().insertBefore(removedCells[i+numberOfRowsAdded], targetCell)
+
+
+                for i in [numberOfRowsAdded...(renderedRows+numberOfRowsAdded)]
+                    targetCell = $('#mtgC' + id + '_' + targetId + ',' + (i-numberOfRowsAdded))
+                    targetCell.parent().insertBefore(removedCells[i], targetCell)
+
+            else if toColumnId == cm.length - 1 # moving to the last column
+                tr = $('#mtgHC' + id + '_' + fromColumnId).parent()
+                removedHeaderCell = $('mtgHC' + id + '_' + fromColumnId).remove()
+                last = $('mtgHC' + id + '_' + cm.length)
+                tr.insertBefore(removedHeaderCell, last)
+              
+                # Moving cell elements
+                removedCells = []
+                idx = 0;
+                for element in $('.mtgC' + id + '_' + fromColumnId)
+                    removedCells[idx++] = element.remove()
+
+                if (numberOfRowsAdded > 0)
+                    for i in [-numberOfRowsAdded...0]
+                        tr = $('mtgRow' + id + '_' + i)
+                        tr.append(removedCells[i+numberOfRowsAdded])
+
+                for i in [umberOfRowsAdded...(renderedRows+numberOfRowsAdded)]
+                    tr = $('#mtgRow' + id + '_' + (i-numberOfRowsAdded))
+                    tr.append(removedCells[i])
+
+            # Update column model
+            columnModelLength = cm.length
+            columnModelEntry = cm[fromColumnId]
+            cm[fromColumnId] = null
+            cm = cm.compact()
+            aTemp = []
+            k = 0
+            targetColumnId = toColumnId
+            targetColumnId++ if toColumnId > 0 and toColumnId < fromColumnId
+            targetColumnId-- if targetColumnId == fromColumnId
+            for c in [0...columnModelLength]
+                aTemp[k++] = columnModelEntry if c == targetColumnId
+                aTemp[k++] = cm[c] if c < (columnModelLength - 1)
+            cm = @columnModel = aTemp
+            $('#mtgHRT'+id + ' th').each (index, th) ->
+                if index < cm.length
+                    th.id = 'mtgHC'+ id + '_' + index
+                    try
+                        ihc = th.find('div.my-tablegrid-inner-header-cell')
+                        ihc.attr('id', 'mtgIHC' + id + '_' + index)
+                        ihc.find('span').attr('id', 'mtgSortIcon' + id + '_' + index)
+                        hs = th.find('div.mtgHS')
+                        hs.attr('id', 'mtgHS' + id + '_' + index)
+                    catch ihc_ex
+                        # exception of ihc.down('div') being non existant
+
+            # Recreates cell indexes
+            for i in [-numberOfRowsAdded...renderedRows]
+                $('.mtgR'+id+'_'+i).each (index, td) ->
+                    td.attr('id', 'mtgC' + id + '_' + index + ',' + i)
+                    td.attr('class', 'my-tablegrid-cell mtgC' + id + ' mtgC' + id + '_' + index + ' mtgR' + id + '_' + i)
+
+                $('.mtgIR'+id+'_'+i).each (index, div) ->
+                    div.attr('id', 'mtgIC' + id + '_' + index + ',' + i)
+                    modifiedCellClass = if div.attr('class').match(/modified-cell/) then ' modified-cell' else ''
+                    div.attr('class', 'my-tablegrid-inner-cell mtgIC' + id + ' mtgIC' + id + '_' + index + ' mtgIR' + id + '_' + i + modifiedCellClass)
+                    if div.first() and div.first().is('INPUT')  # when it contains a checkbox or radio button
+                        input = div.first()
+                        input.attr('id', 'mtgInput' + id + '_' + index + ',' + i)
+                        input.attr('name', 'mtgInput' + id + '_' + index + ',' + i)
+                        # input.className =  input.className.replace(/mtgInput.*?_.*?\s/, 'mtgInput'+id+'_'+index+' ')
+                        input.attr('class', 'mtgInput' + id + '_' + index)
+
+            @sortedColumnIndex = toColumnId if fromColumnId == @sortedColumnIndex
+
         test: ->
             alert 'test method'
 
