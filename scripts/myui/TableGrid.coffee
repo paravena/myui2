@@ -97,8 +97,6 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             @scrollTop = 0
             @targetColumnId = null
           
-            self = this
-          
             @bodyDiv.bind 'dom:dataLoaded', =>
                 @_showLoaderSpinner()
                 @bodyTable = $('#mtgBT' + id)
@@ -326,7 +324,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
 
             for i in [renderedRows...lastRowToRender]
                 rows[i] = @_fromArrayToObject(rows[i])
-                html[idx++] = self._createRow(rows[i], i)
+                html[idx++] = @_createRow(rows[i], i)
                 renderedRows++
           
             if firstRenderingFlg
@@ -618,8 +616,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             topPos = 0
             topPos += @titleHeight if @options.title
             topPos += @toolbarHeight if (@options.toolbar)
-            columnIndex
-            self = this
+            columnIndex = 0
             leftPos = 0
             for separator in $('.mtgHS' + @_mtgId)
                 separator.mousemove =>
@@ -637,7 +634,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             new Draggable(@resizeMarkerRight, {
                 constraint : 'horizontal'
                 onStart : ->
-                    markerHeight = self.bodyHeight + headerHeight + 2
+                    markerHeight = @bodyHeight + headerHeight + 2
                     markerHeight = markerHeight - scrollBarWidth + 1 if @_hasHScrollBar()
                     @resizeMarkerRight.css({
                         'height' : markerHeight + 'px',
@@ -671,6 +668,143 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             })
 
 
+        ###
+        # Resizes a column to a new size
+        #
+        # @param index the index column position
+        # @param newWidth resizing width
+        ###
+        _resizeColumn: (index, newWidth) ->
+            id = @_mtgId
+            cm = @columnModel
+            gap = @gap
+
+            oldWidth = parseInt($('mtgHC' + id + '_' + index).attr('width'))
+            editor = cm[index].editor
+            checkboxOrRadioFlg = editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor == 'radio' or editor instanceof TableGrid.CellRadioButton
+
+            $('#mtgHC' + id + '_' + index).attr('width', newWidth)
+            $('#mtgHC' + id + '_' + index).css('width', newWidth + 'px')
+            $('#mtgIHC' + id + '_' + index).css('width', (newWidth - 8 - (if gap == 0 then 2 else 0)) + 'px')
+
+            for cell in $('.mtgC' + id + '_' + index)
+                cell.attr('width', newWidth)
+                cell.css('width', newWidth + 'px')
+
+
+            for cell in $('.mtgIC' + id + '_' + index)
+                cellId = cell.id
+                coords = cellId.substring(cellId.indexOf('_') + 1, cellId.length).split(',')
+                y = coords[1]
+                value = @getValueAt(index, y)
+                cell.setStyle({width: (newWidth - 6 - (if gap == 0 then 2 else 0)) + 'px'})
+                if !checkboxOrRadioFlg
+                    if cm[index].renderer
+                        if editor instanceof ComboBox
+                            value = cm[index].renderer(value, editor.getItems(), @getRow(y))
+                        else
+                            value = cm[index].renderer(value, @getRow(y))
+                    cell.html(value)
+
+            @headerWidth = @headerWidth - (oldWidth - newWidth)
+
+            $('#mtgHRT' + id).attr('width', @headerWidth + 21)
+            $('#mtgBT' + id).attr('width', @headerWidth)
+          
+            @columnModel[index].width = newWidth
+            @_syncScroll()
+
+        _hasHScrollBar : ->
+            return @headerWidth + 20 > @tableWidth
+
+        ###
+        # Makes all columns draggable
+        ###
+        _makeAllColumnDraggable : ->
+            @separators = []
+            i = 0
+            id = @_mtgId
+            for separator in $('.mtgHS' + @_mtgId)
+                @separators[i++] = separator
+
+            topPos = 0
+            topPos += @titleHeight if @options.title
+            topPos += @toolbarHeight if @options.toolbar
+          
+            dragColumn = $('#dragColumn' + id)
+          
+            for column in $('.mtgIHC' + id)
+                columnIndex = -1
+                column.on  'mousemove', ->
+                    leftPos = column.parent().position().left
+                    dragColumn.css({
+                        top: (topPos + 15) + 'px',
+                        left: (leftPos - @scrollLeft + 15) + 'px'
+                    })
+                # TODO check this
+                new Draggable(dragColumn, {
+                    handle : column,
+                    onStart : ->
+                        for i in [0...@columnModel.length]
+                            if index == @columnModel[i].positionIndex
+                                columnIndex = i
+                                break
+                        dragColumn.find('span').html(@columnModel[columnIndex].title)
+                        dragColumn.css('visibility', 'visible')
+                    onDrag : ->
+                        leftPos = parseInt(dragColumn.css('left'))
+                        width = parseInt(dragColumn.css('width'))
+                        setTimeout(( ->
+                            @_detectDroppablePosition(leftPos + width / 2, width, dragColumn, columnIndex)
+                        ), 0)
+                    onEnd : ->
+                        dragColumn.css('visibility', 'hidden')
+                        @colMoveTopDiv.css('visibility', 'hidden')
+                        @colMoveBottomDiv.css('visibility', 'hidden')
+                        if columnIndex >= 0 and @targetColumnId >= 0
+                            setTimeout(( ->
+                                @_moveColumn(columnIndex, @targetColumnId)
+                                columnIndex = -1
+                            ), 0)
+                    endeffect : false
+                })
+
+        ###
+        # Detects droppable position when the mouse pointer is over a header cell
+        # separator
+        ###
+        _detectDroppablePosition : (columnPos, width, dragColumn, index) ->
+            topPos = -10
+            topPos += @headerHeight if (@options.title)
+            topPos += @headerHeight if (@options.toolbar)
+            sepLeftPos = 0
+            cm = @columnModel
+            gap = @gap
+            scrollLeft = @scrollLeft
+            colMoveTopDiv = @colMoveTopDiv
+            colMoveBottomDiv = @colMoveBottomDiv
+          
+            for i in [0...cm.length]
+                sepLeftPos += parseInt(cm[i].width) + gap if (cm[i].visible)
+                if columnPos > (sepLeftPos - scrollLeft) and (columnPos - (sepLeftPos - @scrollLeft)) < (width / 2)
+                    colMoveTopDiv.css({
+                        'top' : topPos + 'px',
+                        'left' : (sepLeftPos - scrollLeft - 4) + 'px',
+                        'visibility' : 'visible'
+                    })
+                    colMoveBottomDiv.css({
+                        'top' : (topPos + 34) + 'px',
+                        'left' : (sepLeftPos - scrollLeft - 4) + 'px',
+                        'visibility' : 'visible'
+                    })
+                    @targetColumnId = i
+                    dragColumn.find('div').addClass( if i != index then 'drop-yes' else 'drop-no') # TODO check this
+                    break
+                else
+                    colMoveTopDiv.css('visibility', 'hidden')
+                    colMoveBottomDiv.css('visibility', 'hidden')
+                    @targetColumnId = null
+                    dragColumn.find('div').addClass('drop-no') # TODO check this
 
         test: ->
             alert 'test method'
