@@ -946,6 +946,62 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
 
             @sortedColumnIndex = toColumnId if fromColumnId == @sortedColumnIndex
 
+
+        ###
+        # Add Key behavior functionality to the table grid
+        ###
+        _addKeyBehavior : ->
+            rows = @rows
+            renderedRows = @renderedRows
+            renderedRowsAllowed = @renderedRowsAllowed
+            beginAtRow = renderedRows - renderedRowsAllowed
+            beginAtRow = 0 if beginAtRow < 0
+            for j in [beginAtRow...renderedRows]
+                @_addKeyBehaviorToRow(rows[j], j)
+
+        _addKeyBehaviorToRow : (row, j) ->
+            id = @_mtgId
+            cm = @columnModel
+            keys = @keys
+          
+            for i in [0...cm.length]
+                element = $('#mtgC' + id + '_' + i + ',' + j)
+                if cm[i].editable
+                    keys.event.remove.action(element)
+                    keys.event.remove.esc(element)
+                    keys.event.remove.blur(element)
+                  
+                    f_action = ((element) =>
+                        return ->
+                            if @editedCellId == null or @editedCellId != element.attr('id')
+                                @editedCellId = element.attr('id')
+                                @_editCellElement(element)
+                            else
+                                @editedCellId = null if @_blurCellElement(element)
+
+                    )(element)
+                    keys.event.action(element, f_action)
+                  
+                    f_esc = ((element) =>
+                        return ->
+                            @editedCellId = null if @_blurCellElement(element)
+                    )(element)
+                    keys.event.esc(element, f_esc)
+                  
+                    f_blur = ((x, y, element) =>
+                        return ->
+                            @editedCellId = null if @_blurCellElement(element)
+                            @onCellBlur(element, row[x], x, y, cm[x].id) if (@onCellBlur)
+                    )(i, j, element)
+                    keys.event.blur(element, f_blur)
+
+                keys.event.remove.focus(element)
+                f_focus = ((x, y, element) =>
+                    return ->
+                        @onCellFocus(element, row[x], x, y, cm[x].id) if @onCellFocus
+                )(i, j, element)
+                keys.event.focus(element, f_focus);
+
         test: ->
             alert 'test method'
 
