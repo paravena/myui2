@@ -1002,6 +1002,283 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                 )(i, j, element)
                 keys.event.focus(element, f_focus);
 
+        ###
+        # When a cell is edited
+        ###
+        _editCellElement : (element) ->
+            @keys._bInputFocused = true
+            cm = @columnModel
+            coords = @getCurrentPosition()
+            x = coords[0]
+            y = coords[1]
+            width = parseInt(element.css('width'))
+            height = parseInt(element.css('height'))
+            innerElement = element.find('div') # TODO check this
+            value = @getValueAt(x, y)
+            editor = @columnModel[x].editor or 'input'
+            input = null
+            isInputFlg = !(editor == 'radio' or editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
+          
+            if isInputFlg
+                element.css('height', @cellHeight + 'px')
+                innerElement.css({
+                    'position': 'relative',
+                    'width': width + 'px',
+                    'height': height + 'px',
+                    'padding': '0',
+                    'border': '0',
+                    'margin': '0'
+                })
+                innerElement.html('')
+                value = cm[x].renderer(value, editor.getItems(), @getRow(y)) if editor instanceof ComboBox # when is a list
+                # Creating a normal input
+                inputId = 'mtgInput' + @_mtgId + '_' + x + ',' + y
+                input = $('input').attr({'id' : inputId, 'type' : 'text', 'value' : value})
+                input.addClass('my-tablegrid-textfield')
+                input.css({
+                    'padding' : '3px',
+                    'width' : (width - 8) + 'px'
+                })
+                innerElement.append(input)
+                editor.setTableGrid(this)
+                editor.render(input)
+                editor.validate() if editor.validate
+                input.focus()
+                input.select()
+            else if editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox
+                input = $('#mtgInput' + @_mtgId + '_' + x + ',' + y)
+                input.attr('checked', !input.is(':checked')) # TODO check this weird thing
+                if editor.selectable == undefined or !editor.selectable
+                    value = input.is(':checked')
+                    value = editor.getValueOf(input.is(':checked')) if editor.hasOwnProperty('getValueOf')
+                    @setValueAt(value, x, y, false)
+                    @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1 # if doesn't exist in the array the row is registered
+
+                editor.onClickCallback(value, input.is(':checked')) if editor instanceof TableGrid.CellCheckbox and editor.onClickCallback
+                @keys._bInputFocused = false
+                @editedCellId = null
+                innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
+            else if editor == 'radio' or editor instanceof TableGrid.CellRadioButton
+                input = $('#mtgInput' + @_mtgId + '_' + x + ',' + y)
+                input.attr('checked', !input.is(':checked')) # TODO check this weird thing
+                value = input.is(':checked')
+                value = editor.getValueOf(input.is(':checked')) if editor.hasOwnProperty('getValueOf')
+                @setValueAt(value, x, y, false)
+                @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1 #if doesn't exist in the array the row is registered
+                editor.onClickCallback(value, input.is(':checked')) if editor instanceof TableGrid.CellRadioButton and editor.onClickCallback
+                @keys._bInputFocused = false
+                @editedCellId = null
+                innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
+            # end if
+
+        ###
+        # When the cell is blured
+        ###
+        _blurCellElement : (element) ->
+            return unless @keys._bInputFocused
+            id = @_mtgId
+            keys = @keys
+            cm = @columnModel
+            width = parseInt(element.css('width'))
+            height = parseInt(element.css('height'))
+            coords = @getCurrentPosition()
+            x = coords[0]
+            y = coords[1]
+            cellHeight = @cellHeight
+            innerId = '#mtgIC' + id + '_' + x + ',' + y
+            input = $('#mtgInput' + id + '_' + x + ',' + y)
+            innerElement = $(innerId)
+            value = input.val()
+            editor = cm[x].editor or 'input'
+            type = cm[x].type or 'string'
+            columnId = cm[x].id
+            alignment = if (type == 'number') then 'right' else 'left'
+          
+            isInputFlg = !(editor == 'radio' or editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
+            if isInputFlg
+                editor.hide() if editor.hide # this only happen when editor is a Combobox
+                return false if editor instanceof DatePicker and editor.visibleFlg
+                editor.reset() if editor.reset
+                element.css('height', cellHeight + 'px')
+                innerElement.css({
+                    'width' : (width - 6) + 'px',
+                    'height' : (height - 6) + 'px',
+                    'padding' : '3px',
+                    'text-align' : alignment
+                }).html(value)
+
+            # I hope I can find a better solution
+            value = editor.getSelectedValue(value) if editor instanceof Autocompleter
+
+            if y >= 0 and @rows[y][columnId] != value
+                @rows[y][columnId] = value
+                innerElement.addClass('modified-cell')
+                @modifiedRows.push(y) if @modifiedRows.indexOf(y) == -1 # if doesn't exist in the array the row is registered
+            else if y < 0
+                @newRowsAdded[Math.abs(y)-1][columnId] = value
+            #end if
+            editor.afterUpdateCallback(element, value) if (editor instanceof BrowseInput or editor instanceof TextField or editor instanceof DatePicker) and editor.afterUpdateCallback
+            keys._bInputFocused = false
+            return true
+
+        ###
+        # Applies header buttons
+        ###
+        _applyHeaderButtons : ->
+            id = @_mtgId
+            headerHeight = @headerHeight
+            headerButton = $('#mtgHB' + @_mtgId)
+            headerButtonMenu = $('#mtgHBM' + @_mtgId)
+            sortAscMenuItem = $('#mtgSortAsc'+@_mtgId)
+            sortDescMenuItem = $('#mtgSortDesc'+@_mtgId)
+            topPos = 0
+            topPos += @titleHeight if @options.title
+            topPos += @toolbarHeight if @options.toolbar
+            selectedHCIndex = -1
+            for element in $('.mtgIHC' + id)
+                editor = null
+                sortable = true
+                hbHeight = null
+                element.on 'mousemove', =>
+                    cm = @columnModel;
+                    return if !element.attr('id')
+                    selectedHCIndex = parseInt(element.attr('id').substring(element.attr('id').indexOf('_') + 1, element.attr('id').length))
+                    editor = cm[selectedHCIndex].editor
+                    sortable = cm[selectedHCIndex].sortable
+                    hbHeight = cm[selectedHCIndex].height
+                    if sortable or editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox
+                        hc = element.parent()
+                        leftPos = hc.offsetLeft + hc.offsetWidth
+                        leftPos = leftPos - 16 - @scrollLeft
+                        if leftPos < @bodyDiv.clientWidth
+                            headerButton.css({
+                                'top' : (topPos + 3 + headerHeight - hbHeight) + 'px',
+                                'left' : leftPos + 'px',
+                                'height' : hbHeight + 'px',
+                                'visibility' : 'visible'
+                            })
+
+                        sortAscMenuItem.on 'click', => @_sortData(selectedHCIndex, 'ASC')
+                        sortDescMenuItem.on 'click', => @_sortData(selectedHCIndex, 'DESC')
+
+                # Sorting when click on header column
+                element.on 'click', =>
+                    return unless element.attr('id')
+                    selectedHCIndex = parseInt(element.attr('id').substring(element.attr('id').indexOf('_') + 1, element.attr('id').length))
+                    @_toggleSortData(selectedHCIndex)
+
+            headerButton.on 'click', =>
+                cm = self.columnModel
+                if headerButtonMenu.css('visibility') == 'hidden'
+                    if cm[selectedHCIndex].sortable
+                        $('mtgSortDesc' + @_mtgId).show()
+                        $('mtgSortAsc' + @_mtgId).show()
+                    else
+                        $('mtgSortDesc' + @_mtgId).hide()
+                        $('mtgSortAsc' + @_mtgId).hide()
+
+                    selectAllItem = $('#mtgHBM' + id + ' .mtgSelectAll:first')  # TODO check this
+                    if @renderedRows > 0 and (cm[selectedHCIndex].editor == 'checkbox' or cm[selectedHCIndex].editor instanceof TableGrid.CellCheckbox)
+                        selectAllItem.find('input').attr('checked', cm[selectedHCIndex].selectAllFlg)
+                        selectAllItem.show()
+                        selectAllHandler = => # onclick handler
+                            flag = cm[selectedHCIndex].selectAllFlg = $('#mtgSelectAll' + id).is(':checked')
+                            selectableFlg = false
+                            selectableFlg = true if cm[selectedHCIndex].editor instanceof TableGrid.CellCheckbox and cm[selectedHCIndex].editor.selectable
+                            renderedRows = self.renderedRows
+                            beginAtRow = 0
+                            beginAtRow = -@newRowsAdded.length if @newRowsAdded.length > 0
+                            x = selectedHCIndex
+                            for y in [beginAtRow...renderedRows]
+                                element = $('#mtgInput' + id + '_' + x +','+y)
+                                element.attr('checked', flag)
+                                value = flag
+                                if !selectableFlg
+                                    value = cm[x].editor.getValueOf(element.is(':checked')) if cm[x].editor.hasOwnProperty('getValueOf')
+                                    @setValueAt(value, x, y, false)
+                                    # if doesn't exist in the array the row is registered
+                                    @modifiedRows.push(y) if y >= 0 and self.modifiedRows.indexOf(y) == -1
+                        # TODO review this
+                        selectAllItem.on 'click', selectAllHandler
+                    else
+                        selectAllItem.hide()
+
+                    leftPos = parseInt(headerButton.css('left'))
+                    topPos = @headerHeight + 2
+                    topPos += @titleHeight if @options.title
+                    topPos += @toolbarHeight if @options.toolbar
+                    headerButtonMenu.css({
+                        'top' : topPos + 'px',
+                        'left' : leftPos + 'px',
+                        'visibility' : 'visible'
+                    })
+                else
+                    headerButtonMenu.css('visibility', 'hidden')
+
+            miFlg = false
+            headerButtonMenu.on 'mousemove', -> miFlg = true
+
+            headerButtonMenu.on 'mouseout', (event) ->
+                miFlg = false
+                element = $(event.target)
+                setTimeout(( ->
+                    headerButtonMenu.css('visibility', 'hidden') if !element.closest(headerButtonMenu) and !miFlg # TODO check this
+                ), 500)
+
+        _sortData : (idx, ascDescFlg) ->
+            cm = @columnModel
+            id = @_mtgId
+            if cm[idx].sortable
+                $('#mtgSortIcon'+id+'_'+idx).attr('class', if (ascDescFlg == 'ASC') then 'my-tablegrid-sort-asc-icon' else 'my-tablegrid-sort-desc-icon')
+                @request[@sortColumnParameter] = cm[idx].id;
+                @request[@ascDescFlagParameter] = ascDescFlg;
+                @_retrieveDataFromUrl(1)
+                $('#mtgSortIcon'+id+'_'+@sortedColumnIndex).css('visibility', 'hidden')
+                $('#mtgIHC'+id+'_'+@sortedColumnIndex).css('color', 'dimgray')
+                $('#mtgSortIcon'+id+'_'+idx).css('visibility', 'visible')
+                $('#mtgIHC'+id+'_'+idx).css('color', 'black')
+                @sortedColumnIndex = idx
+                cm[idx].sortedAscDescFlg = ascDescFlg
+
+        _toggleSortData : (idx) ->
+            cm = @columnModel
+            if cm[idx].sortedAscDescFlg == 'DESC'
+                @_sortData(idx, 'ASC')
+            else
+                @_sortData(idx, 'DESC')
+
+        _toggleColumnVisibility : (index, visibleFlg) ->
+            @_blurCellElement(@keys._nCurrentFocus) # in case there is a cell in editing mode
+            @keys.blur() #remove the focus of the selected cell
+            headerRowTable = $('#mtgHRT' + @_mtgId)
+            bodyTable = $('#mtgBT' + @_mtgId)
+
+            for i in [0...@columnModel.length]
+                if @columnModel[i].positionIndex == index
+                    index = i
+                    break
+
+            targetColumn = $('#mtgHC' + @_mtgId + '_' + index)
+            $('#mtgHB' + @_mtgId).css('visibility', 'hidden')
+            width = 0
+
+            if !visibleFlg  # hide
+                width = parseInt(targetColumn.offsetWidth)
+                targetColumn.hide()
+                element.hide() for element in $('.mtgC'+@_mtgId+ '_'+index)
+                @columnModel[index].visible = false
+                @headerWidth = @headerWidth - width
+            else # show
+                targetColumn.show()
+                width = parseInt(targetColumn.offsetWidth) + 2
+                element.show() for element in $('.mtgC'+@_mtgId+ '_'+index)
+                @columnModel[index].visible = true
+                @headerWidth = @headerWidth + width
+
+            headerRowTable.attr('width', @headerWidth + 21)
+            bodyTable.attr('width', @headerWidth)
+            bodyTable.css('width', @headerWidth + 'px')
+
         test: ->
             alert 'test method'
 
