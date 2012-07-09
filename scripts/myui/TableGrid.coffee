@@ -1168,7 +1168,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                     @_toggleSortData(selectedHCIndex)
 
             headerButton.on 'click', =>
-                cm = self.columnModel
+                cm = @columnModel
                 if headerButtonMenu.css('visibility') == 'hidden'
                     if cm[selectedHCIndex].sortable
                         $('mtgSortDesc' + @_mtgId).show()
@@ -1185,7 +1185,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                             flag = cm[selectedHCIndex].selectAllFlg = $('#mtgSelectAll' + id).is(':checked')
                             selectableFlg = false
                             selectableFlg = true if cm[selectedHCIndex].editor instanceof TableGrid.CellCheckbox and cm[selectedHCIndex].editor.selectable
-                            renderedRows = self.renderedRows
+                            renderedRows = @renderedRows
                             beginAtRow = 0
                             beginAtRow = -@newRowsAdded.length if @newRowsAdded.length > 0
                             x = selectedHCIndex
@@ -1197,7 +1197,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                                     value = cm[x].editor.getValueOf(element.is(':checked')) if cm[x].editor.hasOwnProperty('getValueOf')
                                     @setValueAt(value, x, y, false)
                                     # if doesn't exist in the array the row is registered
-                                    @modifiedRows.push(y) if y >= 0 and self.modifiedRows.indexOf(y) == -1
+                                    @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1
                         # TODO review this
                         selectAllItem.on 'click', selectAllHandler
                     else
@@ -1278,6 +1278,187 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             headerRowTable.attr('width', @headerWidth + 21)
             bodyTable.attr('width', @headerWidth)
             bodyTable.css('width', @headerWidth + 'px')
+
+        _fullPadding : (element, s) ->
+            padding = parseInt(element.css('padding-'+s))
+            padding = if isNaN(padding) then 0 else padding
+            border = parseInt(element.css('border-'+s+'-width'))
+            border = if isNaN(border) then 0 else border
+            return padding + border
+
+        _retrieveDataFromUrl : (pageNumber, firstTimeFlg) ->
+            return if !firstTimeFlg and @onPageChange amd !@onPageChange()
+            pageParameter = 'page'
+            pageParameter = @pager.pageParameter if @pager != null and @pager.pageParameter
+            @request[pageParameter] = pageNumber
+            @_toggleLoadingOverlay()
+            @columnModel[i].selectAllFlg = false for i in [0...@columnModel.length] # TODO could be simplyfied
+            # TODO lot of work to do here
+            new Ajax.Request(@url, {
+                parameters: @request,
+                onSuccess: (response) ->
+                    tableModel = response.responseText.evalJSON()
+                    try
+                        @rows = tableModel.rows or []
+                        @pager = null
+                        @pager = tableModel.options.pager if tableModel.options != null and tableModel.options.pager
+                        @pager = {} if @pager == null
+                        @pager.pageParameter = pageParameter
+                        @renderedRows = 0
+                        @innerBodyDiv.html(@_createTableBody(tableModel.rows))
+                        @bodyTable = $('#mtgBT' + @_mtgId)
+                        if tableModel.rows.length > 0 and !firstTimeFlg
+                            @_applyCellCallbacks()
+                            @keys = new KeyTable(self)
+                            @_addKeyBehavior()
+
+                        if (@pager)
+                            @pagerDiv.html(@_updatePagerInfo()) # update pager info panel
+                            @_addPagerBehavior()
+
+                        @afterRender() if @afterRender
+                    catch ex
+                        @onFailure(response) if @onFailure
+                    finally
+                        @_toggleLoadingOverlay()
+                        @scrollTop = @bodyDiv.scrollTop = 0
+                        @bodyDiv.fire('dom:dataLoaded') if firstTimeFlg
+                onFailure : (transport) ->
+                    @onFailure(transport) if @onFailure
+                    @_toggleLoadingOverlay()
+                    @scrollTop = @bodyDiv.scrollTop = 0
+                    @bodyDiv.fire('dom:dataLoaded') if firstTimeFlg
+            })
+
+        _updatePagerInfo : (emptyFlg) ->
+            id = @_mtgId
+            return '<span id="mtgLoader'+id+'" class="mtgLoader">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' if emptyFlg
+            html = []
+            idx = 0
+            pager = @pager
+            if @pager.total > 0
+                temp = i18n.getMessage('message.totalDisplay', {'total' : pager.total})
+                temp += i18n.getMessage('message.rowsDisplay', {'from' : pager.from, 'to' : pager.to}) if pager.from and pager.to
+                html[idx++] = '<span class="my-tablegrid-pager-message">'+temp+'</span>'
+                if pager.pages
+                    input = '<input type="text" name="mtgPageInput'+id+'" id="mtgPageInput'+id+'" value="'+pager.currentPage+'" class="my-tablegrid-page-input" size="3" maxlength="3">'
+                    temp = i18n.getMessage('message.pagePrompt', {'pages' : pager.pages, 'input' : input})
+                    html[idx++] = '<table class="my-tablegrid-pager-table" border="0" cellpadding="0" cellspacing="0">'
+                    html[idx++] = '<tbody>'
+                    html[idx++] = '<tr>'
+                    html[idx++] = '<td><div id="mtgLoader'+id+'" class="mtgLoader">&nbsp;</div></td>'
+                    html[idx++] = '<td><div class="my-tablegrid-pager-separator">&nbsp;</div></td>'
+                    html[idx++] = '<td><a id="mtgFirst'+id+'" class="my-tablegrid-pager-control"><div class="first-page">&nbsp;</div></a></td>'
+                    html[idx++] = '<td><a id="mtgPrev'+id+'" class="my-tablegrid-pager-control"><div class="previous-page">&nbsp;</div></a></td>'
+                    html[idx++] = '<td><div class="my-tablegrid-pager-separator">&nbsp;</div></td>'
+                    html[idx++] = temp
+                    html[idx++] = '<td><div class="my-tablegrid-pager-separator">&nbsp;</div></td>'
+                    html[idx++] = '<td><a id="mtgNext'+id+'" class="my-tablegrid-pager-control"><div class="next-page">&nbsp;</div></a></td>'
+                    html[idx++] = '<td><a id="mtgLast'+id+'" class="my-tablegrid-pager-control"><div class="last-page">&nbsp;</div></a></td>'
+                    html[idx++] = '</tr>'
+                    html[idx++] = '</tbody>'
+                    html[idx++] = '</table>'
+                else
+                    html[idx++] = '<table class="my-tablegrid-pager-table" border="0" cellpadding="0" cellspacing="0">'
+                    html[idx++] = '<tbody>'
+                    html[idx++] = '<tr>'
+                    html[idx++] = '<td><div id="my-tablegrid-pager-loader'+id+'" class="mtgLoader">&nbsp;</div></td>'
+                    html[idx++] = '</tr>'
+                    html[idx++] = '</tbody>'
+                    html[idx++] = '</table>'
+            else
+                html[idx++] = '<span class="my-tablegrid-pager-message">'+i18n.getMessage('message.noRecordFound')+'</span>'
+
+            return html.join('')
+
+        _addPagerBehavior : ->
+            id = @_mtgId
+            return unless @pager.pages
+            currentPage = @pager.currentPage
+            pages = @pager.pages
+            total = @pager.total
+            if total > 0
+                if currentPage > 1
+                    $('#mtgFirst'+id).find('div').attr('class', 'first-page')
+                    $('#mtgFirst'+id).on 'click', => @_retrieveDataFromUrl(1)
+                else
+                    $('#mtgFirst'+id).find('div').attr('class', 'first-page-disabled')
+
+                if currentPage > 0 and currentPage < pages
+                    $('#mtgNext'+id).find('div').attr('class', 'next-page')
+                    $('#mtgNext'+id).on 'click', => @_retrieveDataFromUrl(parseInt(currentPage) + 1)
+                else
+                    $('#mtgNext'+id).find('div').attr('class', 'next-page-disabled')
+
+                if currentPage > 1 and currentPage <= pages
+                    $('#mtgPrev'+id).find('div').attr('class', 'previous-page')
+                    $('#mtgPrev'+id).on 'click', => @_retrieveDataFromUrl(parseInt(currentPage) - 1)
+                else
+                    $('#mtgPrev'+id).find('div').attr('class', 'previous-page-disabled')
+
+                if currentPage < pages
+                    $('#mtgLast'+id).find('div').attr('class', 'last-page')
+                    $('#mtgLast'+id).on 'click', => @_retrieveDataFromUrl(@pager.pages)
+                else
+                    $('#mtgLast'+id).find('div').attr('class', 'last-page-disabled')
+
+                $('#mtgPageInput'+id).on 'keydown', (event) =>
+                    if event.which == eventUtil.KEY_RETURN
+                        pageNumber = $('#mtgPageInput'+id).val()
+                        pageNumber = pages if pageNumber > pages
+                        pageNumber = '1' if pageNumber < 1
+                        $('#mtgPageInput'+id).val(pageNumber)
+                        @_retrieveDataFromUrl(pageNumber)
+
+        resize : ->
+            target = $(@target)
+            width = @options.width or (target.width() - @_fullPadding(target, 'left') - @_fullPadding(target, 'right')) + 'px'
+            height = @options.height or (target.height() - @_fullPadding(target, 'top') - @_fullPadding(target, 'bottom')) + 'px'
+            @tableWidth = parseInt(width) - 2
+            tallerFlg = false
+            tallerFlg = true if (parseInt(height) - 2) > @tableHeight
+            @tableHeight = parseInt(height) - 2
+
+            headerButton = $('#mtgHB' + @_mtgId)
+            headerButton.css('visibility', 'hidden') if headerButton
+
+            @tableDiv.css({
+                'width' : @tableWidth + 'px',
+                'height' : @tableHeight + 'px'
+            })
+
+            @headerTitle.css('width', (@tableWidth - 6) + 'px') if @headerTitle
+            @headerToolbar.css('width', (@tableWidth - 4) + 'px') if @headerToolbar
+            @headerRowDiv.css('width', @tableWidth + 'px')
+            @overlayDiv.css('width', (@tableWidth + 2) + 'px')
+            settingButton = $('#mtgSB' + @_mtgId)
+            settingButton.css('left', (@tableWidth - 20) + 'px') if settingButton
+            @bodyHeight = @tableHeight - @headerHeight - 3
+            @bodyHeight = @bodyHeight - @titleHeight - 1 if @options.title
+            @overlayDiv.css('height', (@bodyHeight + 4) + 'px')
+            @bodyHeight = @bodyHeight - @pagerHeight if @options.pager
+            @bodyHeight = @bodyHeight - @pagerHeight if @options.toolbar
+            @bodyDiv.css({
+                'width' : @tableWidth + 'px',
+                'height' : @bodyHeight + 'px'
+            })
+
+            if @options.pager
+                topPos = @bodyHeight + @headerHeight +  5
+                topPos += @titleHeight if @options.title
+                topPos += @toolbarHeight if @options.toolbar
+                @pagerDiv.css({
+                    'top' : topPos + 'px',
+                    'width' : (@tableWidth - 4) + 'px'
+                })
+
+            @renderedRowsAllowed = Math.floor(@bodyDiv.clientHeight / @cellHeight)
+            if tallerFlg
+                html = @_createTableBody(@rows);
+                @bodyTable.find('tbody').append(html)
+                @_addKeyBehavior()
+                @_applyCellCallbacks()
+                @keys.addMouseBehavior()
 
         test: ->
             alert 'test method'
