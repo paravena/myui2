@@ -1460,6 +1460,101 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                 @_applyCellCallbacks()
                 @keys.addMouseBehavior()
 
+        getValueAt : (x, y) ->
+            value = null
+            columnId = @columnModel[x].id
+            value = if y >= 0 then @rows[y][columnId] else @newRowsAdded[Math.abs(y)-1][columnId]
+            return value
+
+        setValueAt : (value, x, y, refreshValueFlg) ->
+            cm = @columnModel
+            id = @_mtgId
+            editor = cm[x].editor
+            columnId = cm[x].id
+
+            if refreshValueFlg == undefined or refreshValueFlg
+                if editor != null and (editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor == 'radio' or editor instanceof TableGrid.CellRadioButton)
+                    input = $('#mtgInput'+id+'_'+x+','+y)
+                    if editor.hasOwnProperty('getValueOf')
+                        trueVal = editor.getValueOf(true)
+                        if value == trueVal
+                            input.attr('checked', true)
+                        else
+                            input.attr('checked', false)
+                            value = editor.getValueOf(false)
+                    else
+                        if (eval(value))
+                            input.attr('checked', true)
+                        else
+                            input.attr('checked', false)
+                            value = false
+                else
+                    $('#mtgIC'+id+'_'+x+','+y).html(value)
+
+            if y >= 0
+                @rows[y][columnId] = value
+            else
+                @newRowsAdded[Math.abs(y)-1][columnId] = value
+
+        getColumnIndex : (id) ->
+            index = -1
+            for i in [0...@columnModel.length]
+                if @columnModel[i].id == id
+                    index = @columnModel[i].positionIndex
+                    break
+            return index;
+
+        getIndexOf : (id) ->
+            cm = @columnModel
+            idx = -1
+            for i in[0...cm.length]
+                if cm[i].id == id
+                    idx = i
+                    break
+            return idx
+
+        getCurrentPosition : ->
+            return [@keys._xCurrentPos, @keys._yCurrentPos]
+
+        getCellElementAt : (x, y) ->
+            return $('#mtgC'+@_mtgId + '_' + x + ',' + y)
+
+        getModifiedRows : ->
+            result = []
+            modifiedRows = @modifiedRows
+            rows = @rows
+            for i in [0...modifiedRows.length]
+                idx = modifiedRows[i]
+                result.push(rows[idx])
+            return result
+
+        getNewRowsAdded : ->
+            return @newRowsAdded
+
+        getDeletedRows : ->
+            return @deletedRows
+
+        ###
+        # Returns the selected rows by column
+        #
+        # @param id of the selectable column
+        ###
+        getSelectedRowsByColumn : (id) ->
+            idx = @getIndexOf(id)
+            result = []
+            rows = @rows
+            newRowsAdded = @newRowsAdded
+            return null if idx < 0
+            selectedRowsIdx = @_getSelectedRowsIdx(idx)
+            for i in [0...selectedRowsIdx.length]
+                rowIdx = selectedRowsIdx[i]
+                if rowIdx >= 0
+                    result.push(rows[rowIdx])
+                else
+                    result.push(newRowsAdded[Math.abs(rowIdx)-1])
+            return result;
+
+
         test: ->
             alert 'test method'
 
