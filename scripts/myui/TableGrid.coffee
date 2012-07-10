@@ -1554,10 +1554,138 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                     result.push(newRowsAdded[Math.abs(rowIdx)-1])
             return result;
 
+        _getSelectedRowsIdx: (idx) ->
+            result = []
+            id = @_mtgId
+            cm = @columnModel
+            newRowsAdded = @newRowsAdded
+            renderedRows = @renderedRows
+            idx = idx or -1 # Selectable column index
+            selectAllFlg = false
+            if idx == -1
+                for i in [0...cm.length]
+                    if cm[i].editor == 'checkbox' or cm[i].editor instanceof TableGrid.CellCheckbox and cm[i].editor.selectable
+                        idx = cm[i].positionIndex
+                        selectAllFlg = cm[i].selectAllFlg
+                        break
+            else
+                selectAllFlg = cm[idx].selectAllFlg
 
-        test: ->
-            alert 'test method'
+            if idx >= 0
+                j = 0
+                y = 0
+                if newRowsAdded.length > 0 # there are new rows added
+                    for j in [0...newRowsAdded.length]
+                        y = -(j + 1);
+                        result.push(y) if $('#mtgInput'+id+'_'+idx+','+y).is(':checked')
 
+                for j in [0...renderedRows]
+                    y = j;
+                    result.push(y) if @deletedRows.indexOf(@getRow(y)) == -1 and $('#mtgInput'+id+'_'+idx+','+y).size() > 0 and $('#mtgInput'+id+'_'+idx+','+y).is(':checked')
+
+
+                if selectAllFlg and renderedRows < @rows.length
+                    result.push(j) for j in [renderedRows...@rows.length]
+
+            return result;
+
+        highlightRow : (id, value) ->
+            $('.mtgRow'+@_mtgId).removeClass('focus')
+            index = @getColumnIndex(id)
+            rowIndex = -1
+            for i in [0...@rows.length]
+                if @rows[i][index] == value
+                    rowIndex = i
+                    break
+            $('#mtgRow'+@_mtgId+'_'+rowIndex).addClass('focus') if rowIndex >= 0
+
+        getRow : (y) ->
+            result = null
+            result = if y >= 0 then @rows[y] else @newRowsAdded[-(y + 1)]
+            return result
+
+        getColumnValues : (id) ->
+            result = []
+            j = 0
+            i = 0
+            result[j++] = @newRowsAdded[i][id] for i in [0...@newRowsAdded.length]
+            result[j++] = @rows[i][id] for i in [0...@rows.length]
+            return result
+
+        clear : ->
+            @modifiedRows = []
+            @deletedRows = []
+            @newRowsAdded = []
+
+        addNewRow : (newRow) ->
+            keys = @keys
+            bodyTable = @bodyTable
+            cm = @columnModel
+            i = @newRowsAdded.length + 1
+            if newRow == undefined
+                newRow = {}
+                newRow[cm[j].id] = '' for j in [0...cm.length]
+
+            bodyTable.find('tbody').prepend(@_createRow(newRow, -i))
+            @newRowsAdded[i-1] = newRow
+            keys.setTopLimit(-i)
+            @_addKeyBehaviorToRow(newRow, -i)
+            keys.addMouseBehaviorToRow(-i)
+            @_applyCellCallbackToRow(-i)
+            @scrollTop = @bodyDiv.scrollTop = 0 # TODO check this
+
+        deleteRows : ->
+            id = @_mtgId
+            selectedRows = @_getSelectedRowsIdx()
+            i = 0
+            y = 0
+            for i in [0...selectedRows.length]
+                y = selectedRows[i]
+                if y >= 0
+                    @deletedRows.push(@getRow(y))
+                else
+                    @newRowsAdded[Math.abs(y)-1] = null
+                $('#mtgRow'+id+'_'+y).hide()
+
+            totalDiv = $('#mtgTotal')
+            if totalDiv?
+                total = parseInt(totalDiv.html())
+                total -= selectedRows.length
+                totalDiv.html(total)
+
+            toDiv = $('#mtgTo')
+            if toDiv?
+                to = parseInt(toDiv.html())
+                to -= selectedRows.length
+                toDiv.html(to)
+            @_syncScroll()
+
+        refresh : ->
+            @modifiedRows = []
+            @deletedRows = []
+            @newRowsAdded = []
+            @_retrieveDataFromUrl(1, false)
+
+        empty : ->
+            bodyTable = @bodyTable
+            bodyTable.find('tbody').html('')
+            @rows = []
+            @pager.total = 0
+            @pagerDiv.html(@_updatePagerInfo())
+
+        ###
+        # Turns an array row into an object row
+        ###
+        _fromArrayToObject : (row) ->
+            result = null
+            cm = @columnModel
+            if row instanceof Array
+                result = {};
+                result[cm[i].id] = row[cm[i].positionIndex] for i in [0...cm.length]
+            else if row instanceof Object
+                result = row
+            return result
+    #end TableGrid
 
     TableGrid.ADD_BTN = 1
     TableGrid.DEL_BTN = 4
