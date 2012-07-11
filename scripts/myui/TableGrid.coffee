@@ -1680,6 +1680,20 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
     TableGrid.DEL_BTN = 4
     TableGrid.SAVE_BTN = 8
 
+    class TableGrid.CellCheckbox
+        constructor : (options) ->
+            options = options or {}
+            @onClickCallback = options.onClick or null
+            @selectable = options.selectable or false
+            @getValueOf = options.getValueOf if options.getValueOf?
+
+    class TableGrid.CellRadioButton
+        constructor : (options) ->
+            options = options or {}
+            @onClickCallback = options.onClick or null
+            @selectable = options.selectable or false
+            @getValueOf = options.getValueOf if options.getValueOf?
+
     class HeaderBuilder
         constructor: (id, cm) ->
             @columnModel = cm
