@@ -556,8 +556,8 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
           
             settingButton.click ->
                 if settingMenu.css('visibility') == 'hidden'
-                    topPos = settingButton.offsetTop  #TODO check this
-                    leftPos = settingButton.offsetLeft #TODO check this
+                    topPos = settingButton.position().top
+                    leftPos = settingButton.position().left
                     settingMenu.css({
                         'top' : (topPos + 16) + 'px',
                         'left' : (leftPos - width + 16) + 'px',
@@ -593,12 +593,12 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             bodyTable = @bodyTable
             renderedRows = @renderedRows
 
-            @scrollLeft = headerRowDiv.scrollLeft = bodyDiv.scrollLeft # TODO check this
-            @scrollTop = bodyDiv.scrollTop # TODO check this
+            @scrollLeft = headerRowDiv.scrollLeft(bodyDiv.scrollLeft)
+            @scrollTop = bodyDiv.scrollTop()
 
             $('mtgHB' + id).css('visibility', 'hidden')
 
-            if renderedRows < @rows.length and (bodyTable.height() - bodyDiv.scrollTop - 10) < bodyDiv.clientHeight # TODO check this
+            if renderedRows < @rows.length and (bodyTable.height() - bodyDiv.scrollTop() - 10) < bodyDiv[0].clientHeight
                 html = @_createTableBody(@rows)
                 bodyTable.find('tbody').append(html)
                 @_addKeyBehavior()
@@ -619,7 +619,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             columnIndex = 0
             leftPos = 0
             for separator in $('.mtgHS' + @_mtgId)
-                separator.mousemove =>
+                $(separator).mousemove =>
                     columnIndex = parseInt(separator.attr('id').substring(separator.attr('id').indexOf('_') + 1, separator.attr('id').length))
                     if columnIndex >= 0
                         leftPos = $('#mtgHC' + id + '_' + columnIndex).offsetLeft - @scrollLeft
@@ -630,43 +630,37 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                             'left' : leftPos + 'px'
                         })
 
-            # TODO I need to change this, maybe with jquery++
-            new Draggable(@resizeMarkerRight, {
-                constraint : 'horizontal'
-                onStart : ->
-                    markerHeight = @bodyHeight + headerHeight + 2
-                    markerHeight = markerHeight - scrollBarWidth + 1 if @_hasHScrollBar()
-                    @resizeMarkerRight.css({
-                        'height' : markerHeight + 'px',
-                        'background-color' : 'dimgray'
-                    })
+            @resizeMarkerRight.on 'draginit', (event, drag) =>
+                drag.horizontal()
+                markerHeight = @bodyHeight + headerHeight + 2
+                markerHeight = markerHeight - scrollBarWidth + 1 if @_hasHScrollBar()
+                @resizeMarkerRight.css({
+                    'height' : markerHeight + 'px',
+                    'background-color' : 'dimgray'
+                })
 
-                    leftPos = $('#mtgHC' + id + '_' + columnIndex).offsetLeft - @scrollLeft
+                leftPos = $('#mtgHC' + id + '_' + columnIndex).offsetLeft - @scrollLeft
 
-                    @resizeMarkerLeft.css({
-                        'height' : markerHeight + 'px',
-                        'top' : (topPos + 2) + 'px',
-                        'left' : leftPos + 'px',
-                        'background-color' : 'dimgray'
-                    })
+                @resizeMarkerLeft.css({
+                    'height' : markerHeight + 'px',
+                    'top' : (topPos + 2) + 'px',
+                    'left' : leftPos + 'px',
+                    'background-color' : 'dimgray'
+                })
 
-                onEnd : ->
-                    newWidth = parseInt(@resizeMarkerRight.css('left')) - parseInt(@resizeMarkerLeft.css('left'))
-                    if newWidth > 0 and columnIndex != null
-                        setTimeout(( ->
-                            @_resizeColumn(columnIndex, newWidth)
-                        ), 0)
+            @resizeMarkerRight.on 'dragend', (event, drag) =>
+                newWidth = parseInt(@resizeMarkerRight.css('left')) - parseInt(@resizeMarkerLeft.css('left'))
+                if newWidth > 0 and columnIndex != null
+                    setTimeout(( ->
+                        @_resizeColumn(columnIndex, newWidth)
+                    ), 0)
 
-                    @resizeMarkerLeft.css({
-                        'backgroundColor' : 'transparent',
-                        'left' : '0'
-                    })
-        
-                    @resizeMarkerRight.css('background-color', 'transparent')
+                @resizeMarkerLeft.css({
+                    'backgroundColor' : 'transparent',
+                    'left' : '0'
+                })
 
-                endeffect : false
-            })
-
+                @resizeMarkerRight.css('background-color', 'transparent')
 
         ###
         # Resizes a column to a new size
@@ -688,16 +682,16 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             $('#mtgIHC' + id + '_' + index).css('width', (newWidth - 8 - (if gap == 0 then 2 else 0)) + 'px')
 
             for cell in $('.mtgC' + id + '_' + index)
-                cell.attr('width', newWidth)
-                cell.css('width', newWidth + 'px')
+                $(cell).attr('width', newWidth)
+                $(cell).css('width', newWidth + 'px')
 
 
             for cell in $('.mtgIC' + id + '_' + index)
-                cellId = cell.id
+                cellId = $(cell).attr('id')
                 coords = cellId.substring(cellId.indexOf('_') + 1, cellId.length).split(',')
                 y = coords[1]
                 value = @getValueAt(index, y)
-                cell.setStyle({width: (newWidth - 6 - (if gap == 0 then 2 else 0)) + 'px'})
+                $(cell).css({'width': (newWidth - 6 - (if gap == 0 then 2 else 0)) + 'px'})
                 if !checkboxOrRadioFlg
                     if cm[index].renderer
                         if editor instanceof ComboBox
@@ -721,21 +715,16 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # Makes all columns draggable
         ###
         _makeAllColumnDraggable : ->
-            @separators = []
-            i = 0
             id = @_mtgId
-            for separator in $('.mtgHS' + @_mtgId)
-                @separators[i++] = separator
-
+            @separators = $('.mtgHS' + @_mtgId)
             topPos = 0
-            topPos += @titleHeight if @options.title
-            topPos += @toolbarHeight if @options.toolbar
-          
+            topPos += @titleHeight if @options.title?
+            topPos += @toolbarHeight if @options.toolbar?
             dragColumn = $('#dragColumn' + id)
           
             for column in $('.mtgIHC' + id)
                 columnIndex = -1
-                column.on  'mousemove', ->
+                $(column).on  'mousemove', ->
                     leftPos = column.parent().position().left
                     dragColumn.css({
                         top: (topPos + 15) + 'px',
@@ -1632,7 +1621,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             @_addKeyBehaviorToRow(newRow, -i)
             keys.addMouseBehaviorToRow(-i)
             @_applyCellCallbackToRow(-i)
-            @scrollTop = @bodyDiv.scrollTop = 0 # TODO check this
+            @scrollTop = @bodyDiv.scrollTop(0)
 
         deleteRows : ->
             id = @_mtgId
