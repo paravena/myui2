@@ -323,31 +323,31 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
             if bAutoScroll and @_bodyDiv
                 # Scroll the viewport such that the new cell is fully visible in the
                 # rendered window
-                iViewportHeight = @_bodyDiv.clientHeight
-                iViewportWidth = @_bodyDiv.clientWidth
+                viewportHeight = @_bodyDiv[0].clientHeight
+                viewportWidth = @_bodyDiv[0].clientWidth
 
-                iScrollTop = @_bodyDiv.scrollTop()
-                iScrollLeft = @_bodyDiv.scrollLeft()
+                scrollTop = @_bodyDiv.scrollTop()
+                scrollLeft = @_bodyDiv.scrollLeft()
 
-                iHeight = element.offsetHeight
-                iWidth = element.offsetWidth
-                aiPos = @getPosition(element)
+                height = element.outerHeight()
+                width = element.outerWidth()
+                pos = @getPosition(element)
 
                 # Correct viewport positioning for vertical scrolling
-                if aiPos[1]+iHeight > iScrollTop+iViewportHeight
+                if pos[1]+height > scrollTop+viewportHeight
                     # Displayed element if off the bottom of the viewport
-                    @setScrollTop(aiPos[1]+iHeight - iViewportHeight)
-                else if aiPos[1] < iScrollTop
+                    @setScrollTop(pos[1]+height - viewportHeight)
+                else if pos[1] < scrollTop
                     # Displayed element if off the top of the viewport
-                    @setScrollTop(aiPos[1])
+                    @setScrollTop(pos[1])
 
                 # Correct viewport positioning for horizontal scrolling
-                if aiPos[0] + iWidth > iScrollLeft + iViewportWidth
+                if pos[0] + width > scrollLeft + viewportWidth
                     # Displayed element is off the bottom of the viewport
-                    @setScrollLeft(aiPos[0] + iWidth - iViewportWidth)
-                else if aiPos[0] < iScrollLeft
+                    @setScrollLeft(pos[0] + width - viewportWidth)
+                else if pos[0] < scrollLeft
                     # Displayed element if off the Left of the viewport
-                    @setScrollLeft(aiPos[0])
+                    @setScrollLeft(pos[0])
 
         ###
         # Set the vertical scrolling position
@@ -424,11 +424,11 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         ###
         getCoordsFromCell : (element) ->
             id = element.attr('id')
-            return null if id is undefined
-            coords = id.substring(id.indexOf('-') + 1, id.length).split('a')
+            return null if id?
+            match = id.match(/c(\d.*?)r(\d.*?)$/)
             return [
-                parseInt(coords[0]),
-                parseInt(coords[1])
+                parseInt(match[1]),
+                parseInt(match[2])
             ]
 
         ###
@@ -438,7 +438,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
         # @return TD target
         ###
         getCellFromCoords : (x, y) ->
-            element = $(@idPrefix + x + 'a' + y, @nBody)
+            element = $(@idPrefix + 'c' + x + 'r' + y, @nBody)
             return null if element.length == 0
             return element
             # return @_targetTable.rows[y].cells[x] # <-- this sadly doesn't work

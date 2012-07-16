@@ -1,4 +1,4 @@
-define ['jquery', 'cs!myui/Util'], ($, Util) ->
+define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 'cs!myui/ComboBox'], ($, Util, TextField, Autocompleter, ComboBox) ->
     class TableGrid
         ###
         # TableGrid constructor

@@ -172,7 +172,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             html = []
             html[idx++] = '<a class="toolbar-button prev"><span class="icon" style="margin: 1px 0">&nbsp;</span></a>'
             html[idx++] = '<a class="toolbar-button next"><span class="icon" style="margin: 1px 0">&nbsp;</span></a>'
-            html[idx++] = '<span id="mdpSelectedDate-'+id+'" class="selected-date"></span>'
+            html[idx++] = '<span id="mdpSelectedDate_'+id+'" class="selected-date"></span>'
             headerDiv.append html.join('')
 
         ###
@@ -221,7 +221,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     html[idx++] = '<option value="'+month+'">'+dateUtil.getMonthNames()[month]+'</option>' for month in [0..11]
                     html[idx++] = '</select>';
                 else
-                    html[idx++] = '<span id="mdpMonthLabel-'+@_mdpId+'-'+i+'" class="month-label">'
+                    html[idx++] = '<span id="mdpMonthLabel-'+@_mdpId+'_'+i+'" class="month-label">'
                     html[idx++] = '</span>'
 
                 if @options.changeYear
@@ -230,7 +230,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     html[idx++] = '</select>'
                 else
                     html[idx++] = '&nbsp;'
-                    html[idx++] = '<span id="mdpYearLabel-'+@_mdpId+'-'+i+'" class="year-label">'
+                    html[idx++] = '<span id="mdpYearLabel-'+@_mdpId+'_'+i+'" class="year-label">'
                     html[idx++] = '</span>'
 
                 html[idx++] = '</th>'
@@ -267,7 +267,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     className = 'day'
                     className += ' weekend' if (j % 7 is 0) or ((j + 1) % 7 is 0)
                     className += ' new-month-separator' if j > 0 and j % 7 is 0 and !showWeek
-                    html[idx++] = '<td id="mdpC'+@_mdpId+'-'+j+'a'+i+'" class="'+className+'"><div></div></td>'
+                    html[idx++] = '<td id="mdpC'+@_mdpId+'_c'+j+'r'+i+'" class="'+className+'"><div></div></td>'
 
                 html[idx++] = '</tr>'
 
@@ -417,7 +417,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                         {x, y} = @_getCellCoords(i, m)
                         cell.addClass('day')
                         cell.addClass('weekend') if (x % 7 is 0) or ((x + 1) % 7 is 0)
-                        cell.attr('id', 'mdpC'+@_mdpId+'-'+x+'a'+y)
+                        cell.attr('id', 'mdpC'+@_mdpId+'_c'+x+'r'+y)
                         div.html(day)
                         cell.data('day', day)
                         cell.data('month', month)
@@ -484,7 +484,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 @_setSelectBoxValue(@monthSelect, month)
             else
                 for i in [1..numberOfMonths]
-                    $('#mdpMonthLabel-'+@_mdpId+'-'+i).html(dateUtil.getMonthNames()[month])
+                    $('#mdpMonthLabel-'+@_mdpId+'_'+i).html(dateUtil.getMonthNames()[month])
                     if (month + 1) > 11
                         month = 0
                     else
@@ -500,7 +500,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             else
                 month = @date.getMonth()
                 for i in [1..numberOfMonths]
-                    $('#mdpYearLabel-'+@_mdpId+'-'+i).html(year)
+                    $('#mdpYearLabel-'+@_mdpId+'_'+i).html(year)
                     if (month + 1) > 11
                         month = 0
                         year++
@@ -799,7 +799,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         _applyKeyboardBehavior : ->
             numberOfMonths = @options.numberOfMonths
             @_keys = new KeyTable(@daysTable, {
-                idPrefix : '#mdpC'+@_mdpId+'-',
+                idPrefix : '#mdpC'+@_mdpId+'_',
                 numberOfColumns : numberOfMonths * 7
             })
 
