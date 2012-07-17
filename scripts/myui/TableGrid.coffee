@@ -739,42 +739,40 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             topPos += @titleHeight if @options.title?
             topPos += @toolbarHeight if @options.toolbar?
             dragColumn = $('#dragColumn' + id)
-          
+
             for column in $('.mtgIHC' + id)
                 columnIndex = -1
                 $(column).on  'mousemove', ->
-                    leftPos = column.parent().position().left
+                    leftPos = column.position().left
                     dragColumn.css({
                         'top' : (topPos + 15) + 'px',
                         'left' : (leftPos - @scrollLeft + 15) + 'px'
                     })
-                # TODO check this
-                new Draggable(dragColumn, {
-                    handle : column,
-                    onStart : ->
-                        for i in [0...@columnModel.length]
-                            if index == @columnModel[i].positionIndex
-                                columnIndex = i
-                                break
-                        dragColumn.find('span').html(@columnModel[columnIndex].title)
-                        dragColumn.css('visibility', 'visible')
-                    onDrag : ->
-                        leftPos = parseInt(dragColumn.css('left'))
-                        width = parseInt(dragColumn.css('width'))
+
+                $(column).on 'draginit', (event, drag) =>
+                    for i in [0...@columnModel.length]
+                        if index == @columnModel[i].positionIndex
+                            columnIndex = i
+                            break
+                    dragColumn.find('span').html(@columnModel[columnIndex].title).css('visibility', 'visible')
+                    drag.representative(dragColumn, dragColumn.width(), 0)
+
+                $(column).on 'dragmove', (event, drag) =>
+                    leftPos = dragColumn.position().left
+                    width = dragColumn.width()
+                    setTimeout(( ->
+                      @_detectDroppablePosition(leftPos + width / 2, width, dragColumn, columnIndex)
+                    ), 0)
+
+                $(column).on 'dragend', (event, drag) =>
+                    dragColumn.css('visibility', 'hidden')
+                    @colMoveTopDiv.css('visibility', 'hidden')
+                    @colMoveBottomDiv.css('visibility', 'hidden')
+                    if columnIndex >= 0 and @targetColumnId >= 0
                         setTimeout(( ->
-                            @_detectDroppablePosition(leftPos + width / 2, width, dragColumn, columnIndex)
+                            @_moveColumn(columnIndex, @targetColumnId)
+                            columnIndex = -1
                         ), 0)
-                    onEnd : ->
-                        dragColumn.css('visibility', 'hidden')
-                        @colMoveTopDiv.css('visibility', 'hidden')
-                        @colMoveBottomDiv.css('visibility', 'hidden')
-                        if columnIndex >= 0 and @targetColumnId >= 0
-                            setTimeout(( ->
-                                @_moveColumn(columnIndex, @targetColumnId)
-                                columnIndex = -1
-                            ), 0)
-                    endeffect : false
-                })
 
         ###
         # Detects droppable position when the mouse pointer is over a header cell
@@ -952,6 +950,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             for j in [beginAtRow...renderedRows]
                 @_addKeyBehaviorToRow(rows[j], j)
 
+        ###
+        # Add key behavior to row.
+        ###
         _addKeyBehaviorToRow : (row, j) ->
             id = @_mtgId
             cm = @columnModel
@@ -1218,6 +1219,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                     headerButtonMenu.css('visibility', 'hidden') if !element.closest(headerButtonMenu) and !miFlg # TODO check this
                 ), 500)
 
+        ###
+        # Sort data displayed in TableGrid.
+        ###
         _sortData : (idx, ascDescFlg) ->
             cm = @columnModel
             id = @_mtgId
@@ -1233,6 +1237,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                 @sortedColumnIndex = idx
                 cm[idx].sortedAscDescFlg = ascDescFlg
 
+        ###
+        # Toggle sorting between descendant and ascendant options.
+        ###
         _toggleSortData : (idx) ->
             cm = @columnModel
             if cm[idx].sortedAscDescFlg == 'DESC'
@@ -1240,6 +1247,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             else
                 @_sortData(idx, 'DESC')
 
+        ###
+        # Toggle column visibility.
+        ###
         _toggleColumnVisibility : (index, visibleFlg) ->
             id = @_mtgId
             @_blurCellElement(@keys._nCurrentFocus) # in case there is a cell in editing mode
@@ -1273,6 +1283,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             bodyTable.attr('width', @headerWidth)
             bodyTable.css('width', @headerWidth + 'px')
 
+        ###
+        # Calculates full padding.
+        ###
         _fullPadding : (element, s) ->
             padding = parseInt(element.css('padding-'+s))
             padding = if isNaN(padding) then 0 else padding
@@ -1280,18 +1293,23 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             border = if isNaN(border) then 0 else border
             return padding + border
 
+        ###
+        # Retrieves data from url using an AJAX call, expected result must
+        # in JSON format otherwise it will call onFailure callback.
+        ###
         _retrieveDataFromUrl : (pageNumber, firstTimeFlg) ->
             return if !firstTimeFlg and @onPageChange amd !@onPageChange()
             pageParameter = 'page'
             pageParameter = @pager.pageParameter if @pager != null and @pager.pageParameter
             @request[pageParameter] = pageNumber
             @_toggleLoadingOverlay()
-            @columnModel[i].selectAllFlg = false for i in [0...@columnModel.length] # TODO could be simplyfied
-            # TODO lot of work to do here
-            new Ajax.Request(@url, {
-                parameters: @request,
-                onSuccess: (response) ->
-                    tableModel = response.responseText.evalJSON()
+            column.selectAllFlg = false for column in @columnModel
+            $.ajax({
+                url : @url,
+                data : @request,
+                context : @, # TODO here it maybe will be a problem
+                done : (response) ->
+                    tableModel = $.parseJSON(response)
                     try
                         @rows = tableModel.rows or []
                         @pager = null
@@ -1306,7 +1324,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                             @keys = new KeyTable(self)
                             @_addKeyBehavior()
 
-                        if (@pager)
+                        if @pager?
                             @pagerDiv.html(@_updatePagerInfo()) # update pager info panel
                             @_addPagerBehavior()
 
@@ -1317,13 +1335,16 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                         @_toggleLoadingOverlay()
                         @scrollTop = @bodyDiv.scrollTop = 0
                         @bodyDiv.fire('dom:dataLoaded') if firstTimeFlg
-                onFailure : (transport) ->
-                    @onFailure(transport) if @onFailure
+                fail : (response) ->
+                    @onFailure(response) if @onFailure?
                     @_toggleLoadingOverlay()
                     @scrollTop = @bodyDiv.scrollTop = 0
                     @bodyDiv.fire('dom:dataLoaded') if firstTimeFlg
             })
 
+        ###
+        # Updates pager info.
+        ###
         _updatePagerInfo : (emptyFlg) ->
             id = @_mtgId
             return '<span id="mtgLoader'+id+'" class="mtgLoader">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' if emptyFlg
@@ -1334,7 +1355,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                 temp = i18n.getMessage('message.totalDisplay', {'total' : pager.total})
                 temp += i18n.getMessage('message.rowsDisplay', {'from' : pager.from, 'to' : pager.to}) if pager.from and pager.to
                 html[idx++] = '<span class="my-tablegrid-pager-message">'+temp+'</span>'
-                if pager.pages
+                if pager.pages?
                     input = '<input type="text" name="mtgPageInput'+id+'" id="mtgPageInput'+id+'" value="'+pager.currentPage+'" class="my-tablegrid-page-input" size="3" maxlength="3">'
                     temp = i18n.getMessage('message.pagePrompt', {'pages' : pager.pages, 'input' : input})
                     html[idx++] = '<table class="my-tablegrid-pager-table" border="0" cellpadding="0" cellspacing="0">'
@@ -1365,6 +1386,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
 
             return html.join('')
 
+        ###
+        # Add pager behavior.
+        ###
         _addPagerBehavior : ->
             id = @_mtgId
             return unless @pager.pages
@@ -1403,7 +1427,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                         pageNumber = '1' if pageNumber < 1
                         $('#mtgPageInput'+id).val(pageNumber)
                         @_retrieveDataFromUrl(pageNumber)
-
+        ###
+        # Resize handler.
+        ###
         resize : ->
             target = $(@target)
             width = @options.width or (target.width() - @_fullPadding(target, 'left') - @_fullPadding(target, 'right')) + 'px'
@@ -1454,12 +1480,19 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                 @_applyCellCallbacks()
                 @keys.addMouseBehavior()
 
+        ###
+        # Returns value at given coordinates.
+        ###
         getValueAt : (x, y) ->
             value = null
             columnId = @columnModel[x].id
             value = if y >= 0 then @rows[y][columnId] else @newRowsAdded[Math.abs(y)-1][columnId]
             return value
 
+        ###
+        # Set value at given coordinates, refreshValueFlg makes the
+        # change either visible or not.
+        ###
         setValueAt : (value, x, y, refreshValueFlg) ->
             cm = @columnModel
             id = @_mtgId
@@ -1490,6 +1523,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             else
                 @newRowsAdded[Math.abs(y)-1][columnId] = value
 
+        ###
+        # Returns column index.
+        ###
         getColumnIndex : (id) ->
             index = -1
             for i in [0...@columnModel.length]
@@ -1498,21 +1534,32 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                     break
             return index;
 
+        ###
+        # Returns index of a given id column model item.
+        ###
         getIndexOf : (id) ->
-            cm = @columnModel
             idx = -1
-            for i in[0...cm.length]
-                if cm[i].id == id
+            for column in @columnModel
+                if column.id == id
                     idx = i
                     break
             return idx
 
+        ###
+        # Returns current position.
+        ###
         getCurrentPosition : ->
             return [@keys._xCurrentPos, @keys._yCurrentPos]
 
+        ###
+        # Returns cell element at given position.
+        ###
         getCellElementAt : (x, y) ->
             return $('#mtgC'+@_mtgId + '_c' + x + 'r' + y)
 
+        ###
+        # Returns modified rows.
+        ###
         getModifiedRows : ->
             result = []
             modifiedRows = @modifiedRows
@@ -1522,9 +1569,15 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                 result.push(rows[idx])
             return result
 
+        ###
+        # Returns new rows added.
+        ###
         getNewRowsAdded : ->
             return @newRowsAdded
 
+        ###
+        # Returns deleted rows.
+        ###
         getDeletedRows : ->
             return @deletedRows
 
@@ -1548,6 +1601,10 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                     result.push(newRowsAdded[Math.abs(rowIdx)-1])
             return result;
 
+        ###
+        # Returns an array containing the correlative
+        # index of the selected rows.
+        ###
         _getSelectedRowsIdx: (idx) ->
             result = []
             id = @_mtgId
@@ -1557,10 +1614,10 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             idx = idx or -1 # Selectable column index
             selectAllFlg = false
             if idx == -1
-                for i in [0...cm.length]
-                    if cm[i].editor == 'checkbox' or cm[i].editor instanceof TableGrid.CellCheckbox and cm[i].editor.selectable
-                        idx = cm[i].positionIndex
-                        selectAllFlg = cm[i].selectAllFlg
+                for column in cm
+                    if column.editor == 'checkbox' or column.editor instanceof TableGrid.CellCheckbox and column.editor.selectable
+                        idx = column.positionIndex
+                        selectAllFlg = column.selectAllFlg
                         break
             else
                 selectAllFlg = cm[idx].selectAllFlg
@@ -1583,6 +1640,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
 
             return result;
 
+        ###
+        # Highlight given row id.
+        ###
         highlightRow : (id, value) ->
             $('.mtgRow'+@_mtgId).removeClass('focus')
             index = @getColumnIndex(id)
@@ -1593,11 +1653,17 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                     break
             $('#mtgRow'+@_mtgId+'_r'+rowIndex).addClass('focus') if rowIndex >= 0
 
+        ###
+        # Returns row for given "y" position.
+        ###
         getRow : (y) ->
             result = null
             result = if y >= 0 then @rows[y] else @newRowsAdded[-(y + 1)]
             return result
 
+        ###
+        # Returns column values as an array.
+        ###
         getColumnValues : (id) ->
             result = []
             j = 0
@@ -1606,11 +1672,17 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             result[j++] = @rows[i][id] for i in [0...@rows.length]
             return result
 
+        ###
+        # Clears internal table grid status.
+        ###
         clear : ->
             @modifiedRows = []
             @deletedRows = []
             @newRowsAdded = []
 
+        ###
+        # Add a new row.
+        ###
         addNewRow : (newRow) ->
             keys = @keys
             bodyTable = @bodyTable
@@ -1628,6 +1700,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             @_applyCellCallbackToRow(-i)
             @scrollTop = @bodyDiv.scrollTop(0)
 
+        ###
+        # Deletes selected rows.
+        ###
         deleteRows : ->
             id = @_mtgId
             selectedRows = @_getSelectedRowsIdx()
@@ -1654,12 +1729,18 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                 toDiv.html(to)
             @_syncScroll()
 
+        ###
+        # Refresh data displayed in TableGrid.
+        ###
         refresh : ->
             @modifiedRows = []
             @deletedRows = []
             @newRowsAdded = []
             @_retrieveDataFromUrl(1, false)
 
+        ###
+        # Empty data displayed in TableGrid.
+        ###
         empty : ->
             bodyTable = @bodyTable
             bodyTable.find('tbody').html('')
