@@ -1,20 +1,31 @@
 define ['jquery', 'cs!myui/Autocompleter'], ($, Autocompleter) ->
     class ComboBox extends Autocompleter
+        ###
+        # Constructor method.
+        ###
         constructor : (options) ->
             @baseInitialize(options)
             @options.minChars ?= 0
 
+        ###
+        # Key press handler.
+        ###
         _keyPress : (event) ->
             if event.which is 40 and !@active
                 event.stopPropagation()
                 @changed = false
                 @showAll()
 
+        ###
+        # Displays ComboBox control.
+        ###
         render : (input) ->
             super(input)
             @element.keydown (event) => @_keyPress(event)
 
-
+        ###
+        # Show all elements in the list.
+        ###
         showAll : ->
             if !@active
                 unless @update
@@ -30,9 +41,15 @@ define ['jquery', 'cs!myui/Autocompleter'], ($, Autocompleter) ->
             else
                 @options.onHide(@element, @update)
 
+        ###
+        # Retrieves all choices.
+        ###
         getAllChoices : ->
             @updateChoices @all()
 
+        ###
+        # Generates a list with all elements.
+        ###
         all : ->
             currentValue = $(@element).val()
             result = []
@@ -73,6 +90,9 @@ define ['jquery', 'cs!myui/Autocompleter'], ($, Autocompleter) ->
 
             return '<ul>' + result.join('') + '</ul>'
 
+        ###
+        # Generates input control.
+        ###
         decorate : (element) ->
             width = $(element).width()
             height = $(element).height()
@@ -85,6 +105,6 @@ define ['jquery', 'cs!myui/Autocompleter'], ($, Autocompleter) ->
             comboBoxBtn = $('<div></div>')
             comboBoxBtn.addClass('my-combobox-button gradient')
             container.append(comboBoxBtn)
-            comboBoxBtn.click (event) =>
+            comboBoxBtn.on 'click', (event) =>
                 @showAll()
                 event.stopPropagation()

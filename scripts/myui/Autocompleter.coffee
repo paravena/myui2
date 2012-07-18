@@ -149,9 +149,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             @options.decorate();
             @container = $('#' + @id + '_container');
             @onBlurHandler = (event) => @onBlur(event)
-            $(document).click @onBlurHandler
+            $(document).on 'click', @onBlurHandler
             @onKeyPressHandler = (event) => @_onKeyPress(event)
-            @element.keydown @onKeyPressHandler
+            @element.on 'keydown', @onKeyPressHandler
 
         show : ->
             @options.onShow @element, @update
@@ -377,7 +377,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
 
         addObservers : (entries) ->
             entries.mouseover (event) => @onHover(event)
-            entries.click (event) => @onClick(event)
+            entries.on 'click', (event) => @onClick(event)
             entries.each (index, entry) ->
                 $(entry).data('autocompleteIndex', index)
 

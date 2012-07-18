@@ -1,4 +1,4 @@
-define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 'cs!myui/ComboBox'], ($, Util, TextField, Autocompleter, ComboBox) ->
+define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 'cs!myui/ComboBox'], ($, jquerypp, Util, TextField, Autocompleter, ComboBox) ->
     class TableGrid
         ###
         # TableGrid constructor
@@ -128,7 +128,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             if @options.toolbar?
                 elements = @options.toolbar.elements or []
                 if elements.indexOf(TableGrid.ADD_BTN) >= 0
-                    $('#mtgAddBtn'+id).click =>
+                    $('#mtgAddBtn'+id).on 'click', =>
                         addFlg = true
                         if @options.toolbar.onAdd?
                             addFlg = @options.toolbar.onAdd()
@@ -143,7 +143,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                             @options.toolbar.afterAdd() if @options.toolbar.afterAdd?
               
                 if elements.indexOf(TableGrid.DEL_BTN) >= 0
-                    $('#mtgDelBtn'+id).click =>
+                    $('#mtgDelBtn'+id).on 'click', =>
                         deleteFlg = true
                         if @options.toolbar.onDelete?
                             deleteFlg = @options.toolbar.onDelete()
@@ -158,7 +158,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                             @options.toolbar.afterDelete() if @options.toolbar.afterDelete
 
                 if elements.indexOf(TableGrid.SAVE_BTN) >= 0
-                    $('#mtgSaveBtn'+id).click =>
+                    $('#mtgSaveBtn'+id).on 'click', =>
                         @_blurCellElement(@keys._nCurrentFocus)
                         @options.toolbar.onSave() if @options.toolbar.onSave?
             
@@ -498,7 +498,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                     elementClickHandler = f_handler(editor, element, innerElement)
                     editor.onClickCallback(element.value, element.checked) if editor.onClickCallback
                     innerElement.addClass('modified-cell') if editor.selectable is undefined or !editor.selectable
-                    element.click elementClickHandler
+                    element.on 'click', elementClickHandler
 
         ###
         # Returns TableGrid id.
@@ -570,7 +570,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
           
             width = settingMenu.width()
           
-            settingButton.click ->
+            settingButton.on 'click', ->
                 if settingMenu.css('visibility') == 'hidden'
                     topPos = settingButton.position().top
                     leftPos = settingButton.position().left
@@ -583,10 +583,10 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                     settingMenu.css('visibility', 'hidden')
 
             miFlg = false
-            settingMenu.mousemove ->
+            settingMenu.on 'mousemove', ->
                 miFlg = true
 
-            settingMenu.mouseout (event) ->
+            settingMenu.on 'mouseout', (event) ->
                 miFlg = false
                 element = $(event.target)
                 f_timeout = ->
@@ -596,7 +596,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             i = 0
             # TODO maybe this could be simplified
             for checkbox in $('#mtgSM'+@_mtgId + ' input')
-                $(checkbox).click =>
+                $(checkbox).on 'click', =>
                    @_toggleColumnVisibility(i++, checkbox.checked)
 
          ###
@@ -636,7 +636,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             columnIndex = 0
             leftPos = 0
             for separator in $('.mtgHS' + @_mtgId)
-                $(separator).mousemove =>
+                $(separator).on 'mousemove', =>
                     columnIndex = parseInt(separator.attr('id').substring(separator.attr('id').indexOf('_') + 1, separator.attr('id').length))
                     if columnIndex >= 0
                         leftPos = $('#mtgHC' + id + '_c' + columnIndex).position().left - @scrollLeft
@@ -742,7 +742,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
 
             for column in $('.mtgIHC' + id)
                 columnIndex = -1
-                $(column).on  'mousemove', ->
+                $(column).on 'mousemove', ->
                     leftPos = column.position().left
                     dragColumn.css({
                         'top' : (topPos + 15) + 'px',
@@ -803,13 +803,13 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                         'visibility' : 'visible'
                     })
                     @targetColumnId = i
-                    dragColumn.find('div').addClass(if i != index then 'drop-yes' else 'drop-no') # TODO check this
+                    dragColumn.find('div').attr('class', if i != index then 'drop-yes' else 'drop-no')
                     break
                 else
                     colMoveTopDiv.css('visibility', 'hidden')
                     colMoveBottomDiv.css('visibility', 'hidden')
                     @targetColumnId = null
-                    dragColumn.find('div').addClass('drop-no') # TODO check this
+                    dragColumn.find('div').attr('class','drop-no')
 
         ###
         # Moves a column from one position to a new one
@@ -897,7 +897,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             columnModelLength = cm.length
             columnModelEntry = cm[fromColumnId]
             cm[fromColumnId] = null
-            cm = cm.compact() # TODO check this
+            cm = $.map cm, (element) -> return element if element? # remove empty elements
             aTemp = []
             k = 0
             targetColumnId = toColumnId
@@ -1005,9 +1005,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
             coords = @getCurrentPosition()
             x = coords[0]
             y = coords[1]
-            width = parseInt(element.css('width'))
-            height = parseInt(element.css('height'))
-            innerElement = element.find('div') # TODO check this
+            width = element.width()
+            height = element.height()
+            innerElement = element.find('div')
             value = @getValueAt(x, y)
             editor = @columnModel[x].editor or 'input'
             input = null
@@ -1041,7 +1041,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                 input.select()
             else if editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox
                 input = $('#mtgInput' + @_mtgId + '_c' + x + 'r' + y)
-                input.attr('checked', !input.is(':checked')) # TODO check this weird thing
+                input.attr('checked', !input.is(':checked'))
                 if editor.selectable == undefined or !editor.selectable
                     value = input.is(':checked')
                     value = editor.getValueOf(input.is(':checked')) if editor.hasOwnProperty('getValueOf')
@@ -1054,7 +1054,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                 innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
             else if editor == 'radio' or editor instanceof TableGrid.CellRadioButton
                 input = $('#mtgInput' + @_mtgId + '_c' + x + 'r' + y)
-                input.attr('checked', !input.is(':checked')) # TODO check this weird thing
+                input.attr('checked', !input.is(':checked'))
                 value = input.is(':checked')
                 value = editor.getValueOf(input.is(':checked')) if editor.hasOwnProperty('getValueOf')
                 @setValueAt(value, x, y, false)
@@ -1171,11 +1171,11 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                         $('mtgSortDesc' + id).hide()
                         $('mtgSortAsc' + id).hide()
 
-                    selectAllItem = $('#mtgHBM' + id + ' .mtgSelectAll:first')  # TODO check this
+                    selectAllItem = $('#mtgHBM' + id + ' .mtgSelectAll:first')
                     if @renderedRows > 0 and (cm[selectedHCIndex].editor == 'checkbox' or cm[selectedHCIndex].editor instanceof TableGrid.CellCheckbox)
                         selectAllItem.find('input').attr('checked', cm[selectedHCIndex].selectAllFlg)
                         selectAllItem.show()
-                        selectAllHandler = => # onclick handler
+                        selectAllItem.on 'click', => # onclick handler
                             flag = cm[selectedHCIndex].selectAllFlg = $('#mtgSelectAll' + id).is(':checked')
                             selectableFlg = false
                             selectableFlg = true if cm[selectedHCIndex].editor instanceof TableGrid.CellCheckbox and cm[selectedHCIndex].editor.selectable
@@ -1192,8 +1192,6 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                                     @setValueAt(value, x, y, false)
                                     # if doesn't exist in the array the row is registered
                                     @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1
-                        # TODO review this
-                        selectAllItem.on 'click', selectAllHandler
                     else
                         selectAllItem.hide()
 
@@ -1216,7 +1214,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 
                 miFlg = false
                 element = $(event.target)
                 setTimeout(( ->
-                    headerButtonMenu.css('visibility', 'hidden') if !element.closest(headerButtonMenu) and !miFlg # TODO check this
+                    headerButtonMenu.css('visibility', 'hidden') if !element.closest(headerButtonMenu) and !miFlg
                 ), 500)
 
         ###
