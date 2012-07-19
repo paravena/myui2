@@ -1,4 +1,4 @@
-define ['../jquery'], ($) ->
+define ['jquery'], ($) ->
     event =
         KEY_BACKSPACE: 8
         KEY_TAB:       9
