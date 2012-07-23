@@ -2,9 +2,15 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
     eventUtil = $.util.event
 
     class Autocompleter extends TextField
+        ###
+        # Constructor method.
+        ###
         constructor : (options) ->
             @baseInitialize(options)
 
+        ###
+        # Base initializer.
+        ###
         baseInitialize : (options) ->
             super(options)
             @element = $(options.input);
@@ -138,6 +144,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             @observer = null
             if @element then @render(@element)
 
+        ###
+        # Displays autocompleter control.
+        ###
         render : (input) ->
             super(input)
             @element = $(input)
@@ -153,16 +162,28 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             @onKeyPressHandler = (event) => @_onKeyPress(event)
             @element.on 'keydown', @onKeyPressHandler
 
+        ###
+        # Displays autocompleter control.
+        ###
         show : ->
             @options.onShow @element, @update
 
+        ###
+        # On focus handler.
+        ###
         onFocus : (event) ->
             super(event)
             @tokenBounds = null
 
+        ###
+        # Returns item elements.
+        ###
         getItems : ->
             return @options.items
 
+        ###
+        # Retrieves updated choice list.
+        ###
         getUpdatedChoices : ->
             unless @update
                 $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list shadow"></div>')
@@ -189,6 +210,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             else
                 @updateChoices @options.selector()
 
+        ###
+        # On blur handler.
+        ###
         onBlur : (event) ->
             target = $(event.target)
             ancestor = @container;
@@ -199,6 +223,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 @hasFocus = false
                 @active = false
 
+        ###
+        # Decorates autocompleter control.
+        ###
         decorate : (element) ->
             width = $(element).width()
             height = $(element).height()
@@ -209,6 +236,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             container.attr('id', @id + '_container')
             container.css({width : width + 'px', height: height + 'px'})
 
+        ###
+        # Hide choice list.
+        ###
         hide : ->
             @stopIndicator()
             if @update
@@ -217,13 +247,21 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 @hasFocus = false
                 @update = null
 
+        ###
+        # Displays spinner indicator.
+        ###
         startIndicator : ->
-            if @options.indicator then $(@options.indicator).show()
+          $(@options.indicator).show() if @options.indicator?
 
-
+        ###
+        # Hides spinner indicator.
+        ###
         stopIndicator : ->
-            if @options.indicator then $(@options.indicator).hide()
+            $(@options.indicator).hide() if @options.indicator?
 
+        ###
+        # On keypress handler.
+        ###
         _onKeyPress: (event) ->
             if @active
                 switch event.keyCode
@@ -261,23 +299,35 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             @observer = setTimeout(onObserverEventHandler, @options.frequency * 1000)
             return true
 
+        ###
+        # Activates autocompleter control.
+        ###
         activate : ->
             @changed = false
             @hasFocus = true
             @getUpdatedChoices()
 
+        ###
+        # On hover handler.
+        ###
         onHover : (event) ->
             element = $(event.target).closest('LI')[0]
             if @index isnt $(element).data('autocompleteIndex')
                 @index = $(element).data('autocompleteIndex')
                 @_renderList()
 
+        ###
+        # On click handler.
+        ###
         onClick : (event) ->
             element = $(event.target).closest('LI')[0]
             @index = $(element).data('autocompleteIndex')
             @selectEntry()
             @hide()
 
+        ###
+        # Displays choice list.
+        ###
         _renderList : ->
             if @index is undefined then @index = 0
             if @entryCount > 0
@@ -293,10 +343,15 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 @active = false
                 @hide()
 
-
+        ###
+        # Returns entry by a given index.
+        ###
         _getEntry : (index) ->
             return $('LI', @update)[index]
 
+        ###
+        # Highlight previous item choice.
+        ###
         markPrevious : ->
             if @index > 0
                 @index--;
@@ -304,6 +359,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 @index = @entryCount - 1;
             @_syncScroll(@_getEntry(@index), false)
 
+        ###
+        # Highlight next item choice.
+        ###
         markNext : ->
             if @index < @entryCount - 1
                 @index++
@@ -311,6 +369,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 @index = 0
             @_syncScroll(@_getEntry(@index), true)
 
+        ###
+        # Synchronizes scrolling.
+        ###
         _syncScroll : (entry, bottomFlg) ->
             updateHeight = @update.height()
             scrollTop = @update.scrollTop() # TODO check this
@@ -321,15 +382,27 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             else
                 @update.scrollTop(entry.offsetTop - (updateHeight - $(entry).height() - 5))
 
+        ###
+        # Returns selected item choice.
+        ###
         getCurrentEntry : ->
             return @_getEntry(@index)
 
+        ###
+        # Highlight selected item choice.
+        ###
         selectEntry : ->
             @updateElement(@getCurrentEntry())
 
+        ###
+        # Returns value.
+        ###
         getValue : ->
             return @oldElementValue
 
+        ###
+        # Updates element.
+        ###
         updateElement : (selectedElement) ->
             # if an updateElement method is provided
             if @options.updateElement
@@ -357,6 +430,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             if (@options.afterUpdate)
                 @options.afterUpdate(@element, selectedElement)
 
+        ###
+        # Updates choice list.
+        ###
         updateChoices : (choices) ->
             if !@changed && @hasFocus
                 @update.html(choices)
@@ -374,13 +450,18 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 else
                     @_renderList()
 
-
+        ###
+        # Add event observers.
+        ###
         addObservers : (entries) ->
             entries.mouseover (event) => @onHover(event)
             entries.on 'click', (event) => @onClick(event)
             entries.each (index, entry) ->
                 $(entry).data('autocompleteIndex', index)
 
+        ###
+        # On observer event handler.
+        ###
         onObserverEvent : ->
             @changed = false
             @tokenBounds = null
@@ -392,10 +473,17 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
 
             @oldElementValue = @element.val()
 
+        ###
+        # Returns token.
+        ###
         getToken : ->
             bounds = @getTokenBounds()
             return $.trim(@element.val().substring(bounds[0], bounds[1]))
 
+        ###
+        # Returns am array containing the indexes
+        # that delimits the entered text.
+        ###
         getTokenBounds : ->
             return @tokenBounds if @tokenBounds
             value = @element.val()
@@ -414,6 +502,10 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 ++index
             return (@tokenBounds = [prevTokenPos + 1, nextTokenPos])
 
+        ###
+        # Returns first position where a character is
+        # found different than the current entered text.
+        ###
         getFirstDifferencePos : (newS, oldS) ->
             boundary = Math.min(newS.length, oldS.length)
             for index in [0...boundary] #TODO check this
@@ -421,7 +513,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                     return index
             return boundary
 
-
+        ###
+        # Returns selected value.
+        ###
         getSelectedValue : (text) ->
             items = @options.items
             listTextPropertyName = @options.listTextPropertyName
