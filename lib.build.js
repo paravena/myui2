@@ -3,5 +3,5 @@
     stubModules: ['cs'],
     name : 'main',
     out : 'scripts/main-build.js',
-    exclude: ['cs', 'jquery', 'jquerypp.custom']
+    exclude: ['coffee-script', 'jquery', 'jquerypp.custom']
 })
