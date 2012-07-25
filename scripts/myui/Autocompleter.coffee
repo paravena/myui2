@@ -20,25 +20,27 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             @index = 0;
             @entryCount = 0;
 
-            @options.items = null unless @options.items
-            @options.listId = null unless @options.listId
-            @options.tokens = [] unless @options.tokens
-            @options.frequency = 0.4 unless @options.frequency
-            @options.minChars = 2 unless @options.minChars
-            @options.url = null unless @options.url
-            @options.parameters = {} unless @options.parameters
-            @options.finderParamName = 'find' unless @options.finderParamName
-            @options.listTextPropertyName = 'text' unless @options.listTextPropertyName
-            @options.listValuePropertyName = 'value' unless @options.listValuePropertyName
-            @options.height = null unless @options.height
-            @options.indicator = null unless @options.indicator
-            @options.autoSelect = false unless @options.autoSelect
-            @options.choices = 10 unless @options.choices
-            @options.partialSearch = true unless @options.partialSearch
-            @options.partialChars = 1 unless @options.partialChars
-            @options.ignoreCase = true unless @options.ignoreCase
-            @options.fullSearch = false unless @options.fullSearch
-            @options.getParameters = null unless @options.getParameters
+            @options = $.extend({
+                items: null,
+                listId: null,
+                tokens: [],
+                frequency: 0.4,
+                minChars: 2,
+                url: null,
+                parameters: {},
+                finderParamName: 'find',
+                listTextPropertyName: 'text',
+                listValuePropertyName: 'value',
+                height: null,
+                indicator: null,
+                autoSelect: false,
+                choices: 10,
+                partialSearch : true,
+                partialChars : 1,
+                ignoreCase: true,
+                fullSearch: false,
+                getParameters: null
+            }, options or {})
 
             unless @options.decorate
                 @options.decorate = => @decorate(@element)
@@ -88,7 +90,6 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                     $(update).hide()
                     @hasFocus = false
                     @active = false
-
 
             unless @options.selector
                 @options.selector = =>
@@ -142,7 +143,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 @options.tokens.push '\n'
 
             @observer = null
-            if @element then @render(@element)
+            @render(@element) if @element?
 
         ###
         # Displays autocompleter control.
@@ -251,7 +252,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         # Displays spinner indicator.
         ###
         startIndicator : ->
-          $(@options.indicator).show() if @options.indicator?
+            $(@options.indicator).show() if @options.indicator?
 
         ###
         # Hides spinner indicator.
@@ -295,8 +296,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             @hasFocus = true
 
             clearTimeout @observer if @observe
-            onObserverEventHandler = => @onObserverEvent()
-            @observer = setTimeout(onObserverEventHandler, @options.frequency * 1000)
+            @observer = setTimeout(( => @onObserverEvent()), @options.frequency * 1000)
             return true
 
         ###
