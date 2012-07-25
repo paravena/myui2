@@ -8,10 +8,24 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             @tableModel = tableModel
             @columnModel = tableModel.columnModel or []
             @rows = tableModel.rows or []
-            @options = tableModel.options or {}
             @name = tableModel.name or ''
-            @fontSize = 11
-            @cellHeight = parseInt(@options.cellHeight) or 24
+
+            @options = $.extend({
+                cellHeight : 24,
+                pager : null
+                sortColumnParameter : 'sortColumn',
+                ascDescFlagParameter : 'ascDescFlg',
+                onCellFocus : null,
+                onCellBlur : null,
+                onPageChange : null,
+                afterRender : null,
+                onFailure : null,
+                rowStyle : ( ->  return ''),
+                rowClass : ( ->  return ''),
+                addSettingBehavior : true,
+                addDraggingBehaviour : true
+            }, tableModel.options or {})
+
             @pagerHeight = 24
             @titleHeight = 24
             @toolbarHeight = 24
@@ -19,24 +33,15 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             @topPos = 0
             @leftPos = 0
             @selectedHCIndex = 0
-            @pager = @options.pager or null
-            @pager.pageParameter = @options.pager.pageParameter or 'page' if (@options.pager)
+            @pager = @options.pager
+            @pager.pageParameter = @options.pager.pageParameter or 'page' if @options.pager?
             @url = tableModel.url or null
             @request = tableModel.request or {}
-            @sortColumnParameter = @options.sortColumnParameter or 'sortColumn'
-            @ascDescFlagParameter = @options.ascDescFlagParameter or 'ascDescFlg'
+            @sortColumnParameter = @options.sortColumnParameter
+            @ascDescFlagParameter = @options.ascDescFlagParameter
             @sortedColumnIndex = 0
             @sortedAscDescFlg = 'ASC' # or 'DESC'
-            @onCellFocus = @options.onCellFocus or null
-            @onCellBlur = @options.onCellBlur or null
             @modifiedRows = [] #will contain the modified row numbers
-            @afterRender = @options.afterRender or null #after rendering handler
-            @onFailure = @options.onFailure or null #on failure handler
-            @rowStyle = @options.rowStyle or null #row style handler
-            @rowClass = @options.rowClass or null #row class handler
-            @addSettingBehaviorFlg = (@options.addSettingBehavior == undefined or @options.addSettingBehavior)? true : false
-            @addDraggingBehaviorFlg = (@options.addDraggingBehavior == undefined or @options.addDraggingBehavior)? true : false
-            @onPageChange = @options.onPageChange or null
             @renderedRows = 0 #Use for lazy rendering
             @renderedRowsAllowed = 0 #Use for lazy rendering depends on bodyDiv height
             @newRowsAdded = []
@@ -45,8 +50,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             # Header builder
             @hb = new HeaderBuilder(@_mtgId, @columnModel)
             if @hb.getHeaderRowNestedLevel() > 1
-                @addSettingBehaviorFlg = false
-                @addDraggingBehaviorFlg = false
+                @options.addSettingBehavior = false
+                @options.addDraggingBehavior = false
 
             @headerWidth = @hb.getTableHeaderWidth()
             @headerHeight = @hb.getTableHeaderHeight()
@@ -67,7 +72,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             @editedCellId = null
     
             @gap = 2 #diff between width and offsetWidth
-            @gap = 0 if Prototype.Browser.WebKit
+            @gap = 0 if $.browser.webkit
 
         ###
         # Displays TableGrid control.
@@ -105,16 +110,16 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                 @_applyCellCallbacks()
                 @_applyHeaderButtons()
                 @_makeAllColumnsResizable()
-                @_makeAllColumnDraggable() if @addDraggingBehaviorFlg
-                @_applySettingMenuBehavior() if @addSettingBehaviorFlg
-                @keys = new KeyTable(@) # TODO veridy if this is correct
+                @_makeAllColumnDraggable() if @options.addDraggingBehavior
+                @_applySettingMenuBehavior() if @options.addSettingBehavior
+                @keys = new KeyTable(@) # TODO verify if this is correct
                 @_addKeyBehavior()
                 @_addPagerBehavior() if @pager
-                @afterRender() if @afterRender
+                @options.afterRender() if @options.afterRender?
                 @_hideLoaderSpinner()
           
             setTimeout(( =>
-                    @renderedRowsAllowed = Math.floor((@bodyHeight - @scrollBarWidth - 3)  / @cellHeight) + 1
+                    @renderedRowsAllowed = Math.floor((@bodyHeight - @scrollBarWidth - 3)  / @options.cellHeight) + 1
                     if @tableModel.hasOwnProperty('rows')
                         @innerBodyDiv.html(@_createTableBody(@rows))
                         @pagerDiv.html(@_updatePagerInfo()) if @pager
@@ -163,11 +168,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                         @options.toolbar.onSave() if @options.toolbar.onSave?
             
             # Adding scrolling handler
-            f_scroll = => @_syncScroll()
-            @bodyDiv.bind 'scroll', f_scroll 
+            @bodyDiv.bind 'scroll', => @_syncScroll()
             # Adding resize handler
-            f_resize = => @resize() 
-            $(window).bind 'resize', f_resize
+            $(window).bind 'resize', => @resize()
 
         ###
         # Creates the table layout
@@ -227,9 +230,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
 
             # Adding Body Area
             @bodyHeight = @tableHeight - @headerHeight - 3
-            @bodyHeight = @bodyHeight - @titleHeight - 1 if @options.title
-            @bodyHeight = @bodyHeight - @pagerHeight - 1 if @options.pager
-            @bodyHeight = @bodyHeight - @toolbarHeight - 1 if @options.toolbar
+            @bodyHeight = @bodyHeight - @titleHeight - 1 if @options.title?
+            @bodyHeight = @bodyHeight - @pagerHeight - 1 if @options.pager?
+            @bodyHeight = @bodyHeight - @toolbarHeight - 1 if @options.toolbar?
             overlayHeight = @bodyHeight + @headerHeight
 
             html[idx++] = '<div id="overlayDiv'+id+'" class="overlay" style="position:absolute;top:'+overlayTopPos+'px;width:'+(@tableWidth+2)+'px;height:'+(overlayHeight+2)+'px;overflow:none;">'
@@ -241,14 +244,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             html[idx++] = '</div>' # closes bodyDiv
 
             # Adding Pager Panel
-            if @pager
+            if @pager?
                 @topPos += @bodyHeight + 2
                 html[idx++] = '<div id="pagerDiv'+id+'" class="my-tablegrid-pager" style="position:absolute;top:'+@topPos+'px;left:0;bottom:0;width:'+(@tableWidth - 4)+'px;height:'+(@pagerHeight - 4)+'px">'
                 html[idx++] = @_updatePagerInfo(true)
                 html[idx++] = '</div>' # closes Pager Div
 
             # Adding Table Setting Button Control
-            if @addSettingBehaviorFlg
+            if @options.addSettingBehavior
                 html[idx++] = '<div id="mtgSB'+id+'" class="my-tablegrid-setting-button" style="left:'+(@tableWidth - 20)+'px"><div class="icon">&nbsp;</div></div>'
                 # Adding Table Setting Menu
                 html[idx++] = @_createSettingMenu()
@@ -308,7 +311,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             id = @_mtgId
             renderedRowsAllowed = @renderedRowsAllowed
             renderedRows = @renderedRows
-            cellHeight = @cellHeight
+            cellHeight = @options.cellHeight
             headerWidth = @headerWidth
             html = []
             idx = 0
@@ -350,9 +353,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                 checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x}" checked="{checked}">'
                 radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x}">'
 
-            rs = @rowStyle or ( ->  return '') # row style handler
-            rc = @rowClass or ( ->  return '') # row class handler
-            cellHeight = @cellHeight
+            rs = @options.rowStyle # row style handler
+            rc = @options.rowClass # row class handler
+            cellHeight = @options.cellHeight
             iCellHeight = cellHeight - 6
             cm = @columnModel
             gap = if @gap == 0 then 2 else 0
@@ -511,16 +514,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
         ###
         _showLoaderSpinner : ->
             id = @_mtgId
-            loaderSpinner = $('#mtgLoader'+id)
-            loaderSpinner.show() if loaderSpinner
+            $('#mtgLoader'+id).show()
 
         ###
         # Hides loader spinner.
         ###
         _hideLoaderSpinner : ->
             id = @_mtgId
-            loaderSpinner = $('#mtgLoader'+id)
-            loaderSpinner.hide() if(loaderSpinner)
+            $('#mtgLoader'+id).hide()
 
         ###
         # Hides menus.
@@ -613,7 +614,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             @scrollLeft = headerRowDiv.scrollLeft(bodyDiv.scrollLeft)
             @scrollTop = bodyDiv.scrollTop()
 
-            $('mtgHB' + id).css('visibility', 'hidden')
+            $('#mtgHB' + id).css('visibility', 'hidden')
 
             if renderedRows < @rows.length and (bodyTable.height() - bodyDiv.scrollTop() - 10) < bodyDiv[0].clientHeight
                 html = @_createTableBody(@rows)
@@ -690,7 +691,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             cm = @columnModel
             gap = @gap
 
-            oldWidth = $('mtgHC' + id + '_' + index).width()
+            oldWidth = $('#mtgHC' + id + '_' + index).width()
             editor = cm[index].editor
             checkboxOrRadioFlg = editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor == 'radio' or editor instanceof TableGrid.CellRadioButton
 
@@ -761,7 +762,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                     leftPos = dragColumn.position().left
                     width = dragColumn.width()
                     setTimeout(( ->
-                      @_detectDroppablePosition(leftPos + width / 2, width, dragColumn, columnIndex)
+                        @_detectDroppablePosition(leftPos + width / 2, width, dragColumn, columnIndex)
                     ), 0)
 
                 $(column).on 'dragend', (event, drag) =>
@@ -827,7 +828,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             renderedRows = @renderedRows
             numberOfRowsAdded = @newRowsAdded.length
           
-            $('mtgHB' + id).css('visibility', 'hidden') # in case the cell menu button is visible
+            $('#mtgHB' + id).css('visibility', 'hidden') # in case the cell menu button is visible
             @_blurCellElement(keys._nCurrentFocus) # in case there is a cell in editing mode
             keys.blur() # remove the focus of the selected cell
           
@@ -863,7 +864,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                 targetId-- if targetId == fromColumnId
                 targetHeaderCell = $('#mtgHC'+id+'_c'+ targetId)
                 removedHeaderCell.insertBefore(targetHeaderCell)
-              
                 # Moving cell elements
                 removedCells =  $('.mtgC' + id + '_c' + fromColumnId).remove()
 
@@ -909,7 +909,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             cm = @columnModel = aTemp
             $('#mtgHRT'+id + ' th').each (index, th) ->
                 if index < cm.length
-                    th.id = 'mtgHC'+ id + '_c' + index
+                    th.attr('id', 'mtgHC'+ id + '_c' + index)
                     try
                         ihc = th.find('div.my-tablegrid-inner-header-cell')
                         ihc.attr('id', 'mtgIHC' + id + '_c' + index)
@@ -947,8 +947,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             renderedRowsAllowed = @renderedRowsAllowed
             beginAtRow = renderedRows - renderedRowsAllowed
             beginAtRow = 0 if beginAtRow < 0
-            for j in [beginAtRow...renderedRows]
-                @_addKeyBehaviorToRow(rows[j], j)
+            @_addKeyBehaviorToRow(rows[j], j) for j in [beginAtRow...renderedRows]
 
         ###
         # Add key behavior to row.
@@ -985,14 +984,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                     f_blur = ((x, y, element) =>
                         return ->
                             @editedCellId = null if @_blurCellElement(element)
-                            @onCellBlur(element, row[x], x, y, cm[x].id) if (@onCellBlur)
+                            @options.onCellBlur(element, row[x], x, y, cm[x].id) if @options.onCellBlur?
                     )(i, j, element)
                     keys.event.blur(element, f_blur)
 
                 keys.event.remove.focus(element)
                 f_focus = ((x, y, element) =>
                     return ->
-                        @onCellFocus(element, row[x], x, y, cm[x].id) if @onCellFocus
+                        @options.onCellFocus(element, row[x], x, y, cm[x].id) if @options.onCellFocus?
                 )(i, j, element)
                 keys.event.focus(element, f_focus);
 
@@ -1014,7 +1013,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             isInputFlg = !(editor == 'radio' or editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
           
             if isInputFlg
-                element.css('height', @cellHeight + 'px')
+                element.css('height', @options.cellHeight + 'px')
                 innerElement.css({
                     'position': 'relative',
                     'width': width + 'px',
@@ -1135,7 +1134,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                 hbHeight = null
                 element.on 'mousemove', =>
                     cm = @columnModel;
-                    return if !element.attr('id')
+                    return unless element.attr('id')
                     selectedHCIndex = parseInt(element.attr('id').substring(element.attr('id').indexOf('_') + 1, element.attr('id').length))
                     editor = cm[selectedHCIndex].editor
                     sortable = cm[selectedHCIndex].sortable
@@ -1144,7 +1143,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                         hc = element.parent()
                         leftPos = hc.offsetLeft + hc.offsetWidth
                         leftPos = leftPos - 16 - @scrollLeft
-                        if leftPos < @bodyDiv.clientWidth
+                        if leftPos < @bodyDiv[0].clientWidth
                             headerButton.css({
                                 'top' : (topPos + 3 + headerHeight - hbHeight) + 'px',
                                 'left' : leftPos + 'px',
@@ -1165,11 +1164,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                 cm = @columnModel
                 if headerButtonMenu.css('visibility') == 'hidden'
                     if cm[selectedHCIndex].sortable
-                        $('mtgSortDesc' + id).show()
-                        $('mtgSortAsc' + id).show()
+                        $('#mtgSortDesc' + id).show()
+                        $('#mtgSortAsc' + id).show()
                     else
-                        $('mtgSortDesc' + id).hide()
-                        $('mtgSortAsc' + id).hide()
+                        $('#mtgSortDesc' + id).hide()
+                        $('#mtgSortAsc' + id).hide()
 
                     selectAllItem = $('#mtgHBM' + id + ' .mtgSelectAll:first')
                     if @renderedRows > 0 and (cm[selectedHCIndex].editor == 'checkbox' or cm[selectedHCIndex].editor instanceof TableGrid.CellCheckbox)
@@ -1265,14 +1264,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             width = 0
 
             if !visibleFlg  # hide
-                width = parseInt(targetColumn.offsetWidth)
+                width = targetColumn.outerWidth()
                 targetColumn.hide()
                 element.hide() for element in $('.mtgC'+@_mtgId+ '_'+index)
                 @columnModel[index].visible = false
                 @headerWidth = @headerWidth - width
             else # show
                 targetColumn.show()
-                width = parseInt(targetColumn.offsetWidth) + 2
+                width = targetColumn.outerWidth() + 2
                 element.show() for element in $('.mtgC'+@_mtgId+ '_'+index)
                 @columnModel[index].visible = true
                 @headerWidth = @headerWidth + width
@@ -1296,7 +1295,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
         # in JSON format otherwise it will call onFailure callback.
         ###
         _retrieveDataFromUrl : (pageNumber, firstTimeFlg) ->
-            return if !firstTimeFlg and @onPageChange amd !@onPageChange()
+            if !firstTimeFlg and @options.onPageChange?
+                return unless @options.onPageChange()
             pageParameter = 'page'
             pageParameter = @pager.pageParameter if @pager != null and @pager.pageParameter
             @request[pageParameter] = pageNumber
@@ -1306,8 +1306,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                 url : @url,
                 data : @request,
                 context : @, # TODO here it maybe will be a problem
+                dataType : 'json',
                 done : (response) ->
-                    tableModel = $.parseJSON(response)
+                    tableModel = $.parseJSON(response.responseText)
                     try
                         @rows = tableModel.rows or []
                         @pager = null
@@ -1326,18 +1327,18 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                             @pagerDiv.html(@_updatePagerInfo()) # update pager info panel
                             @_addPagerBehavior()
 
-                        @afterRender() if @afterRender
+                        @options.afterRender() if @options.afterRender?
                     catch ex
-                        @onFailure(response) if @onFailure
+                        @options.onFailure(response) if @options.onFailure?
                     finally
                         @_toggleLoadingOverlay()
-                        @scrollTop = @bodyDiv.scrollTop = 0
-                        @bodyDiv.fire('dom:dataLoaded') if firstTimeFlg
+                        @bodyDiv.scrollTop(@scrollTop = 0)
+                        @bodyDiv.trigger('dom:dataLoaded') if firstTimeFlg
                 fail : (response) ->
-                    @onFailure(response) if @onFailure?
+                    @options.onFailure(response) if @options.onFailure?
                     @_toggleLoadingOverlay()
-                    @scrollTop = @bodyDiv.scrollTop = 0
-                    @bodyDiv.fire('dom:dataLoaded') if firstTimeFlg
+                    @bodyDiv.scrollTop(@scrollTop = 0)
+                    @bodyDiv.trigger('dom:dataLoaded') if firstTimeFlg
             })
 
         ###
@@ -1470,7 +1471,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                     'width' : (@tableWidth - 4) + 'px'
                 })
 
-            @renderedRowsAllowed = Math.floor(@bodyDiv.clientHeight / @cellHeight)
+            @renderedRowsAllowed = Math.floor(@bodyDiv[0].clientHeight / @options.cellHeight)
             if tallerFlg
                 html = @_createTableBody(@rows);
                 @bodyTable.find('tbody').append(html)
@@ -1696,7 +1697,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             @_addKeyBehaviorToRow(newRow, -i)
             keys.addMouseBehaviorToRow(-i)
             @_applyCellCallbackToRow(-i)
-            @scrollTop = @bodyDiv.scrollTop(0)
+            @bodyDiv.scrollTop(@scrollTop = 0)
 
         ###
         # Deletes selected rows.
@@ -1828,7 +1829,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                     display = ''
                     if cnl == 0 # is a leaf element
                         rowspan = rnl - i
-                        cell.height = rowspan * (@cellHeight + 2)
+                        cell.height = rowspan * (@options.cellHeight + 2)
                         x = @_getNextIndexPosition(x)
                         display = if !cell.visible then 'none' else ''
                         temp = thTmpl.replace(/\{id\}/g, id)
@@ -1896,10 +1897,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                     temp = temp.replace(/\{colspan\}/g, '1')
                     temp = temp.replace(/\{rowspan\}/g, rnl)
                     temp = temp.replace(/\{width\}/g, 20)
-                    temp = temp.replace(/\{height\}/g, rnl*@cellHeight)
+                    temp = temp.replace(/\{height\}/g, rnl*@options.cellHeight)
                     html[idx++] = temp
                     temp = ihcTmplLast.replace(/\{id\}/g, id)
-                    temp = temp.replace(/\{height\}/g, rnl*@cellHeight-6)
+                    temp = temp.replace(/\{height\}/g, rnl*@options.cellHeight-6)
                     temp = temp.replace(/\{width\}/g, 14)
                     html[idx++] = temp
                     html[idx++] = '&nbsp;'
