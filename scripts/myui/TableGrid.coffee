@@ -1,4 +1,4 @@
-define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 'cs!myui/ComboBox'], ($, jquerypp, Util, TextField, Autocompleter, ComboBox) ->
+define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 'cs!myui/ComboBox', 'cs!myui/DatePicker'], ($, jquerypp, Util, TextField, Autocompleter, ComboBox, DatePicker) ->
     class TableGrid
         ###
         # TableGrid constructor
@@ -1784,7 +1784,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             @columnModel = cm
             @_mtgId = id
             @gap = 2 #diff between width and offsetWidth
-            @gap = 0 if Prototype.Browser.WebKit
+            @gap = 0 if $.browser.webkit
             @filledPositions = []
             @_leafElements = []
             @defaultHeaderColumnWidth = 100
@@ -2073,6 +2073,5 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                         x += colspan - 1
                     x++
             return @_leafElements
-
 
     return TableGrid
