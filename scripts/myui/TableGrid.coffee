@@ -37,8 +37,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             @pager.pageParameter = @options.pager.pageParameter or 'page' if @options.pager?
             @url = tableModel.url or null
             @request = tableModel.request or {}
-            @sortColumnParameter = @options.sortColumnParameter
-            @ascDescFlagParameter = @options.ascDescFlagParameter
             @sortedColumnIndex = 0
             @sortedAscDescFlg = 'ASC' # or 'DESC'
             @modifiedRows = [] #will contain the modified row numbers
@@ -595,14 +593,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                         settingMenu.css('visibility', 'hidden')
                 setTimeout f_timeout, 500
             i = 0
-            # TODO maybe this could be simplified
-            for checkbox in $('#mtgSM'+@_mtgId + ' input')
-                $(checkbox).on 'click', =>
-                   @_toggleColumnVisibility(i++, checkbox.checked)
+            $('#mtgSM'+@_mtgId + ' input').on 'click', =>
+                @_toggleColumnVisibility(i++, $(this).is(':checked'))
 
-         ###
-         # Synchronizes horizontal scrolling
-         ###
+        ###
+        # Synchronizes horizontal scrolling
+        ###
         _syncScroll : ->
             id = @_mtgId
             keys = @keys
@@ -1224,8 +1220,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             id = @_mtgId
             if cm[idx].sortable
                 $('#mtgSortIcon'+id+'_c'+idx).attr('class', if (ascDescFlg == 'ASC') then 'my-tablegrid-sort-asc-icon' else 'my-tablegrid-sort-desc-icon')
-                @request[@sortColumnParameter] = cm[idx].id;
-                @request[@ascDescFlagParameter] = ascDescFlg;
+                @request[@options.sortColumnParameter] = cm[idx].id;
+                @request[@options.ascDescFlagParameter] = ascDescFlg;
                 @_retrieveDataFromUrl(1)
                 $('#mtgSortIcon'+id+'_c'+@sortedColumnIndex).css('visibility', 'hidden')
                 $('#mtgIHC'+id+'_c'+@sortedColumnIndex).css('color', 'dimgray')
@@ -1761,9 +1757,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             return result
     #end TableGrid
 
-    TableGrid.ADD_BTN = 1
-    TableGrid.DEL_BTN = 4
-    TableGrid.SAVE_BTN = 8
+    TableGrid::ADD_BTN = 1
+    TableGrid::DEL_BTN = 4
+    TableGrid::SAVE_BTN = 8
 
     class TableGrid.CellCheckbox
         constructor : (options) ->
@@ -2074,4 +2070,3 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                     x++
             return @_leafElements
 
-    return TableGrid

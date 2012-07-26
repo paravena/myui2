@@ -1,4 +1,4 @@
-define ['jquery', 'cs!myui/Util', 'cs!myui/TableGrid'], ($, Util, TableGrid) ->
+define ['jquery', 'cs!myui/Util'], ($, Util) ->
 
     eventUtil = $.util.event
 

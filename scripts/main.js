@@ -1,5 +1,4 @@
-require(['cs!myui/ComboBox'], function(ComboBox) {
-/*
+require(['cs!myui/TableGrid'], function(TableGrid) {
     $(document).ready(function(){
         var tableModel = {
             options : {
@@ -87,8 +86,7 @@ require(['cs!myui/ComboBox'], function(ComboBox) {
 
         var tableGrid1 = new TableGrid(tableModel);
         tableGrid1.render('#mytable1');
-        */
-
+    /*
         new ComboBox({
             input : '#name',
             url : 'get_manufacturers_list.php',
@@ -96,5 +94,7 @@ require(['cs!myui/ComboBox'], function(ComboBox) {
             required : true,
             initialText : 'Enter a manufacturer'
         });
+    */
+    });
 
 });
