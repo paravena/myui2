@@ -1,4 +1,4 @@
-define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 'cs!myui/ComboBox', 'cs!myui/DatePicker'], ($, jquerypp, Util, TextField, Autocompleter, ComboBox, DatePicker) ->
+define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!myui/Autocompleter', 'cs!myui/ComboBox', 'cs!myui/DatePicker', 'myui/i18n'], ($, jquerypp, Util, TextField, Autocompleter, ComboBox, DatePicker, i18n) ->
     class TableGrid
         ###
         # TableGrid constructor
@@ -117,14 +117,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                 @_hideLoaderSpinner()
           
             setTimeout(( =>
-                    @renderedRowsAllowed = Math.floor((@bodyHeight - @scrollBarWidth - 3)  / @options.cellHeight) + 1
-                    if @tableModel.hasOwnProperty('rows')
-                        @innerBodyDiv.html(@_createTableBody(@rows))
-                        @pagerDiv.html(@_updatePagerInfo()) if @pager
-                        @bodyDiv.trigger 'dom:dataLoaded'
-                    else
-                        @_retrieveDataFromUrl(1, true)
-                ), 0)
+                @renderedRowsAllowed = Math.floor((@bodyHeight - @scrollBarWidth - 3)  / @options.cellHeight) + 1
+                if @tableModel.hasOwnProperty('rows')
+                    @innerBodyDiv.html(@_createTableBody(@rows))
+                    @pagerDiv.html(@_updatePagerInfo()) if @pager
+                    @bodyDiv.trigger 'dom:dataLoaded'
+                else
+                    @_retrieveDataFromUrl(1, true)
+            ), 0)
 
             @options.toolbar = @options.toolbar or null
           
@@ -588,13 +588,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
             settingMenu.on 'mouseout', (event) ->
                 miFlg = false
                 element = $(event.target)
-                f_timeout = ->
+                setTimeout ( ->
                     if !element.parent(settingMenu) and !miFlg
                         settingMenu.css('visibility', 'hidden')
-                setTimeout f_timeout, 500
-            i = 0
-            $('#mtgSM'+@_mtgId + ' input').on 'click', =>
-                @_toggleColumnVisibility(i++, $(this).is(':checked'))
+                ), 500
+
+            $('#mtgSM'+@_mtgId + ' input').on 'click', (event) =>
+                checkbox = $(event.target)
+                @_toggleColumnVisibility(i++, checkbox.is(':checked'))
 
         ###
         # Synchronizes horizontal scrolling
@@ -1128,7 +1129,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                 editor = null
                 sortable = true
                 hbHeight = null
-                element.on 'mousemove', =>
+                $(element).on 'mousemove', =>
                     cm = @columnModel;
                     return unless element.attr('id')
                     selectedHCIndex = parseInt(element.attr('id').substring(element.attr('id').indexOf('_') + 1, element.attr('id').length))
@@ -1151,7 +1152,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                         sortDescMenuItem.on 'click', => @_sortData(selectedHCIndex, 'DESC')
 
                 # Sorting when click on header column
-                element.on 'click', =>
+                $(element).on 'click', =>
                     return unless element.attr('id')
                     selectedHCIndex = parseInt(element.attr('id').substring(element.attr('id').indexOf('_') + 1, element.attr('id').length))
                     @_toggleSortData(selectedHCIndex)
@@ -1303,7 +1304,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                 data : @request,
                 context : @, # TODO here it maybe will be a problem
                 dataType : 'json',
-                done : (response) ->
+                complete : (response) ->
                     tableModel = $.parseJSON(response.responseText)
                     try
                         @rows = tableModel.rows or []
@@ -1825,7 +1826,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                     display = ''
                     if cnl == 0 # is a leaf element
                         rowspan = rnl - i
-                        cell.height = rowspan * (@options.cellHeight + 2)
+                        cell.height = rowspan * (@cellHeight + 2)
                         x = @_getNextIndexPosition(x)
                         display = if !cell.visible then 'none' else ''
                         temp = thTmpl.replace(/\{id\}/g, id)
@@ -1893,10 +1894,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                     temp = temp.replace(/\{colspan\}/g, '1')
                     temp = temp.replace(/\{rowspan\}/g, rnl)
                     temp = temp.replace(/\{width\}/g, 20)
-                    temp = temp.replace(/\{height\}/g, rnl*@options.cellHeight)
+                    temp = temp.replace(/\{height\}/g, rnl*@cellHeight)
                     html[idx++] = temp
                     temp = ihcTmplLast.replace(/\{id\}/g, id)
-                    temp = temp.replace(/\{height\}/g, rnl*@options.cellHeight-6)
+                    temp = temp.replace(/\{height\}/g, rnl*@cellHeight-6)
                     temp = temp.replace(/\{width\}/g, 14)
                     html[idx++] = temp
                     html[idx++] = '&nbsp;'
@@ -2070,3 +2071,5 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/TextField', 'cs!my
                     x++
             return @_leafElements
 
+
+    return TableGrid
