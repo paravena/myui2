@@ -603,6 +603,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Synchronizes horizontal scrolling
         ###
         _syncScroll : ->
+            console.log 'syncScroll is called'
             id = @_mtgId
             keys = @keys
             bodyDiv = @bodyDiv
@@ -610,7 +611,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             bodyTable = @bodyTable
             renderedRows = @renderedRows
 
-            @scrollLeft = headerRowDiv.scrollLeft(bodyDiv.scrollLeft)
+            console.log 'bodyDiv.scrollLeft ' + bodyDiv.scrollLeft()
+            @scrollLeft = bodyDiv.scrollLeft()
+            headerRowDiv.scrollLeft(bodyDiv.scrollLeft())
             @scrollTop = bodyDiv.scrollTop()
 
             $('#mtgHB' + id).css('visibility', 'hidden')
@@ -635,19 +638,23 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             topPos += @toolbarHeight if (@options.toolbar)
             columnIndex = 0
             leftPos = 0
-            for separator in $('.mtgHS' + @_mtgId)
+            for separator in $('.mtgHS' + id)
                 do (separator) =>
                     $(separator).on 'mousemove', =>
                         separatorId = $(separator).attr('id')
+                        console.log 'over ' + separatorId
                         columnIndex = separatorId.match(/_c(\d)/)[1] # extracts column index
+                        console.log 'positioning right marker at columnIndex ' + columnIndex
                         if columnIndex >= 0
+                            console.log 'calculating position of ' + '#mtgHC' + id + '_c' + columnIndex
+                            console.log '#mtgHC' + id + '_c' + columnIndex + ' left : ' + $('#mtgHC' + id + '_c' + columnIndex).position().left + ' scrollLeft: ' + @scrollLeft
                             leftPos = $('#mtgHC' + id + '_c' + columnIndex).position().left - @scrollLeft
                             leftPos += $('#mtgHC' + id + '_c' + columnIndex).outerWidth() - 1
+                            console.log 'leftPos ' + leftPos
                             @resizeMarkerRight.css({
                                 'height' : (@bodyHeight + headerHeight) + 'px',
                                 'top' : (topPos + 2) + 'px',
-                                'left' : leftPos + 'px',
-                                'background-color' : 'dimgray'
+                                'left' : leftPos + 'px'
                             })
 
             @resizeMarkerRight.on 'draginit', (event, drag) =>
@@ -672,7 +679,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 newWidth = @resizeMarkerRight.position().left - @resizeMarkerLeft.position().left
                 @_resizeColumn(columnIndex, newWidth) if newWidth > 0 and columnIndex != null
                 @resizeMarkerLeft.css({
-                    'background-color' : 'dimgray',
+                    'background-color' : 'transparent',
                     'left' : '0'
                 })
                 @resizeMarkerRight.css('background-color', 'transparent')
