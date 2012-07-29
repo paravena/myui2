@@ -7,8 +7,8 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             options = $.extend({
                 idPrefix : '',
                 form : false}, options or {})
-
-            if targetTable instanceof TableGrid
+            @_tableGrid = null
+            if targetTable.columnModel? # Is a TableGrid object?
                 @_numberOfRows = targetTable.rows.length
                 @_numberOfColumns = targetTable.columnModel.length
                 @_tableGrid = targetTable
@@ -20,7 +20,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                 @_numberOfColumns = options.numberOfColumns or @_targetTable.find('tbody > tr')[0].cells.length
 
             @idPrefix = options.idPrefix
-            @idPrefix = '#mtgC'+ @_tableGrid._mtgId + '-' if @_tableGrid
+            @idPrefix = '#mtgC'+ @_tableGrid._mtgId + '_' if @_tableGrid?
 
             @nBody = @_targetTable.find('tbody') # Cache the tbody node of interest
             @_xCurrentPos = null
@@ -73,7 +73,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
 
             $(document).click @onClickHandler
 
-            @addMouseBehavior() if targetTable instanceof TableGrid
+            @addMouseBehavior() if @_tableGrid?
 
             @onKeyPressHandler = (event) =>
                 result = @onKeyPress(event)
@@ -91,18 +91,15 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             @addMouseBehaviorToRow(j) for j in [beginAtRow...renderedRows]
 
         addMouseBehaviorToRow : (y) ->
+            console.log 'add mouse behavior to row ' + y + ' number of columns ' + @_numberOfColumns
             for i in [0...@_numberOfColumns]
                 element = @getCellFromCoords(i, y)
-                f_click = (event) =>
+                element.on 'click', (event) =>
                     @onClick(event)
                     @_eventFire('focus', element)
 
-                element.click f_click
-
-                f_dblclick = (event) =>
+                element.on 'dblclick', (event) =>
                     @_eventFire('action', element)
-
-                element.dblclick f_dblclick
 
         ###
         # Purpose:  Create a function (with closure for sKey) event addition API
@@ -308,12 +305,12 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         ###
         setFocus : (element, bAutoScroll = true) ->
             # If cell already has focus, just ignore this call
-            return if @_nCurrentFocus == element
+            return if @_nCurrentFocus? and @_nCurrentFocus.is(element)
             # Remove old css focus class (with blur event if needed)
-            @removeFocus(@_nCurrentFocus) if @_nCurrentFocus
+            @removeFocus(@_nCurrentFocus, false) if @_nCurrentFocus?
             # Add the focus css class to highlight the focused cell
             element.addClass(@_sFocusClass)
-            element.parent('tr').addClass(@_sFocusClass) if element.closest('tr')
+            element.closest('tr').addClass(@_sFocusClass)
             # Cache the information that we are interested in
             @_nOldFocus = @_nCurrentFocus
             @_nCurrentFocus = element
@@ -424,8 +421,8 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         ###
         getCoordsFromCell : (element) ->
             id = element.attr('id')
-            return null if id?
-            match = id.match(/c(\d.*?)r(\d.*?)$/)
+            return null unless id?
+            match = id.match(/c(\d)r(\d)$/)
             return [
                 parseInt(match[1]),
                 parseInt(match[2])
@@ -438,6 +435,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # @return TD target
         ###
         getCellFromCoords : (x, y) ->
+            console.log 'getting element ' + @idPrefix + 'c' + x + 'r' + y
             element = $(@idPrefix + 'c' + x + 'r' + y, @nBody)
             return null if element.length == 0
             return element

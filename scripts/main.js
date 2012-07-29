@@ -58,27 +58,19 @@ require(['cs!myui/TableGrid'], function(TableGrid) {
                     id : 'manufId',
                     title : 'Id',
                     width : 30,
-                    editable: true,
-                    editor: new TableGrid.CellCheckbox({
-                        selectable : true,
-                        onClick : function(value, checked) {
-                            alert(value + ' ' + checked);
-                        }
-                    })
+                    editable: true
                 },
                 {
                     id : 'manufName',
                     title : 'Manufacturer',
                     width : 140,
-                    editable: true,
-                    sortable: true
+                    editable: true
                 },
                 {
                     id : 'manufDesc',
                     title : 'Description',
                     width : 90,
-                    editable: true,
-                    sortable: true
+                    editable: true
                 }
             ],
             url : 'get_all_manufacturers.php'
