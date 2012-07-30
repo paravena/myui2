@@ -68,9 +68,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             @targetColumnId = null
             @editedCellId = null
-    
-            @gap = 2 #diff between width and offsetWidth
-            @gap = 2 if $.browser.webkit
 
         ###
         # Displays TableGrid control.
@@ -358,15 +355,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             cellHeight = @options.cellHeight
             iCellHeight = cellHeight - 6
             cm = @columnModel
-            gap = if @gap == 0 then 2 else 0
             html = []
             idx = 0
-            html[idx++] = '<tr id="mtgRow'+id+'_'+rowIdx+'" class="mtgRow'+id+' '+rc(rowIdx)+'" style="'+rs(rowIdx)+'">'
+            html[idx++] = '<tr id="mtgRow'+id+'_r'+rowIdx+'" class="mtgRow'+id+' '+rc(rowIdx)+'" style="'+rs(rowIdx)+'">'
             for j in [0...cm.length]
                 columnId = cm[j].id
                 type = cm[j].type or 'string'
                 cellWidth = parseInt(cm[j].width) # consider border at both sides
-                iCellWidth = cellWidth - 6 - gap # consider padding at both sides
+                iCellWidth = cellWidth - 6 # consider padding at both sides
                 editor = cm[j].editor or null
                 normalEditorFlg = !(editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor == 'radio' or editor instanceof TableGrid.CellRadioButton or editor instanceof ComboBox)
                 alignment = 'left'
@@ -643,7 +639,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     $(separator).on 'mousemove', =>
                         separatorId = $(separator).attr('id')
                         console.log 'over ' + separatorId
-                        columnIndex = separatorId.match(/_c(\d)/)[1] # extracts column index
+                        columnIndex = separatorId.match(/_c(\d*)/)[1] # extracts column index
                         console.log 'positioning right marker at columnIndex ' + columnIndex
                         if columnIndex >= 0
                             console.log 'calculating position of ' + '#mtgHC' + id + '_c' + columnIndex
@@ -693,7 +689,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         _resizeColumn: (index, newWidth) ->
             id = @_mtgId
             cm = @columnModel
-            gap = @gap
 
             oldWidth = $('#mtgHC' + id + '_c' + index).width()
             editor = cm[index].editor
@@ -701,7 +696,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             $('#mtgHC' + id + '_c' + index).attr('width', newWidth)
             $('#mtgHC' + id + '_c' + index).css('width', newWidth + 'px')
-            $('#mtgIHC' + id + '_c' + index).css('width', (newWidth - 8 - (if gap == 0 then 2 else 0)) + 'px')
+            $('#mtgIHC' + id + '_c' + index).css('width', (newWidth - 8) + 'px')
 
             $('.mtgC' + id + '_c' + index).attr('width', newWidth)
             $('.mtgC' + id + '_c' + index).css('width', newWidth + 'px')
@@ -710,9 +705,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 do (cell) =>
                     cellId = $(cell).attr('id')
                     console.log 'resizing cell ' + cellId
-                    y = cellId.match(/r(\d)/)[1] # extracts row index
+                    y = cellId.match(/r(\d*)/)[1] # extracts row index
                     value = @getValueAt(index, y)
-                    $(cell).css('width', (newWidth - 6 - (if gap == 0 then 2 else 0)) + 'px')
+                    $(cell).css('width', (newWidth - 6) + 'px')
                     if !checkboxOrRadioFlg
                         if cm[index].renderer?
                             if editor instanceof ComboBox
@@ -787,13 +782,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             topPos += @headerHeight if @options.toolbar?
             sepLeftPos = 0
             cm = @columnModel
-            gap = @gap
             scrollLeft = @scrollLeft
             colMoveTopDiv = @colMoveTopDiv
             colMoveBottomDiv = @colMoveBottomDiv
           
             for i in [0...cm.length]
-                sepLeftPos += parseInt(cm[i].width) + gap if (cm[i].visible)
+                sepLeftPos += parseInt(cm[i].width) + 2 if (cm[i].visible)
                 if columnPos > (sepLeftPos - scrollLeft) and (columnPos - (sepLeftPos - @scrollLeft)) < (width / 2)
                     colMoveTopDiv.css({
                         'top' : topPos + 'px',
@@ -1133,7 +1127,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     $(element).on 'mousemove', =>
                         return unless $(element).attr('id')
                         elementId = $(element).attr('id')
-                        selectedHCIndex = elementId.match(/_c(\d)/)[1] # extract column number from id
+                        console.log 'elementId ' + elementId
+                        selectedHCIndex = elementId.match(/_c(\d*)/)[1] # extract column number from id
                         editor = cm[selectedHCIndex].editor
                         sortable = cm[selectedHCIndex].sortable
                         hbHeight = cm[selectedHCIndex].height
@@ -1156,7 +1151,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     $(element).on 'click', =>
                         return unless $(element).attr('id')
                         elementId = $(element).attr('id')
-                        selectedHCIndex = elementId.match(/_c(\d)/)[1] # extract column number from id
+                        selectedHCIndex = elementId.match(/_c(\d*)/)[1] # extract column number from id
                         @_toggleSortData(selectedHCIndex)
 
 
@@ -1794,8 +1789,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         constructor: (id, cm) ->
             @columnModel = cm
             @_mtgId = id
-            @gap = 2 #diff between width and offsetWidth
-            @gap = 2 if $.browser.webkit
             @filledPositions = []
             @_leafElements = []
             @defaultHeaderColumnWidth = 100
@@ -1817,7 +1810,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             siTmpl = '<span id="mtgSortIcon{id}_c{x}" style="width:8px;height:4px;visibility:hidden">&nbsp;&nbsp;&nbsp;</span>'
             cm = @columnModel
             id = @_mtgId
-            gap = if @gap == 0 then 2 else 0
             rnl = @rnl #row nested level
 
             html = []
@@ -1858,8 +1850,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
                         temp = ihcTmpl.replace(/\{id\}/g, id)
                         temp = temp.replace(/\{x\}/g, x)
-                        temp = temp.replace(/\{width\}/g,  cellWidth - 8 - gap)
-                        temp = temp.replace(/\{height\}/g, cell.height - 6 - gap)
+                        temp = temp.replace(/\{width\}/g,  cellWidth - 8)
+                        temp = temp.replace(/\{height\}/g, cell.height - 6)
                         html[idx++] = temp
                         html[idx++] = row[j].title
                         html[idx++] = '&nbsp;'
@@ -2047,9 +2039,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 column.width = if column.width then parseInt(column.width) else defaultWidth
             return column
 
-
         getTableHeaderWidth : ->
-            gap = @gap
             rnl = @rnl #row nested level
             result = 0
             for i in [0...rnl] # for each nested level
@@ -2057,7 +2047,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 for j in [0...row.length]
                     cnl = @_getHeaderColumnNestedLevel(row[j])
                     if cnl == 0 # is a leaf element
-                        result += row[j].width + gap if row[j].visible is undefined or row[j].visible
+                        result += row[j].width + 2 if row[j].visible is undefined or row[j].visible
             return result
 
 

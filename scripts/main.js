@@ -73,7 +73,25 @@ require(['cs!myui/TableGrid'], function(TableGrid) {
                     editable: true
                 }
             ],
-            url : 'get_all_manufacturers.php'
+            //url : 'get_all_manufacturers.php'
+            rows : [
+                {'manufId': '1', 'manufName': 'Toyota', 'manufDesc' : 'Japanese Manufacturer'},
+                {'manufId': '2', 'manufName': 'Honda', 'manufDesc' : 'Japanese Manufacturer'},
+                {'manufId': '3', 'manufName': 'Daihatsu', 'manufDesc' : 'Japanese Manufacturer'},
+                {'manufId': '4', 'manufName': 'Nissan', 'manufDesc' : 'Japanese Manufacturer'},
+                {'manufId': '5', 'manufName': 'Mitsubishi', 'manufDesc' : 'Japanese Manufacturer'},
+                {'manufId': '6', 'manufName': 'Renault', 'manufDesc' : 'French Manufacturer'},
+                {'manufId': '7', 'manufName': 'Peugeot', 'manufDesc' : 'French Manufacturer'},
+                {'manufId': '8', 'manufName': 'Citroen', 'manufDesc' : 'French Manufacturer'},
+                {'manufId': '9', 'manufName': 'Simca', 'manufDesc' : 'French Manufacturer'},
+                {'manufId': '10', 'manufName': 'BMW', 'manufDesc' : 'German Manufacturer'},
+                {'manufId': '11', 'manufName': 'Audi', 'manufDesc' : 'German Manufacturer'},
+                {'manufId': '12', 'manufName': 'Volkswagen', 'manufDesc' : 'German Manufacturer'},
+                {'manufId': '13', 'manufName': 'Mercedes Benz', 'manufDesc' : 'German Manufacturer'},
+                {'manufId': '14', 'manufName': 'KIA', 'manufDesc' : 'Korean Manufacturer'},
+                {'manufId': '15', 'manufName': 'Hyundai', 'manufDesc' : 'Korean Manufacturer'},
+                {'manufId': '16', 'manufName': 'Samsung', 'manufDesc' : 'Korean Manufacturer'}
+            ]
         };
 
         var tableGrid1 = new TableGrid(tableModel);

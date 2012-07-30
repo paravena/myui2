@@ -420,9 +420,10 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # @return [x, y] position of the element
         ###
         getCoordsFromCell : (element) ->
-            id = element.attr('id')
+            id = $(element).attr('id')
             return null unless id?
-            match = id.match(/c(\d)r(\d)$/)
+            console.log 'extracting coords from ' + id
+            match = id.match(/c(\d*?)r(\d*?)$/)
             return [
                 parseInt(match[1]),
                 parseInt(match[2])
