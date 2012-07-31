@@ -405,13 +405,13 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # @param obj element of interest
         # @return the element position [left, right]
         ###
-        getPosition : (obj) ->
-            iLeft = 0
-            iTop = 0
-            if obj.offsetParent
-                iLeft = obj.offsetLeft
-                iTop = obj.offsetTop
-            return [iLeft, iTop]
+        getPosition : (element) ->
+            left = 0
+            top = 0
+            if element.position()
+                left = element.position().left
+                top = element.position().top
+            return [left, top]
 
         ###
         # Calculates the x and y position in a table from a TD cell
