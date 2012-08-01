@@ -1115,12 +1115,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             headerButtonMenu = $('#mtgHBM' + id)
             sortAscMenuItem = $('#mtgSortAsc'+id)
             sortDescMenuItem = $('#mtgSortDesc'+id)
-            topPos = 0
-            topPos += @titleHeight if @options.title
-            topPos += @toolbarHeight if @options.toolbar
             selectedHCIndex = -1
             for element in $('.mtgIHC' + id)
                 do (element) =>
+                    topPos = 0 # topPos is here because ouside mess with the other topPos var
+                    topPos += @titleHeight if @options.title?
+                    topPos += @toolbarHeight if @options.toolbar?
                     editor = null
                     sortable = true
                     hbHeight = null
@@ -1191,8 +1191,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
                     leftPos = parseInt(headerButton.css('left'))
                     topPos = @headerHeight + 2
-                    topPos += @titleHeight if @options.title
-                    topPos += @toolbarHeight if @options.toolbar
+                    topPos += @titleHeight if @options.title?
+                    topPos += @toolbarHeight if @options.toolbar?
                     headerButtonMenu.css({
                         'top' : topPos + 'px',
                         'left' : leftPos + 'px',
@@ -1202,13 +1202,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     headerButtonMenu.css('visibility', 'hidden')
 
             miFlg = false
-            headerButtonMenu.on 'mousemove', -> miFlg = true
+            headerButtonMenu.on 'mouseenter', -> miFlg = true
 
-            headerButtonMenu.on 'mouseout', (event) ->
+            headerButtonMenu.on 'mouseleave', (event) ->
                 miFlg = false
-                element = $(event.target)
                 setTimeout(( ->
-                    headerButtonMenu.css('visibility', 'hidden') if !element.closest(headerButtonMenu) and !miFlg
+                    headerButtonMenu.css('visibility', 'hidden') unless miFlg
                 ), 500)
 
         ###
