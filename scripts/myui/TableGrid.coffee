@@ -580,15 +580,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     settingMenu.css('visibility', 'hidden')
 
             miFlg = false
-            settingMenu.on 'mousemove', ->
-                miFlg = true
-
-            settingMenu.on 'mouseout', (event) ->
+            settingMenu.on 'mouseenter', -> miFlg = true
+            settingMenu.on 'mouseleave', (event) ->
                 miFlg = false
-                element = $(event.target)
                 setTimeout ( ->
-                    if !element.parent(settingMenu) and !miFlg
-                        settingMenu.css('visibility', 'hidden')
+                    settingMenu.css('visibility', 'hidden') unless miFlg
                 ), 500
 
             $('#mtgSM'+@_mtgId + ' input').on 'click', (event) =>
