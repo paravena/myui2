@@ -91,7 +91,6 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             @addMouseBehaviorToRow(j) for j in [beginAtRow...renderedRows]
 
         addMouseBehaviorToRow : (y) ->
-            console.log 'add mouse behavior to row ' + y + ' number of columns ' + @_numberOfColumns
             for i in [0...@_numberOfColumns]
                 element = @getCellFromCoords(i, y)
                 element.on 'click', (event) =>
@@ -422,7 +421,6 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         getCoordsFromCell : (element) ->
             id = $(element).attr('id')
             return null unless id?
-            console.log 'extracting coords from ' + id
             match = id.match(/c(\d*?)r(\d*?)$/)
             return [
                 parseInt(match[1]),
@@ -436,7 +434,6 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # @return TD target
         ###
         getCellFromCoords : (x, y) ->
-            console.log 'getting element ' + @idPrefix + 'c' + x + 'r' + y
             element = $(@idPrefix + 'c' + x + 'r' + y, @nBody)
             return null if element.length == 0
             return element

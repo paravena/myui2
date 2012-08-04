@@ -23,7 +23,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 rowStyle : ( ->  return ''),
                 rowClass : ( ->  return ''),
                 addSettingBehavior : true,
-                addDraggingBehaviour : true
+                addDraggingBehavior : true
             }, tableModel.options or {})
 
             @pagerHeight = 24
@@ -321,12 +321,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             lastRowToRender = renderedRows + renderedRowsAllowed
             lastRowToRender = rows.length if lastRowToRender > rows.length
             @_showLoaderSpinner()
-            console.log 'before loop from ' + renderedRows + ' to ' + lastRowToRender
             for i in [renderedRows...lastRowToRender]
-                console.log 'iteration ' + i
                 rows[i] = @_fromArrayToObject(rows[i])
                 html[idx++] = @_createRow(rows[i], i)
-                console.log html[idx]
                 renderedRows++
           
             if firstRenderingFlg
@@ -595,7 +592,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Synchronizes horizontal scrolling
         ###
         _syncScroll : ->
-            console.log 'syncScroll is called'
             id = @_mtgId
             keys = @keys
             bodyDiv = @bodyDiv
@@ -603,7 +599,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             bodyTable = @bodyTable
             renderedRows = @renderedRows
 
-            console.log 'bodyDiv.scrollLeft ' + bodyDiv.scrollLeft()
             @scrollLeft = bodyDiv.scrollLeft()
             headerRowDiv.scrollLeft(bodyDiv.scrollLeft())
             @scrollTop = bodyDiv.scrollTop()
@@ -634,15 +629,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 do (separator) =>
                     $(separator).on 'mousemove', =>
                         separatorId = $(separator).attr('id')
-                        console.log 'over ' + separatorId
                         columnIndex = separatorId.match(/_c(\d*)/)[1] # extracts column index
-                        console.log 'positioning right marker at columnIndex ' + columnIndex
                         if columnIndex >= 0
-                            console.log 'calculating position of ' + '#mtgHC' + id + '_c' + columnIndex
-                            console.log '#mtgHC' + id + '_c' + columnIndex + ' left : ' + $('#mtgHC' + id + '_c' + columnIndex).position().left + ' scrollLeft: ' + @scrollLeft
                             leftPos = $('#mtgHC' + id + '_c' + columnIndex).position().left - @scrollLeft
                             leftPos += $('#mtgHC' + id + '_c' + columnIndex).outerWidth() - 1
-                            console.log 'leftPos ' + leftPos
                             @resizeMarkerRight.css({
                                 'height' : (@bodyHeight + headerHeight) + 'px',
                                 'top' : (topPos + 2) + 'px',
@@ -700,7 +690,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             for cell in $('.mtgIC' + id + '_c' + index)
                 do (cell) =>
                     cellId = $(cell).attr('id')
-                    console.log 'resizing cell ' + cellId
                     y = cellId.match(/r(\d*)/)[1] # extracts row index
                     value = @getValueAt(index, y)
                     $(cell).css('width', (newWidth - 6) + 'px')
@@ -731,42 +720,38 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _makeAllColumnDraggable : ->
             id = @_mtgId
-            @separators = $('.mtgHS' + id)
             topPos = 0
+            columnIndex = -1
             topPos += @titleHeight if @options.title?
             topPos += @toolbarHeight if @options.toolbar?
             dragColumn = $('#dragColumn' + id)
 
-            for column in $('.mtgIHC' + id)
-                do (column) =>
+            $('.mtgIHC' + id).on 'mouseenter', (event) =>
+                column = $(event.target)
+                leftPos = column.parent('th').position().left
+                dragColumn.css({
+                    'top' : (topPos + 15) + 'px',
+                    'left' : (leftPos - @scrollLeft + 15) + 'px'
+                })
+
+            $('.mtgIHC' + id).on 'draginit', (event, drag) =>
+                column = $(event.target)
+                columnIndex = column.attr('id').match(/c(\d*)/)[1]
+                dragColumn.find('span').html(column.text()).end().css('visibility', 'visible')
+                drag.representative(dragColumn, dragColumn.width() / 2, 10)
+
+            $('.mtgIHC' + id).on 'dragmove', (event, drag) =>
+                leftPos = dragColumn.position().left
+                width = dragColumn.width()
+                @_detectDroppablePosition(leftPos + width / 2, width, dragColumn, columnIndex)
+
+            $('.mtgIHC' + id).on 'dragend', (event, drag) =>
+                dragColumn.css('visibility', 'hidden')
+                @colMoveTopDiv.css('visibility', 'hidden')
+                @colMoveBottomDiv.css('visibility', 'hidden')
+                if columnIndex >= 0 and @targetColumnId >= 0
+                    @_moveColumn(columnIndex, @targetColumnId)
                     columnIndex = -1
-                    $(column).on 'mousemove', ->
-                        leftPos = column.position().left
-                        dragColumn.css({
-                            'top' : (topPos + 15) + 'px',
-                            'left' : (leftPos - @scrollLeft + 15) + 'px'
-                        })
-
-                    $(column).on 'draginit', (event, drag) =>
-                        for i in [0...@columnModel.length]
-                            if index == @columnModel[i].positionIndex
-                                columnIndex = i
-                                break
-                        dragColumn.find('span').html(@columnModel[columnIndex].title).css('visibility', 'visible')
-                        drag.representative(dragColumn, dragColumn.width(), 0)
-
-                    $(column).on 'dragmove', (event, drag) =>
-                        leftPos = dragColumn.position().left
-                        width = dragColumn.width()
-                        @_detectDroppablePosition(leftPos + width / 2, width, dragColumn, columnIndex)
-
-                    $(column).on 'dragend', (event, drag) =>
-                        dragColumn.css('visibility', 'hidden')
-                        @colMoveTopDiv.css('visibility', 'hidden')
-                        @colMoveBottomDiv.css('visibility', 'hidden')
-                        if columnIndex >= 0 and @targetColumnId >= 0
-                            @_moveColumn(columnIndex, @targetColumnId)
-                            columnIndex = -1
 
         ###
         # Detects droppable position when the mouse pointer is over a header cell
@@ -869,9 +854,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     $(removedCells[i]).insertBefore(targetCell)
 
             else if toColumnId == cm.length - 1 # moving to the last column
-                tr = $('#mtgHC' + id + '_c' + fromColumnId).parent('tr')
-                removedHeaderCell = $('mtgHC' + id + '_' + fromColumnId).remove()
-                tr.append(removedHeaderCell)
+                lastTh = $('#mtgHC' + id + '_c' + fromColumnId).parent('tr').find('th:last')
+                removedHeaderCell = $('#mtgHC' + id + '_c' + fromColumnId).remove()
+                removedHeaderCell.insertBefore(lastTh)
 
                 # Moving cell elements
                 removedCells = $('.mtgC' + id + '_c' + fromColumnId).remove()
@@ -881,7 +866,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         tr = $('#mtgRow' + id + '_r' + i)
                         tr.append(removedCells[i+numberOfRowsAdded])
 
-                for i in [umberOfRowsAdded...(renderedRows+numberOfRowsAdded)]
+                for i in [numberOfRowsAdded...(renderedRows+numberOfRowsAdded)]
                     tr = $('#mtgRow' + id + '_r' + (i-numberOfRowsAdded))
                     tr.append(removedCells[i])
 
@@ -901,12 +886,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             cm = @columnModel = aTemp
             $('#mtgHRT'+id + ' th').each (index, th) ->
                 if index < cm.length
-                    th.attr('id', 'mtgHC'+ id + '_c' + index)
+                    $(th).attr('id', 'mtgHC'+ id + '_c' + index)
                     try
-                        ihc = th.find('div.my-tablegrid-inner-header-cell')
+                        ihc = $(th).find('div.my-tablegrid-inner-header-cell')
                         ihc.attr('id', 'mtgIHC' + id + '_c' + index)
                         ihc.find('span').attr('id', 'mtgSortIcon' + id + '_c' + index)
-                        hs = th.find('div.mtgHS')
+                        hs = $(th).find('div.mtgHS')
                         hs.attr('id', 'mtgHS' + id + '_c' + index)
                     catch ihc_ex
                         # exception of ihc.find('div') being non existant
@@ -918,11 +903,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     $(this).attr('class', 'my-tablegrid-cell mtgC' + id + ' mtgC' + id + '_c' + index + ' mtgR' + id + '_r' + i)
 
                 $('.mtgIR'+id+'_r'+i).each (index, div) ->
-                    div.attr('id', 'mtgIC' + id + '_c' + index + 'r' + i)
-                    modifiedCellClass = if div.attr('class').match(/modified-cell/) then ' modified-cell' else ''
-                    div.attr('class', 'my-tablegrid-inner-cell mtgIC' + id + ' mtgIC' + id + '_c' + index + ' mtgIR' + id + '_r' + i + modifiedCellClass)
-                    if div.first() and div.first().is(':input')  # when it contains a checkbox or radio button
-                        input = div.first()
+                    $(div).attr('id', 'mtgIC' + id + '_c' + index + 'r' + i)
+                    modifiedCellClass = if $(div).attr('class').match(/modified-cell/) then ' modified-cell' else ''
+                    $(div).attr('class', 'my-tablegrid-inner-cell mtgIC' + id + ' mtgIC' + id + '_c' + index + ' mtgIR' + id + '_r' + i + modifiedCellClass)
+                    if $(div).first() and $(div).first().is(':input')  # when it contains a checkbox or radio button
+                        input = $(div).first()
                         input.attr('id', 'mtgInput' + id + '_c' + index + 'r' + i)
                         input.attr('name', 'mtgInput' + id + '_c' + index + 'r' + i)
                         input.attr('class', 'mtgInput' + id + '_c' + index)
@@ -1011,7 +996,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 value = cm[x].renderer(value, editor.getItems(), @getRow(y)) if editor instanceof ComboBox # when is a list
                 # Creating a normal input
                 inputId = 'mtgInput' + @_mtgId + '_c' + x + 'r' + y
-                console.log 'before error'
                 input = $('<input>').attr({'id' : inputId, 'type' : 'text', 'value' : value})
                 input.addClass('my-tablegrid-textfield')
                 input.css({
@@ -1123,7 +1107,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     $(element).on 'mousemove', =>
                         return unless $(element).attr('id')
                         elementId = $(element).attr('id')
-                        console.log 'elementId ' + elementId
                         selectedHCIndex = elementId.match(/_c(\d*)/)[1] # extract column number from id
                         editor = cm[selectedHCIndex].editor
                         sortable = cm[selectedHCIndex].sortable
@@ -1298,20 +1281,15 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 context : @, # TODO here it maybe will be a problem
                 dataType : 'json',
                 complete : (response) ->
-                    console.log 'step 1'
                     tableModel = $.parseJSON(response.responseText)
-                    console.log 'step 2 ' + tableModel.rows
                     try
                         @rows = tableModel.rows or []
                         @pager = null
                         @pager = tableModel.options.pager if tableModel.options? and tableModel.options.pager?
-                        console.log 'step 3'
                         @pager = {} unless @pager?
                         @pager.pageParameter = pageParameter
-                        console.log 'step 4'
                         @renderedRows = 0
                         @innerBodyDiv.html(@_createTableBody(tableModel.rows))
-                        console.log 'step 5'
                         @bodyTable = $('#mtgBT' + @_mtgId)
                         if tableModel.rows.length > 0 and !firstTimeFlg
                             @_applyCellCallbacks()
@@ -1746,18 +1724,13 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Turns an array row into an object row
         ###
         _fromArrayToObject : (row) ->
-            console.log 'from array to object ' + row
             result = null
             cm = @columnModel
             if row instanceof Array
-                console.log 'is array!'
                 result = {}
                 for i in [0...cm.length]
-                    console.log 'adding item ' + i
                     result[cm[i].id] = row[cm[i].positionIndex]
-                    console.log i + 'item added'
             else if row instanceof Object
-                console.log 'is object!'
                 result = row
             return result
     #end TableGrid
