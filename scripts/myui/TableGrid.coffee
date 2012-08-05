@@ -820,11 +820,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             last = null
           
             if toColumnId == 0  # moving to the left to first column
-                removedHeaderCell = $('#mtgHC'+id+'_c'+fromColumnId).remove()
+                removedHeaderCell = $('#mtgHC'+id+'_c'+fromColumnId).detach()
                 targetHeaderCell = $('#mtgHC'+id+'_c'+ toColumnId)
                 removedHeaderCell.insertBefore(targetHeaderCell)
                 # Moving cell elements
-                removedCells =  $('.mtgC' + id + '_c' + fromColumnId).remove()
+                removedCells =  $('.mtgC' + id + '_c' + fromColumnId).detach()
 
                 if numberOfRowsAdded > 0
                     for i in [-numberOfRowsAdded...0]
@@ -836,15 +836,15 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     $(removedCells[i]).insertBefore(targetCell)
 
             else if toColumnId > 0 and toColumnId < cm.length - 1 # moving in between
-                removedHeaderCell = $('#mtgHC' + id + '_c' + fromColumnId).remove()
+                removedHeaderCell = $('#mtgHC' + id + '_c' + fromColumnId).detach()
                 targetId = toColumnId + 1
                 targetId-- if targetId == fromColumnId
                 targetHeaderCell = $('#mtgHC'+id+'_c'+ targetId)
                 removedHeaderCell.insertBefore(targetHeaderCell)
                 # Moving cell elements
-                removedCells =  $('.mtgC' + id + '_c' + fromColumnId).remove()
+                removedCells =  $('.mtgC' + id + '_c' + fromColumnId).detach()
 
-                if (numberOfRowsAdded > 0)
+                if numberOfRowsAdded > 0
                     for i in [-numberOfRowsAdded...0]
                         targetCell = $('#mtgC' + id + '_c' + targetId +'r' + i)
                         $(removedCells[i+numberOfRowsAdded]).insertBefore(targetCell)
@@ -855,11 +855,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             else if toColumnId == cm.length - 1 # moving to the last column
                 lastTh = $('#mtgHC' + id + '_c' + fromColumnId).parent('tr').find('th:last')
-                removedHeaderCell = $('#mtgHC' + id + '_c' + fromColumnId).remove()
+                removedHeaderCell = $('#mtgHC' + id + '_c' + fromColumnId).detach()
                 removedHeaderCell.insertBefore(lastTh)
 
                 # Moving cell elements
-                removedCells = $('.mtgC' + id + '_c' + fromColumnId).remove()
+                removedCells = $('.mtgC' + id + '_c' + fromColumnId).detach()
 
                 if (numberOfRowsAdded > 0)
                     for i in [-numberOfRowsAdded...0]
@@ -1038,12 +1038,13 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # When the cell is blured
         ###
         _blurCellElement : (element) ->
+            console.log '_blurCellElement is called'
             return unless @keys._bInputFocused
             id = @_mtgId
             keys = @keys
             cm = @columnModel
-            width = parseInt(element.css('width'))
-            height = parseInt(element.css('height'))
+            width = element.width()
+            height = element.height()
             coords = @getCurrentPosition()
             x = coords[0]
             y = coords[1]
@@ -1055,13 +1056,13 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             editor = cm[x].editor or 'input'
             type = cm[x].type or 'string'
             columnId = cm[x].id
-            alignment = if (type == 'number') then 'right' else 'left'
+            alignment = if type == 'number' then 'right' else 'left'
           
             isInputFlg = !(editor == 'radio' or editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
             if isInputFlg
-                editor.hide() if editor.hide # this only happen when editor is a Combobox
+                editor.hide() if editor.hide? # this only happen when editor is a Combobox
                 return false if editor instanceof DatePicker and editor.visibleFlg
-                editor.reset() if editor.reset
+                editor.reset() if editor.reset?
                 element.css('height', cellHeight + 'px')
                 innerElement.css({
                     'width' : (width - 6) + 'px',

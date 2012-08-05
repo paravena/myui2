@@ -1,5 +1,17 @@
-require(['cs!myui/TableGrid'], function(TableGrid) {
-    $(document).ready(function(){
+require(['cs!myui/ComboBox', 'cs!myui/TableGrid'], function(ComboBox, TableGrid) {
+    $(document).ready(function() {
+        var countryList = [
+            {value: 'FR', text: 'France'},
+            {value: 'UK', text: 'United Kingdon'},
+            {value: 'US', text: 'United States'},
+            {value: 'CL', text: 'Chile'},
+            {value: 'BR', text: 'Brazil'},
+            {value: 'IT', text: 'Italy'},
+            {value: 'DE', text: 'Germany'},
+            {value: 'KR', text: 'Korea'},
+            {value: 'JP', text: 'Japan'}
+        ];
+
         var tableModel = {
             options : {
                 width: '640px',
@@ -70,27 +82,36 @@ require(['cs!myui/TableGrid'], function(TableGrid) {
                     id : 'manufDesc',
                     title : 'Description',
                     width : 90,
-                    editable: true
+                    editable : true
+                },
+                {
+                    id : 'origCountry',
+                    title : 'Origin Country',
+                    width : 100,
+                    editable: true,
+                    editor: new ComboBox({
+                        items: countryList
+                    })
                 }
             ],
             //url : 'get_all_manufacturers.php'
             rows : [
-                {'manufId': '1', 'manufName': 'Toyota', 'manufDesc' : 'Japanese Manufacturer'},
-                {'manufId': '2', 'manufName': 'Honda', 'manufDesc' : 'Japanese Manufacturer'},
-                {'manufId': '3', 'manufName': 'Daihatsu', 'manufDesc' : 'Japanese Manufacturer'},
-                {'manufId': '4', 'manufName': 'Nissan', 'manufDesc' : 'Japanese Manufacturer'},
-                {'manufId': '5', 'manufName': 'Mitsubishi', 'manufDesc' : 'Japanese Manufacturer'},
-                {'manufId': '6', 'manufName': 'Renault', 'manufDesc' : 'French Manufacturer'},
-                {'manufId': '7', 'manufName': 'Peugeot', 'manufDesc' : 'French Manufacturer'},
-                {'manufId': '8', 'manufName': 'Citroen', 'manufDesc' : 'French Manufacturer'},
-                {'manufId': '9', 'manufName': 'Simca', 'manufDesc' : 'French Manufacturer'},
-                {'manufId': '10', 'manufName': 'BMW', 'manufDesc' : 'German Manufacturer'},
-                {'manufId': '11', 'manufName': 'Audi', 'manufDesc' : 'German Manufacturer'},
-                {'manufId': '12', 'manufName': 'Volkswagen', 'manufDesc' : 'German Manufacturer'},
-                {'manufId': '13', 'manufName': 'Mercedes Benz', 'manufDesc' : 'German Manufacturer'},
-                {'manufId': '14', 'manufName': 'KIA', 'manufDesc' : 'Korean Manufacturer'},
-                {'manufId': '15', 'manufName': 'Hyundai', 'manufDesc' : 'Korean Manufacturer'},
-                {'manufId': '16', 'manufName': 'Samsung', 'manufDesc' : 'Korean Manufacturer'}
+                {'manufId': '1', 'manufName': 'Toyota', 'manufDesc' : 'Japanese Manufacturer', 'origCountry' : 'JP'},
+                {'manufId': '2', 'manufName': 'Honda', 'manufDesc' : 'Japanese Manufacturer', 'origCountry' : 'JP'},
+                {'manufId': '3', 'manufName': 'Daihatsu', 'manufDesc' : 'Japanese Manufacturer', 'origCountry' : 'JP'},
+                {'manufId': '4', 'manufName': 'Nissan', 'manufDesc' : 'Japanese Manufacturer', 'origCountry' : 'JP'},
+                {'manufId': '5', 'manufName': 'Mitsubishi', 'manufDesc' : 'Japanese Manufacturer', 'origCountry' : 'JP'},
+                {'manufId': '6', 'manufName': 'Renault', 'manufDesc' : 'French Manufacturer', 'origCountry' : 'JP'},
+                {'manufId': '7', 'manufName': 'Peugeot', 'manufDesc' : 'French Manufacturer', 'origCountry' : 'FR'},
+                {'manufId': '8', 'manufName': 'Citroen', 'manufDesc' : 'French Manufacturer', 'origCountry' : 'FR'},
+                {'manufId': '9', 'manufName': 'Simca', 'manufDesc' : 'French Manufacturer', 'origCountry' : 'FR'},
+                {'manufId': '10', 'manufName': 'BMW', 'manufDesc' : 'German Manufacturer', 'origCountry' : 'DE'},
+                {'manufId': '11', 'manufName': 'Audi', 'manufDesc' : 'German Manufacturer', 'origCountry' : 'DE'},
+                {'manufId': '12', 'manufName': 'Volkswagen', 'manufDesc' : 'German Manufacturer', 'origCountry' : 'DE'},
+                {'manufId': '13', 'manufName': 'Mercedes Benz', 'manufDesc' : 'German Manufacturer', 'origCountry' : 'DE'},
+                {'manufId': '14', 'manufName': 'KIA', 'manufDesc' : 'Korean Manufacturer', 'origCountry' : 'KR'},
+                {'manufId': '15', 'manufName': 'Hyundai', 'manufDesc' : 'Korean Manufacturer', 'origCountry' : 'KR'},
+                {'manufId': '16', 'manufName': 'Samsung', 'manufDesc' : 'Korean Manufacturer', 'origCountry' : 'KR'}
             ]
         };
 

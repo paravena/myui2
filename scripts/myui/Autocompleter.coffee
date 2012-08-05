@@ -48,7 +48,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             unless @options.onShow
                 @options.onShow = (element, update) =>
                     $(update).css('position', 'absolute')
-                    p = $(element).offset()
+                    p = $(element).position()
                     vh = $(window).height() #view port height
                     vst = $(window).scrollTop() # view port scrolling top
                     rh = vh + vst - p.top - $(element).outerHeight() #remaining height
@@ -373,14 +373,17 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         # Synchronizes scrolling.
         ###
         _syncScroll : (entry, bottomFlg) ->
+            return unless entry?
+            console.log 'entry: ' + entry
             updateHeight = @update.height()
             scrollTop = @update.scrollTop() # TODO check this
-            if entry.offsetTop > scrollTop and entry.offsetTop < (scrollTop + updateHeight - 10)
+            topPos = $(entry).position().top
+            if topPos > scrollTop and topPos < (scrollTop + updateHeight - 10)
                 return
             unless bottomFlg
-                @update.scrollTop(entry.offsetTop)
+                @update.scrollTop(topPos)
             else
-                @update.scrollTop(entry.offsetTop - (updateHeight - $(entry).height() - 5))
+                @update.scrollTop(topPos - (updateHeight - $(entry).height() - 5))
 
         ###
         # Returns selected item choice.
