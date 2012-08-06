@@ -114,10 +114,9 @@ require(['cs!myui/ComboBox', 'cs!myui/TableGrid'], function(ComboBox, TableGrid)
                 {'manufId': '16', 'manufName': 'Samsung', 'manufDesc' : 'Korean Manufacturer', 'origCountry' : 'KR'}
             ]
         };
-
         var tableGrid1 = new TableGrid(tableModel);
         tableGrid1.render('#mytable1');
-    /*
+        /*
         new ComboBox({
             input : '#name',
             url : 'get_manufacturers_list.php',
@@ -125,7 +124,6 @@ require(['cs!myui/ComboBox', 'cs!myui/TableGrid'], function(ComboBox, TableGrid)
             required : true,
             initialText : 'Enter a manufacturer'
         });
-    */
+        */
     });
-
 });

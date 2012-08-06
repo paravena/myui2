@@ -48,7 +48,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             unless @options.onShow
                 @options.onShow = (element, update) =>
                     $(update).css('position', 'absolute')
-                    p = $(element).position()
+                    p = $(element).offset()
                     vh = $(window).height() #view port height
                     vst = $(window).scrollTop() # view port scrolling top
                     rh = vh + vst - p.top - $(element).outerHeight() #remaining height
@@ -235,7 +235,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             container = $(element).parent()
             container.addClass('my-autocompleter')
             container.attr('id', @id + '_container')
-            container.css({width : width + 'px', height: height + 'px'})
+            container.css({'width' : width + 'px', 'height': height + 'px'})
 
         ###
         # Hide choice list.
@@ -273,24 +273,24 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                         @hide()
                         @active = false
                         event.stopPropagation()
-                        return
+                        return false
                     when eventUtil.KEY_LEFT, eventUtil.KEY_RIGHT
                         return false
                     when eventUtil.KEY_UP
                         @markPrevious()
                         @_renderList()
                         event.stopPropagation()
-                        return
+                        return false
                     when eventUtil.KEY_DOWN
                         @markNext()
                         @_renderList()
                         event.stopPropagation()
-                        return
+                        return false
             else if event.keyCode is eventUtil.KEY_TAB or
                     event.keyCode is eventUtil.KEY_RETURN or
                     event.keyCode is eventUtil.KEY_DOWN or
                     ($.browser.WebKit and event.keyCode is 0)
-                return false
+                return true
 
             @changed = true
             @hasFocus = true
@@ -374,9 +374,8 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         _syncScroll : (entry, bottomFlg) ->
             return unless entry?
-            console.log 'entry: ' + entry
             updateHeight = @update.height()
-            scrollTop = @update.scrollTop() # TODO check this
+            scrollTop = @update.scrollTop()
             topPos = $(entry).position().top
             if topPos > scrollTop and topPos < (scrollTop + updateHeight - 10)
                 return

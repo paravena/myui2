@@ -239,6 +239,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                                 @blur()
                                 return true
                             else
+                                console.log 'this is weird !!'
                                 return false
                         break
                     when eventUtil.KEY_UP # up arrow

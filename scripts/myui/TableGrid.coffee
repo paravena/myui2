@@ -993,18 +993,18 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     'margin': '0'
                 })
                 innerElement.html('')
-                value = cm[x].renderer(value, editor.getItems(), @getRow(y)) if editor instanceof ComboBox # when is a list
+                value = cm[x].renderer(value, editor.getItems(), @getRow(y)) if editor instanceof Autocompleter # when is a list
                 # Creating a normal input
                 inputId = 'mtgInput' + @_mtgId + '_c' + x + 'r' + y
                 input = $('<input>').attr({'id' : inputId, 'type' : 'text', 'value' : value})
                 input.addClass('my-tablegrid-textfield')
                 input.css({
                     'padding' : '3px',
-                    'width' : (width - 8) + 'px'
+                    'width' : width + 'px'
                 })
                 innerElement.append(input)
                 editor.setTableGrid(this)
-                editor.render(input)
+                editor.render(input, true)
                 editor.validate() if editor.validate
                 input.focus()
                 input.select()

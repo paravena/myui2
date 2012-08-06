@@ -2,9 +2,9 @@ define ['jquery', 'cs!myui/ToolTip', 'myui/i18n'], ($, ToolTip, i18n) ->
     class TextField
         constructor : (options = {}) ->
             @baseInitialize(options)
-            if options.input
-                @render options.input
-                @decorate options.input
+            if options.input?
+                @render(options.input, true)
+
 
         baseInitialize : (options) ->
             @options = options
@@ -15,7 +15,7 @@ define ['jquery', 'cs!myui/ToolTip', 'myui/i18n'], ($, ToolTip, i18n) ->
             @options.initialText = null unless @options.initialText
             @options.tabIndex = null unless @options.tabIndex
 
-        render : (input) ->
+        render : (input, flag = false) ->
             @input = $(input)
             @tooltip = null
             @id = $(input).attr('id')
@@ -27,18 +27,19 @@ define ['jquery', 'cs!myui/ToolTip', 'myui/i18n'], ($, ToolTip, i18n) ->
             @input.attr('autocomplete', 'off');
 
             $(input).focus (event) => @onFocus(event)
-
             # registering validate handler
             $(input).blur => @validate()
+            @decorate input if flag
 
         onFocus : ->
             @input.val('') if @options.initialText != null and @input.val() is $.trim(@options.initialText)
 
         decorate : (element) ->
-            $(element).attr('tabIndex', @options.tabIndex) if @options.tabIndex
-            $(element).val @options.initialText if @options.initialText
+            $(element).attr('tabIndex', @options.tabIndex) if @options.tabIndex?
+            $(element).val @options.initialText if @options.initialText?
             width = $(element).width()
             height = $(element).height()
+            $(element).css({width: (width - 8) + 'px'})
             $(element).wrap('<div></div>')
             @container = $(element).parent()
             @container.addClass('my-textfield-container')
