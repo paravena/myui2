@@ -56,12 +56,13 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                     offsetTop = p.top
                     offsetLeft = p.left
                     scrollTop = 0
+                    console.log '@tableGrid ' + @tableGrid._mtgId
                     if @tableGrid
-                        scrollTop = @tableGrid.bodyDiv.scrollTop
+                        scrollTop = @tableGrid.bodyDiv.scrollTop()
                     topPos = $(element).outerHeight() + offsetTop - scrollTop
                     scrollLeft = 0
                     if @tableGrid
-                        scrollLeft = @tableGrid.bodyDiv.scrollLeft
+                        scrollLeft = @tableGrid.bodyDiv.scrollLeft()
                     leftPos = offsetLeft - scrollLeft
                     if (rh >= (p.top - vst))  # down
                         if (uh > rh) then uh = rh - 10
@@ -273,19 +274,20 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                         @hide()
                         @active = false
                         event.stopPropagation()
-                        return false
+                        return true
                     when eventUtil.KEY_LEFT, eventUtil.KEY_RIGHT
-                        return false
+                        console.log 'right or left?'
+                        return true
                     when eventUtil.KEY_UP
                         @markPrevious()
                         @_renderList()
                         event.stopPropagation()
-                        return false
+                        return true
                     when eventUtil.KEY_DOWN
                         @markNext()
                         @_renderList()
                         event.stopPropagation()
-                        return false
+                        return true
             else if event.keyCode is eventUtil.KEY_TAB or
                     event.keyCode is eventUtil.KEY_RETURN or
                     event.keyCode is eventUtil.KEY_DOWN or
@@ -295,7 +297,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             @changed = true
             @hasFocus = true
 
-            clearTimeout @observer if @observe
+            clearTimeout @observer if @observe?
             @observer = setTimeout(( => @onObserverEvent()), @options.frequency * 1000)
             return true
 

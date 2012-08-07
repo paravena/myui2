@@ -559,6 +559,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Applies Setting Menu behavior
         ###
         _applySettingMenuBehavior : ->
+            id = @_mtgId
+            cm = @columnModel
             settingMenu = $('#mtgSM' + @_mtgId)
             settingButton = $('#mtgSB' + @_mtgId)
           
@@ -586,7 +588,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             $('#mtgSM'+@_mtgId + ' input').on 'click', (event) =>
                 checkbox = $(event.target)
-                @_toggleColumnVisibility(i++, checkbox.is(':checked'))
+                columnId = checkbox.attr('id')
+                index = column.positionIndex for column in cm when column.id is columnId
+                @_toggleColumnVisibility(index, checkbox.is(':checked'))
 
         ###
         # Synchronizes horizontal scrolling

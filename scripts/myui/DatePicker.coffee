@@ -47,7 +47,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         render : (input) ->
             super(input)
             @targetElement = $(input)
-            @targetElement = @targetElement.find('INPUT') unless @targetElement[0].tagName == 'INPUT'
+            @targetElement = @targetElement.find('input') unless @targetElement.is('input')
             @options.popupBy = @targetElement
             @options.onchange = @targetElement.onchange
             unless @options.embedded
@@ -151,7 +151,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
             above = true if ((bottom + calendarHeight) > (windowTop + windowHeight)) and (bottom - calendarHeight > windowTop)
             left_px = left + 'px';
-            top_px = if above then (top - calendarHeight - 2) else (top + height + 10) + 'px'
+            top_px = if above then (top - calendarHeight - 10) else (top + height + 10) + 'px'
 
             @_calendarDiv.css('left', left_px)
             @_calendarDiv.css('top', top_px)

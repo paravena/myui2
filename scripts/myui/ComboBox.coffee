@@ -1,4 +1,6 @@
-define ['jquery', 'cs!myui/Autocompleter'], ($, Autocompleter) ->
+define ['jquery', 'cs!myui/Util', 'cs!myui/Autocompleter'], ($, Util, Autocompleter) ->
+    eventUtil = $.util.event
+
     class ComboBox extends Autocompleter
         ###
         # Constructor method.
@@ -11,8 +13,8 @@ define ['jquery', 'cs!myui/Autocompleter'], ($, Autocompleter) ->
         # Key press handler.
         ###
         _keyPress : (event) ->
-            if event.which is 40 and !@active
-                event.stopPropagation()
+            if event.which is eventUtil.KEY_DOWN and !@active
+                #event.stopPropagation()
                 @changed = false
                 @showAll()
 
