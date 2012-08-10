@@ -561,8 +561,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         _applySettingMenuBehavior : ->
             id = @_mtgId
             cm = @columnModel
-            settingMenu = $('#mtgSM' + @_mtgId)
-            settingButton = $('#mtgSB' + @_mtgId)
+            settingMenu = $('#mtgSM' + id)
+            settingButton = $('#mtgSB' + id)
           
             width = settingMenu.width()
           
@@ -586,11 +586,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     settingMenu.css('visibility', 'hidden') unless miFlg
                 ), 500
 
-            $('#mtgSM'+@_mtgId + ' input').on 'click', (event) =>
+            $('#mtgSM'+ id + ' input').on 'click', (event) =>
                 checkbox = $(event.target)
                 columnId = checkbox.attr('id')
-                index = column.positionIndex for column in cm when column.id is columnId
-                @_toggleColumnVisibility(index, checkbox.is(':checked'))
+                @_toggleColumnVisibility(columnId, checkbox.is(':checked'))
 
         ###
         # Synchronizes horizontal scrolling
@@ -1042,8 +1041,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # When the cell is blured
         ###
         _blurCellElement : (element) ->
-            console.log '_blurCellElement is called'
-            return unless @keys._bInputFocused
+            console.log '_blurCellElement is called ' + element?
+            return unless element?
+            console.log 'element exist now :-)'
             id = @_mtgId
             keys = @keys
             cm = @columnModel
@@ -1085,7 +1085,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             else if y < 0
                 @newRowsAdded[Math.abs(y)-1][columnId] = value
             #end if
-            editor.afterUpdateCallback(element, value) if (editor instanceof BrowseInput or editor instanceof TextField or editor instanceof DatePicker) and editor.afterUpdateCallback
+            editor.afterUpdateCallback(element, value) if (editor instanceof BrowseInput or editor instanceof TextField or editor instanceof DatePicker) and editor.afterUpdateCallback?
             keys._bInputFocused = false
             return true
 
@@ -1224,37 +1224,39 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
         ###
         # Toggle column visibility.
+        #
+        # @param columnId column id
+        # @param visibleFlg visibility flag can be true or false.
         ###
-        _toggleColumnVisibility : (index, visibleFlg) ->
+        _toggleColumnVisibility : (columnId, visibleFlg) ->
+            console.log 'toggleColumnVisibility: ' + columnId + ' ' + visibleFlg
             id = @_mtgId
             @_blurCellElement(@keys._nCurrentFocus) # in case there is a cell in editing mode
             @keys.blur() #remove the focus of the selected cell
             headerRowTable = $('#mtgHRT' + id)
             bodyTable = $('#mtgBT' + id)
-
-            for i in [0...@columnModel.length]
-                if @columnModel[i].positionIndex == index
-                    index = i
-                    break
-
+            index = -1
+            index = i for i in [0...@columnModel.length] when @columnModel[i].id == columnId
+            console.log 'hiding index : ' + index
             targetColumn = $('#mtgHC' + id + '_c' + index)
-            $('#mtgHB' + @_mtgId).css('visibility', 'hidden')
+            $('#mtgHB' + id).css('visibility', 'hidden')
             width = 0
 
             if !visibleFlg  # hide
-                width = targetColumn.outerWidth()
+                width = targetColumn.width()
                 targetColumn.hide()
-                element.hide() for element in $('.mtgC'+@_mtgId+ '_'+index)
+                $('.mtgC'+id+ '_c'+index).hide()
                 @columnModel[index].visible = false
                 @headerWidth = @headerWidth - width
             else # show
                 targetColumn.show()
-                width = targetColumn.outerWidth() + 2
-                element.show() for element in $('.mtgC'+@_mtgId+ '_'+index)
+                width = targetColumn.width() + 2
+                $('.mtgC'+id+ '_c'+index).show()
                 @columnModel[index].visible = true
                 @headerWidth = @headerWidth + width
 
             headerRowTable.attr('width', @headerWidth + 21)
+            headerRowTable.css('width', (@headerWidth + 21) + 'px')
             bodyTable.attr('width', @headerWidth)
             bodyTable.css('width', @headerWidth + 'px')
 

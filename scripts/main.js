@@ -123,7 +123,7 @@ require(['cs!myui/ComboBox', 'cs!myui/DatePicker', 'cs!myui/TableGrid'], functio
                 {'manufId': '16', 'manufName': 'Samsung', 'manufDesc' : 'Korean Manufacturer', 'origCountry' : 'KR', 'startDt' : '22/03/2011'}
             ]
         };
-        var tableGrid1 = new TableGrid(tableModel);
+        window.tableGrid1 = new TableGrid(tableModel);
         tableGrid1.render('#mytable1');
         /*
         new ComboBox({
