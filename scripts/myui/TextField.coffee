@@ -47,6 +47,7 @@ define ['jquery', 'cs!myui/ToolTip', 'myui/i18n'], ($, ToolTip, i18n) ->
             @container.css({'width' : width + 'px', 'height': height + 'px'})
 
         reset : ->
+            return unless @input?
             @input.removeClass('my-textfield-input-error') if @input
             @tooltip.remove() if @tooltip
             @input.unbind('blur')

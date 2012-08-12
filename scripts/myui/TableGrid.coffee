@@ -588,8 +588,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             $('#mtgSM'+ id + ' input').on 'click', (event) =>
                 checkbox = $(event.target)
-                columnId = checkbox.attr('id')
-                @_toggleColumnVisibility(columnId, checkbox.is(':checked'))
+                @_toggleColumnVisibility(checkbox.attr('id'))
 
         ###
         # Synchronizes horizontal scrolling
@@ -1041,9 +1040,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # When the cell is blured
         ###
         _blurCellElement : (element) ->
+            return unless @keys._bInputFocused
             console.log '_blurCellElement is called ' + element?
             return unless element?
-            console.log 'element exist now :-)'
+            console.log 'element exist n  ow :-) ' + element.length + ' id: ' + element.attr('id')
             id = @_mtgId
             keys = @keys
             cm = @columnModel
@@ -1077,7 +1077,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             # I hope I can find a better solution
             value = editor.getSelectedValue(value) if editor instanceof Autocompleter
-
+            console.log 'value : ' + value
             if y >= 0 and @rows[y][columnId] != value
                 @rows[y][columnId] = value
                 innerElement.addClass('modified-cell')
@@ -1224,12 +1224,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
         ###
         # Toggle column visibility.
-        #
         # @param columnId column id
-        # @param visibleFlg visibility flag can be true or false.
         ###
-        _toggleColumnVisibility : (columnId, visibleFlg) ->
-            console.log 'toggleColumnVisibility: ' + columnId + ' ' + visibleFlg
+        _toggleColumnVisibility : (columnId) ->
+            console.log 'toggleColumnVisibility: ' + columnId
             id = @_mtgId
             @_blurCellElement(@keys._nCurrentFocus) # in case there is a cell in editing mode
             @keys.blur() #remove the focus of the selected cell
@@ -1242,7 +1240,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             $('#mtgHB' + id).css('visibility', 'hidden')
             width = 0
 
-            if !visibleFlg  # hide
+            if @columnModel[index].visible  # hide
                 width = targetColumn.width()
                 targetColumn.hide()
                 $('.mtgC'+id+ '_c'+index).hide()

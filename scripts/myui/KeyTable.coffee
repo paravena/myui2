@@ -61,7 +61,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
 
             # Loose table focus when click outside the table
             @onClickHandler = (event) =>
-                unless @_nCurrentFocus then return
+                return unless @_nCurrentFocus?
                 element = $(event.target)
                 blurFlg = true
                 blurFlg = false if element.closest(@_targetTable).length > 0
@@ -71,16 +71,15 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                     @releaseKeys()
                     @_nOldFocus = null
 
-            $(document).click @onClickHandler
-
+            $(document).on 'click', @onClickHandler
             @addMouseBehavior() if @_tableGrid?
 
             @onKeyPressHandler = (event) =>
-                result = @onKeyPress(event)
-                event.stopPropagation() # unless result
-                event.preventDefault()
+                if @onKeyPress(event)
+                    event.stopPropagation()
+                    event.preventDefault()
 
-            $(document).keydown @onKeyPressHandler
+            $(document).on 'keydown', @onKeyPressHandler
 
         addMouseBehavior : ->
             tableGrid = @_tableGrid
@@ -93,12 +92,12 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         addMouseBehaviorToRow : (y) ->
             for i in [0...@_numberOfColumns]
                 element = @getCellFromCoords(i, y)
-                element.on 'click', (event) =>
-                    @onClick(event)
-                    @_eventFire('focus', element)
-
-                element.on 'dblclick', (event) =>
-                    @_eventFire('action', element)
+                do (element) =>
+                    element.on 'click', (event) =>
+                        @_onClick(event)
+                        @_eventFire('focus', element)
+                    element.on 'dblclick', (event) =>
+                        @_eventFire('action', element)
 
         ###
         # Purpose:  Create a function (with closure for sKey) event addition API
@@ -205,75 +204,41 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             topLimit = @_topLimit
             # Capture shift+tab to match the left arrow key
             keyCode = if event.which == eventUtil.KEY_TAB and event.shiftKey then -1 else event.which
-            cell = null
-            while(true)
+            while true
                 switch keyCode
                     when eventUtil.KEY_RETURN # return
                         @_eventFire 'action', @_nCurrentFocus
-                        return true
-                    when Event.KEY_ESC # esc
+                        return false
+                    when eventUtil.KEY_ESC # esc
                         if !@_eventFire 'esc', @_nCurrentFocus
                             # Only lose focus if there isn't an escape handler on the cell
                             @blur()
                         return false
                     when -1, eventUtil.KEY_LEFT # left arrow
-                        return true if @_bInputFocused
+                        return false if @_bInputFocused
                         if @_xCurrentPos > 0
                             x = @_xCurrentPos - 1
                             y = @_yCurrentPos
                         else if @_yCurrentPos > topLimit
                             x = @_numberOfColumns - 1
                             y = @_yCurrentPos - 1
-                        else
-                            # at start of table
-                            if keyCode is -1 and @_bForm
-                                # If we are in a form, return focus to the 'input' element such that tabbing will
-                                # follow correctly in the browser
-                                @_bInputFocused = true
-                                @_nInput.focus()
-                                # This timeout is a little nasty - but IE appears to have some asynchronous behaviour for
-                                # focus
-                                callback = () => @_bInputFocused = false
-                                setTimeout(callback, 0)
-                                @blockKeyCaptureFlg = false
-                                @blur()
-                                return true
-                            else
-                                console.log 'this is weird !!'
-                                return false
                         break
                     when eventUtil.KEY_UP # up arrow
-                        return true if @_bInputFocused
+                        return false if @_bInputFocused
                         if @_yCurrentPos > topLimit
                             x = @_xCurrentPos
                             y = @_yCurrentPos - 1
                         else
-                            return false
+                            return true
                         break
                     when eventUtil.KEY_TAB, eventUtil.KEY_RIGHT # right arrow
-                        return true if @_bInputFocused
+                        return false if @_bInputFocused
                         if @_xCurrentPos < @_numberOfColumns - 1
                             x = @_xCurrentPos + 1
                             y = @_yCurrentPos
                         else if @_yCurrentPos < @_numberOfRows - 1
                             x = 0
                             y = @_yCurrentPos + 1
-                        else
-                            # at end of table
-                            if keyCode is eventUtil.KEY_TAB and @_bForm
-                                # If we are in a form, return focus to the 'input' element such that tabbing will
-                                # follow correctly in the browser
-                                @_bInputFocused = true
-                                @_nInput.focus()
-                                # This timeout is a little nasty - but IE appears to have some asynchronous behaviour for
-                                # focus
-                                callback = () => @_bInputFocused = false
-                                setTimeout(callback, 0)
-                                @blockKeyCaptureFlg = false
-                                @blur()
-                                return true
-                            else
-                                return false
                         break
                     when eventUtil.KEY_DOWN # down arrow
                         return true if @_bInputFocused
@@ -287,14 +252,14 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                         return true
                 # end switch
                 cell = @getCellFromCoords(x, y)
-                if cell != null && cell.css('display') != 'none' and cell.closest('tr').css('display') != 'none'
+                if cell != null and cell.css('display') != 'none' and cell.closest('tr').css('display') != 'none'
                     break
                 else
                     @_xCurrentPos = x
                     @_yCurrentPos = y
             # end while
             @setFocus(cell)
-            @_eventFire "focus", cell
+            @_eventFire 'focus', cell
             return true
 
         ###
@@ -444,11 +409,13 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # Focus on the element that has been clicked on by the user
         # @param event click event
         ###
-        onClick : (event) ->
+        _onClick : (event) ->  # TODO change the name of this method
+            console.log '_onClick was called'
             cell = $(event.target).closest('td')
             if cell isnt @_nCurrentFocus
                 @setFocus(cell)
                 @captureKeys()
+
 
         ###
         # Start capturing key events for this table
@@ -479,4 +446,4 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
 
         stop : ->
             $(document).unbind('keydown', @onKeyPressHandler)
-            $(document).unbind('click', @onClickHandler) if (@_onClickHandler)
+            $(document).unbind('click', @onClickHandler)
