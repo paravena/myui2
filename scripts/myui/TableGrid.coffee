@@ -706,8 +706,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @headerWidth = @headerWidth - (oldWidth - newWidth)
 
             $('#mtgHRT' + id).attr('width', @headerWidth + 21)
+            $('#mtgHRT' + id).css('width', (@headerWidth + 21) + 'px')
             $('#mtgBT' + id).attr('width', @headerWidth)
-          
+            $('#mtgBT' + id).css('width', @headerWidth + 'px')
+
             @columnModel[index].width = newWidth
             @_syncScroll()
 
