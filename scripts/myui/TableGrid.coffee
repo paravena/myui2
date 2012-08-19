@@ -471,7 +471,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         # Apply callback to rows.
         ###
-        _applyCellCallbackToRow : ->
+        _applyCellCallbackToRow : (y) ->
             id = @_mtgId
             cm = @columnModel
             for i in [0...cm.length]
@@ -480,21 +480,19 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                    (editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox)
                     element = $('#mtgInput'+id + '_c' + i + 'r' + y)
                     innerElement = $('#mtgIC'+id + '_c' + i + 'r' + y)
-                    f_handler = (editor, element, innerElement) =>
-                        return ( ->
-                                if editor.selectable is undefined or !editor.selectable
-                                    coords = element.attr('id').substring(element.id.indexOf('_') + 1, element.attr('id').length).split(',')
-                                    x = coords[0];
-                                    y = coords[1];
-                                    value = element.is(':checked')
-                                    value = editor.getValueOf(element.checked) if editor.hasOwnProperty('getValueOf')
-                                    @setValueAt(value, x, y, false);
-                                    @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1  # if doesn't exist in the array the row is registered
-                                )
-                    elementClickHandler = f_handler(editor, element, innerElement)
-                    editor.onClickCallback(element.value, element.checked) if editor.onClickCallback
-                    innerElement.addClass('modified-cell') if editor.selectable is undefined or !editor.selectable
-                    element.on 'click', elementClickHandler
+                    unless editor.selectable
+                        do (editor, element, innerElement) =>
+                            element.on 'click', =>
+                                elementId = element.attr('id')
+                                match = elementId.match(/_c(\d*?)r(\d*?)/)
+                                x = match[1];
+                                y = match[2];
+                                value = element.is(':checked')
+                                value = editor.getValueOf(element.is(':checked')) if editor.getValueOf?
+                                @setValueAt(value, x, y, false);
+                                @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1  # if doesn't exist in the array the row is registered
+                    editor.onClickCallback(element.value, element.is(':checked')) if editor.onClickCallback?
+                    innerElement.addClass('modified-cell') unless editor.selectable
 
         ###
         # Returns TableGrid id.
@@ -540,13 +538,15 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             else
                 html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu shadow">'
             html[idx++] = '<ul>'
-            for i in [0...cm.length]
-                column = cm[i]
-                html[idx++] = '<li>'
+            for c in cm
+                html[idx++] = '<li>' #TODO simplify this code, remove nested table
                 html[idx++] = '<a href="#" class="my-tablegrid-menu-item">'
                 html[idx++] = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
-                html[idx++] = '<tr><td width="25"><span><input id="'+column.id+'" type="checkbox" checked="'+column.visible+'"></span></td>'
-                html[idx++] = '<td><label for="'+column.id+'">&nbsp;'+ column.title+'</label></td></tr>'
+                if c.visible
+                    html[idx++] = '<tr><td width="25"><span><input id="'+c.id+'" type="checkbox" checked="checked"></span></td>'
+                else
+                    html[idx++] = '<tr><td width="25"><span><input id="'+c.id+'" type="checkbox"></span></td>'
+                html[idx++] = '<td><label for="'+c.id+'">&nbsp;'+ c.title+'</label></td></tr>'
                 html[idx++] = '</table>'
                 html[idx++] = '</a>'
                 html[idx++] = '</li>'
@@ -586,7 +586,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     settingMenu.css('visibility', 'hidden') unless miFlg
                 ), 500
 
-            $('#mtgSM'+ id + ' input').on 'click', (event) =>
+            $('#mtgSM'+ id + ' :checkbox').on 'click', (event) =>
                 checkbox = $(event.target)
                 @_toggleColumnVisibility(checkbox.attr('id'))
 
@@ -705,8 +705,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             @headerWidth = @headerWidth - (oldWidth - newWidth)
 
-            $('#mtgHRT' + id).attr('width', @headerWidth + 21)
+            $('#mtgHRB' + id).css('width', (@headerWidth + 21) + 'px')
             $('#mtgHRT' + id).css('width', (@headerWidth + 21) + 'px')
+            $('#mtgHRT' + id).attr('width', @headerWidth + 21)
             $('#mtgBT' + id).attr('width', @headerWidth)
             $('#mtgBT' + id).css('width', @headerWidth + 'px')
 
@@ -1231,28 +1232,29 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         _toggleColumnVisibility : (columnId) ->
             console.log 'toggleColumnVisibility: ' + columnId
             id = @_mtgId
+            cm = @columnModel
             @_blurCellElement(@keys._nCurrentFocus) # in case there is a cell in editing mode
             @keys.blur() #remove the focus of the selected cell
             headerRowTable = $('#mtgHRT' + id)
             bodyTable = $('#mtgBT' + id)
             index = -1
-            index = i for i in [0...@columnModel.length] when @columnModel[i].id == columnId
+            index = i for i in [0...cm.length] when cm[i].id == columnId
             console.log 'hiding index : ' + index
             targetColumn = $('#mtgHC' + id + '_c' + index)
             $('#mtgHB' + id).css('visibility', 'hidden')
             width = 0
 
-            if @columnModel[index].visible  # hide
+            if cm[index].visible  # hide
                 width = targetColumn.width()
                 targetColumn.hide()
                 $('.mtgC'+id+ '_c'+index).hide()
-                @columnModel[index].visible = false
+                cm[index].visible = false
                 @headerWidth = @headerWidth - width
             else # show
                 targetColumn.show()
                 width = targetColumn.width() + 2
                 $('.mtgC'+id+ '_c'+index).show()
-                @columnModel[index].visible = true
+                cm[index].visible = true
                 @headerWidth = @headerWidth + width
 
             headerRowTable.attr('width', @headerWidth + 21)

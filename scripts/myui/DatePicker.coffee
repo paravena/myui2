@@ -143,9 +143,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             windowHeight = $(window).height()
             dim = $(@options.popupBy).offset()
             top = dim.top
-            top = top - @tableGrid.bodyDiv.scrollTop() if @tableGrid
             left = dim.left
-            left = left - @tableGrid.bodyDiv.scrollLeft() if @tableGrid
             height = $(@options.popupBy).height()
             bottom = top + height
 

@@ -70,7 +70,10 @@ require(['cs!myui/ComboBox', 'cs!myui/DatePicker', 'cs!myui/TableGrid'], functio
                     id : 'manufId',
                     title : 'Id',
                     width : 30,
-                    editable: true
+                    editable: true,
+                    editor : new TableGrid.CellCheckbox({
+                        selectable : true
+                    })
                 },
                 {
                     id : 'manufName',

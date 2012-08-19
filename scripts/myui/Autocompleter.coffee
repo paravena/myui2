@@ -55,15 +55,8 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                     uh = (@entryCount * 22) + 6
                     offsetTop = p.top
                     offsetLeft = p.left
-                    scrollTop = 0
-                    console.log '@tableGrid ' + @tableGrid._mtgId
-                    if @tableGrid
-                        scrollTop = @tableGrid.bodyDiv.scrollTop()
-                    topPos = $(element).outerHeight() + offsetTop - scrollTop
-                    scrollLeft = 0
-                    if @tableGrid
-                        scrollLeft = @tableGrid.bodyDiv.scrollLeft()
-                    leftPos = offsetLeft - scrollLeft
+                    topPos = $(element).outerHeight() + offsetTop
+                    leftPos = offsetLeft
                     if (rh >= (p.top - vst))  # down
                         if (uh > rh) then uh = rh - 10
                         update.css({
@@ -75,9 +68,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                     else  # above
                         if (uh > (p.top - vst))
                             uh = p.top - vst - 10;
-                            topPos = p.top - (uh + scrollTop + 4)
+                            topPos = p.top - (uh + 4)
                         else if (uh > rh)
-                            topPos = p.top - (uh + scrollTop + 4)
+                            topPos = p.top - (uh + 4)
                         update.css({
                             top : topPos + 'px',
                             left : leftPos + 'px',
@@ -216,6 +209,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         # On blur handler.
         ###
         onBlur : (event) ->
+            return unless @active
             target = $(event.target)
             ancestor = @container;
             blurFlg = true;
