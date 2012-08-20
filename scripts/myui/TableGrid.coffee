@@ -1165,7 +1165,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                             beginAtRow = -@newRowsAdded.length if @newRowsAdded.length > 0
                             x = selectedHCIndex
                             for y in [beginAtRow...renderedRows]
-                                element = $('#mtgInput' + id + '_c' + x +'r'+y)
+                                element = $('#mtgInput' + id + '_c' + x + 'r' + y)
                                 element.attr('checked', flag)
                                 value = flag
                                 if !selectableFlg
