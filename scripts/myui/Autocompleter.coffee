@@ -213,7 +213,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             target = $(event.target)
             ancestor = @container;
             blurFlg = true;
-            if target.closest(ancestor).length > 0 then blurFlg = false # is descendant of ?
+            blurFlg = false if target.closest(ancestor).size() > 0 # is descendant of ?
             if blurFlg
                 @hide()
                 @hasFocus = false

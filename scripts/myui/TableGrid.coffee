@@ -612,8 +612,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 bodyTable.find('tbody').append(html)
                 @_addKeyBehavior()
                 @_applyCellCallbacks()
-                keys.addMouseBehavior()
-
 
         ###
         # Makes all columns resizable
@@ -1459,7 +1457,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 @bodyTable.find('tbody').append(html)
                 @_addKeyBehavior()
                 @_applyCellCallbacks()
-                @keys.addMouseBehavior()
 
         ###
         # Returns value at given coordinates.
@@ -1677,7 +1674,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @newRowsAdded[i-1] = newRow
             keys.setTopLimit(-i)
             @_addKeyBehaviorToRow(newRow, -i)
-            keys.addMouseBehaviorToRow(-i)
             @_applyCellCallbackToRow(-i)
             @bodyDiv.scrollTop(@scrollTop = 0)
 

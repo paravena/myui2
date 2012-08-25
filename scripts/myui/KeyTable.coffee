@@ -22,7 +22,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             @idPrefix = options.idPrefix
             @idPrefix = '#mtgC'+ @_tableGrid._mtgId + '_' if @_tableGrid?
 
-            @nBody = @_targetTable.find('tbody') # Cache the tbody node of interest
+            @_tableBody = @_targetTable.find('tbody') # Cache the tbody node of interest
             @_xCurrentPos = null
             @_yCurrentPos = null
             @_nCurrentFocus = null
@@ -72,7 +72,17 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                     @_nOldFocus = null
 
             $(document).on 'click', @onClickHandler
-            @addMouseBehavior() if @_tableGrid?
+
+            @_tableBody.on 'click', (event) =>
+                cell = $(event.target).closest('td')
+                if cell isnt @_nCurrentFocus
+                    @setFocus(cell)
+                    @captureKeys()
+                @_eventFire('focus', cell)
+
+            @_tableBody.on 'dblclick', (event) =>
+                cell = $(event.target).closest('td')
+                @_eventFire('action', cell)
 
             @onKeyPressHandler = (event) =>
                 if @onKeyPress(event)
@@ -81,23 +91,6 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
 
             $(document).on 'keydown', @onKeyPressHandler
 
-        addMouseBehavior : ->
-            tableGrid = @_tableGrid
-            renderedRows = tableGrid.renderedRows
-            renderedRowsAllowed = tableGrid.renderedRowsAllowed
-            beginAtRow = renderedRows - renderedRowsAllowed
-            beginAtRow = 0 if beginAtRow < 0
-            @addMouseBehaviorToRow(j) for j in [beginAtRow...renderedRows]
-
-        addMouseBehaviorToRow : (y) ->
-            for i in [0...@_numberOfColumns]
-                element = @getCellFromCoords(i, y)
-                do (element) =>
-                    element.on 'click', (event) =>
-                        @_onClick(event)
-                        @_eventFire('focus', element)
-                    element.on 'dblclick', (event) =>
-                        @_eventFire('action', element)
 
         ###
         # Purpose:  Create a function (with closure for sKey) event addition API
@@ -400,22 +393,10 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # @return TD target
         ###
         getCellFromCoords : (x, y) ->
-            element = $(@idPrefix + 'c' + x + 'r' + y, @nBody)
+            element = $(@idPrefix + 'c' + x + 'r' + y, @_tableBody)
             return null if element.length == 0
             return element
             # return @_targetTable.rows[y].cells[x] # <-- this sadly doesn't work
-
-        ###
-        # Focus on the element that has been clicked on by the user
-        # @param event click event
-        ###
-        _onClick : (event) ->  # TODO change the name of this method
-            console.log '_onClick was called'
-            cell = $(event.target).closest('td')
-            if cell isnt @_nCurrentFocus
-                @setFocus(cell)
-                @captureKeys()
-
 
         ###
         # Start capturing key events for this table
