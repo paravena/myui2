@@ -1,3 +1,11 @@
+requirejs.config({
+   baseUrl : 'scripts',
+   paths : {
+       'jquery' : 'libs/jquery',
+       'jquerypp.custom' : 'libs/jquerypp.custom'
+   }
+});
+
 require(['cs!myui/ComboBox', 'cs!myui/DatePicker', 'cs!myui/TableGrid'], function(ComboBox, DatePicker, TableGrid) {
     $(document).ready(function() {
         var countryList = [
