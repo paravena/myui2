@@ -23,7 +23,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 rowStyle : ( ->  return ''),
                 rowClass : ( ->  return ''),
                 addSettingBehavior : true,
-                addDraggingBehavior : true
+                addDraggingBehavior : true,
+                addLazyRenderingBehavior : true,
+                addNewRowsToEndBehaviour : false
             }, tableModel.options or {})
 
             @pagerHeight = 24
@@ -44,7 +46,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @renderedRowsAllowed = 0 #Use for lazy rendering depends on bodyDiv height
             @newRowsAdded = []
             @deletedRows = []
-    
+            @options.addLazyRenderingBehavior = false if @options.addNewRowsToEndBehaviour
             # Header builder
             @hb = new HeaderBuilder(@_mtgId, @columnModel)
             if @hb.getHeaderRowNestedLevel() > 1
@@ -311,7 +313,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html = []
             idx = 0
             firstRenderingFlg = false
-            firstRenderingFlg = true if renderedRows == 0
+            if renderedRows == 0
+                firstRenderingFlg = true
+                renderedRowsAllowed = @renderedRowsAllowed = rows.length if !@options.addLazyRenderingBehavior
 
             if firstRenderingFlg
                 @innerBodyDiv.css('height',  (rows.length * cellHeight) + 'px')
@@ -718,6 +722,15 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         _hasHScrollBar : ->
             return @headerWidth + 20 > @tableWidth
 
+        _scrollToRow : (rowIndex) ->
+            return if @options.addLazyRenderingBehavior # This only works without lazy rendering
+            cellHeight = @options.cellHeight
+            bodyHeight = @bodyHeight
+            scrollBarWidth = this.scrollBarWidth;
+            scrollToPosition = rowIndex * (cellHeight + 1)
+            # Is scrolling necessary?
+            @bodyDiv.scrollTop(@scrollTop = scrollToPosition) if scrollToPosition > bodyHeight - scrollBarWidth - 3
+
         ###
         # Makes all columns draggable
         ###
@@ -1079,12 +1092,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             # I hope I can find a better solution
             value = editor.getSelectedValue(value) if editor instanceof Autocompleter
             console.log 'value : ' + value
-            if y >= 0 and @rows[y][columnId] != value
+            if y >= 0 and y < @rows.length and @rows[y][columnId] != value
                 @rows[y][columnId] = value
                 innerElement.addClass('modified-cell')
                 @modifiedRows.push(y) if @modifiedRows.indexOf(y) == -1 # if doesn't exist in the array the row is registered
             else if y < 0
-                @newRowsAdded[Math.abs(y)-1][columnId] = value
+                @newRowsAdded[Math.abs(y) - 1][columnId] = value
+            else if y >= @rows.length
+                @newRowsAdded[Math.abs(y) - @rows.length][columnId] = value
             #end if
             editor.afterUpdateCallback(element, value) if (editor instanceof BrowseInput or editor instanceof TextField or editor instanceof DatePicker) and editor.afterUpdateCallback?
             keys._bInputFocused = false
@@ -1464,7 +1479,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         getValueAt : (x, y) ->
             value = null
             columnId = @columnModel[x].id
-            value = if y >= 0 then @rows[y][columnId] else @newRowsAdded[Math.abs(y)-1][columnId]
+            rows = @rows
+            newRowsAdded = @newRowsAdded
+            if y >= 0 and y < rows.length
+                value = @rows[y][columnId]
+            else if y < 0
+                value = newRowsAdded[Math.abs(y)-1][columnId]
+            else if y >= rows.length
+                value = newRowsAdded[Math.abs(y) - rows.length][columnId]
             return value
 
         ###
@@ -1476,6 +1498,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             id = @_mtgId
             editor = cm[x].editor
             columnId = cm[x].id
+            rows = @rows
+            newRowsAdded = @newRowsAdded
 
             if refreshValueFlg == undefined or refreshValueFlg
                 if editor != null and (editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor == 'radio' or editor instanceof TableGrid.CellRadioButton)
@@ -1496,11 +1520,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 else
                     $('#mtgIC'+id+'_c'+x+'r'+y).html(value)
 
-            if y >= 0
-                @rows[y][columnId] = value
-            else
-                @newRowsAdded[Math.abs(y)-1][columnId] = value
-
+            if y >= 0 and y < rows.length
+                rows[y][columnId] = value
+            else if y  < 0
+                newRowsAdded[Math.abs(y) - 1][columnId] = value
+            else if y >= rows.length
+                newRowsAdded[Math.abs(y) - rows.length][columnId] = value
         ###
         # Returns column index.
         ###
@@ -1573,10 +1598,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             selectedRowsIdx = @_getSelectedRowsIdx(idx)
             for i in [0...selectedRowsIdx.length]
                 rowIdx = selectedRowsIdx[i]
-                if rowIdx >= 0
+                if rowIdx >= 0 and rowIdx < rows.length
                     result.push(rows[rowIdx])
-                else
-                    result.push(newRowsAdded[Math.abs(rowIdx)-1])
+                else if rowIdx < 0
+                    result.push(newRowsAdded[Math.abs(rowIdx) - 1])
+                else if rowIdx >= rows.length
+                    result.push(newRowsAdded[Math.abs(rowIdx) - rows.length])
             return result;
 
         ###
@@ -1589,6 +1616,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             cm = @columnModel
             newRowsAdded = @newRowsAdded
             renderedRows = @renderedRows
+            addNewRowsToEndBehaviorFlg = @options.addNewRowsToEndBehaviour
+
             idx = idx or -1 # Selectable column index
             selectAllFlg = false
             if idx == -1
@@ -1604,19 +1633,24 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 j = 0
                 y = 0
                 if newRowsAdded.length > 0 # there are new rows added
-                    for j in [0...newRowsAdded.length]
-                        y = -(j + 1);
-                        result.push(y) if $('#mtgInput'+id+'_c'+idx+'r'+y).is(':checked')
+                    if !addNewRowsToEndBehaviorFlg
+                        for j in [0...newRowsAdded.length]
+                            y = -(j + 1)
+                            result.push(y) if $('#mtgInput'+id+'_c'+idx+'r'+y).is(':checked')
+                    else
+                        for j in [0...newRowsAdded.length]
+                            y = j + renderedRows
+                            result.push(y) if $('#mtgInput'+id+'_c'+idx+'r'+y).is(':checked')
 
                 for j in [0...renderedRows]
-                    y = j;
+                    y = j
                     result.push(y) if @deletedRows.indexOf(@getRow(y)) == -1 and $('#mtgInput'+id+'_c'+idx+'r'+y).size() > 0 and $('#mtgInput'+id+'_c'+idx+'r'+y).is(':checked')
 
 
                 if selectAllFlg and renderedRows < @rows.length
                     result.push(j) for j in [renderedRows...@rows.length]
 
-            return result;
+            return result
 
         ###
         # Highlight given row id.
@@ -1665,17 +1699,29 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             keys = @keys
             bodyTable = @bodyTable
             cm = @columnModel
-            i = @newRowsAdded.length + 1
+            index = @newRowsAdded.length
+            renderedRows = @renderedRows
+
             if newRow == undefined
                 newRow = {}
                 newRow[cm[j].id] = '' for j in [0...cm.length]
 
-            bodyTable.find('tbody').prepend(@_createRow(newRow, -i))
-            @newRowsAdded[i-1] = newRow
-            keys.setTopLimit(-i)
-            @_addKeyBehaviorToRow(newRow, -i)
-            @_applyCellCallbackToRow(-i)
-            @bodyDiv.scrollTop(@scrollTop = 0)
+            @newRowsAdded.push(newRow)
+            if !@options.addNewRowsToEndBehaviour
+                index = -(index + 1)
+                bodyTable.find('tbody').prepend(@_createRow(newRow, index))
+                keys.setTopLimit(-index)
+                @bodyDiv.scrollTop(@scrollTop = 0)
+            else
+                index = renderedRows + index
+                bodyTable.find('tbody').append(@_createRow(newRow, index))
+                numberOfRows = renderedRows + @newRowsAdded.length
+                @_keys.setNumberOfRows(numberOfRows)
+                @_scrollToRow(numberOfRows)
+
+            @_addKeyBehaviorToRow(newRow, index)
+            @_applyCellCallbackToRow(-index)
+
 
         ###
         # Deletes selected rows.
@@ -1687,11 +1733,18 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             y = 0
             for i in [0...selectedRows.length]
                 y = selectedRows[i]
-                if y >= 0
+                if y >= 0 and y < @rows.length
                     @deletedRows.push(@getRow(y))
-                else
-                    @newRowsAdded[Math.abs(y)-1] = null
+                else if y < 0
+                    @newRowsAdded[Math.abs(y) - 1] = null
+                else if y >= @rows.length
+                    @newRowsAdded[Math.abs(y) - @rows.length] = null
                 $('#mtgRow'+id+'_r'+y).hide()
+
+            # compacting array
+            temp = []
+            temp.push(index) for index in @newRowsAdded when index != null
+            @newRowsAdded = temp
 
             totalDiv = $('#mtgTotal')
             if totalDiv?
