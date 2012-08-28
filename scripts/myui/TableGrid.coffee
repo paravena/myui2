@@ -1716,7 +1716,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 index = renderedRows + index
                 bodyTable.find('tbody').append(@_createRow(newRow, index))
                 numberOfRows = renderedRows + @newRowsAdded.length
-                @_keys.setNumberOfRows(numberOfRows)
+                @keys.setNumberOfRows(numberOfRows)
                 @_scrollToRow(numberOfRows)
 
             @_addKeyBehaviorToRow(newRow, index)
