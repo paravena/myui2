@@ -488,9 +488,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         do (editor, element, innerElement) =>
                             element.on 'click', =>
                                 elementId = element.attr('id')
-                                match = elementId.match(/_c(\d*?)r(\d*?)/)
-                                x = match[1];
-                                y = match[2];
+                                match = elementId.match(/_c(\d*?)r(\-?\d*?)/)
+                                x = parseInt(match[1]);
+                                y = parseInt(match[2]);
                                 value = element.is(':checked')
                                 value = editor.getValueOf(element.is(':checked')) if editor.getValueOf?
                                 @setValueAt(value, x, y, false);
@@ -633,7 +633,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 do (separator) =>
                     $(separator).on 'mousemove', =>
                         separatorId = $(separator).attr('id')
-                        columnIndex = separatorId.match(/_c(\d*)/)[1] # extracts column index
+                        columnIndex = parseInt(separatorId.match(/_c(\d*)/)[1]) # extracts column index
                         if columnIndex >= 0
                             leftPos = $('#mtgHC' + id + '_c' + columnIndex).position().left - @scrollLeft
                             leftPos += $('#mtgHC' + id + '_c' + columnIndex).outerWidth() - 1
@@ -694,7 +694,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             for cell in $('.mtgIC' + id + '_c' + index)
                 do (cell) =>
                     cellId = $(cell).attr('id')
-                    y = cellId.match(/r(\d*)/)[1] # extracts row index
+                    y = parseInt(cellId.match(/r(\-?\d*)/)[1]) # extracts row index
                     value = @getValueAt(index, y)
                     $(cell).css('width', (newWidth - 6) + 'px')
                     if !checkboxOrRadioFlg
@@ -752,7 +752,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             $('.mtgIHC' + id).on 'draginit', (event, drag) =>
                 column = $(event.target)
-                columnIndex = column.attr('id').match(/c(\d*)/)[1]
+                columnIndex = parseInt(column.attr('id').match(/c(\d*)/)[1])
                 dragColumn.find('span').html(column.text()).end().css('visibility', 'visible')
                 drag.representative(dragColumn, dragColumn.width() / 2, 10)
 
@@ -1128,7 +1128,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     $(element).on 'mousemove', =>
                         return unless $(element).attr('id')
                         elementId = $(element).attr('id')
-                        selectedHCIndex = elementId.match(/_c(\d*)/)[1] # extract column number from id
+                        selectedHCIndex = parseInt(elementId.match(/_c(\d*)/)[1]) # extract column number from id
                         editor = cm[selectedHCIndex].editor
                         sortable = cm[selectedHCIndex].sortable
                         hbHeight = cm[selectedHCIndex].height
@@ -1151,7 +1151,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     $(element).on 'click', =>
                         return unless $(element).attr('id')
                         elementId = $(element).attr('id')
-                        selectedHCIndex = elementId.match(/_c(\d*)/)[1] # extract column number from id
+                        selectedHCIndex = parseInt(elementId.match(/_c(\d*)/)[1]) # extract column number from id
                         @_toggleSortData(selectedHCIndex)
 
 

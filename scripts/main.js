@@ -65,7 +65,7 @@ require(['cs!myui/ComboBox', 'cs!myui/DatePicker', 'cs!myui/TableGrid'], functio
                         //alert('on delete handler');
                     }
                 },
-                addNewRowsToEndBehaviour : true,
+                addNewRowsToEndBehaviour : false,
                 rowClass : function(rowIdx) {
                     var className = '';
                     if (rowIdx % 2 == 0) {

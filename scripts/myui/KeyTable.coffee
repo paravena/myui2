@@ -191,7 +191,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         onKeyPress : (event) ->
             return false unless @blockKeyCaptureFlg
             # If a modifier key is pressed (except shift), ignore the event
-            return false if event.metaKey || event.altKey || event.ctrlKey
+            return false if event.metaKey or event.altKey or event.ctrlKey
             x = @_xCurrentPos
             y = @_yCurrentPos
             topLimit = @_topLimit
@@ -242,7 +242,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                             return false
                         break
                     else # Nothing we are interested in
-                        return true
+                        return false
                 # end switch
                 cell = @getCellFromCoords(x, y)
                 if cell != null and cell.css('display') != 'none' and cell.closest('tr').css('display') != 'none'
@@ -380,7 +380,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         getCoordsFromCell : (element) ->
             id = $(element).attr('id')
             return null unless id?
-            match = id.match(/c(\d*?)r(\d*?)$/)
+            match = id.match(/c(\d*?)r(\-?\d*?)$/)
             return [
                 parseInt(match[1]),
                 parseInt(match[2])
@@ -402,7 +402,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # Start capturing key events for this table
         ###
         captureKeys : ->
-            @blockKeyCaptureFlg = true unless @blockKeyCaptureFlg
+            @blockKeyCaptureFlg = true
 
         ###
         # Stop capturing key events for this table
