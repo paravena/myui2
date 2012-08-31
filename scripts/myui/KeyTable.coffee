@@ -4,23 +4,28 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
 
     class KeyTable
         constructor : (targetTable, options) ->
-            options = $.extend({
+            @options = $.extend({
                 idPrefix : '',
-                form : false}, options or {})
+                cellFocusClass : 'focus'
+            }, options or {})
+
             @_tableGrid = null
+            @_cm = null # column model
+
             if targetTable.columnModel? # Is a TableGrid object?
+                @_cm = targetTable.columnModel
                 @_numberOfRows = targetTable.rows.length
                 @_numberOfColumns = targetTable.columnModel.length
                 @_tableGrid = targetTable
                 @_bodyDiv = $(targetTable.bodyDiv)
                 @_targetTable = $(targetTable.bodyTable)
-            else
+            else if targetTable.is('table')
+                @_cm = @_buildColumnModel(targetTable)
                 @_targetTable = $(targetTable) # a normal table
                 @_numberOfRows = @_targetTable.find('tbody > tr').length
                 @_numberOfColumns = options.numberOfColumns or @_targetTable.find('tbody > tr')[0].cells.length
 
-            @idPrefix = options.idPrefix
-            @idPrefix = '#mtgC'+ @_tableGrid._mtgId + '_' if @_tableGrid?
+            @options.idPrefix = '#mtgC'+ @_tableGrid._mtgId + '_' if @_tableGrid?
 
             @_tableBody = @_targetTable.find('tbody') # Cache the tbody node of interest
             @_xCurrentPos = null
@@ -29,12 +34,8 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             @_nOldFocus = null
             @_topLimit = 0
             # Table grid key navigation handling flags
-            @blockKeyCaptureFlg = false
-
-            @_nInput = null
-            @_bForm = options.form
-            @_bInputFocused = false
-            @_sFocusClass = 'focus'
+            @_blockKeyCaptureFlg = false
+            @_isInputFocusedFlg = false
             @_xCurrentPos = 0
             @_yCurrentPos = 0
 
@@ -60,7 +61,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                 @events.remove[sKey] = @_insertRemoveEventTemplate(sKey)
 
             # Loose table focus when click outside the table
-            @onClickHandler = (event) =>
+            @_onClickHandler = (event) =>
                 return unless @_nCurrentFocus?
                 element = $(event.target)
                 blurFlg = true
@@ -71,7 +72,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                     @releaseKeys()
                     @_nOldFocus = null
 
-            $(document).on 'click', @onClickHandler
+            $(document).on 'click', @_onClickHandler
 
             @_tableBody.on 'click', (event) =>
                 cell = $(event.target).closest('td')
@@ -84,12 +85,12 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                 cell = $(event.target).closest('td')
                 @_eventFire('action', cell)
 
-            @onKeyPressHandler = (event) =>
+            @_onKeyPressHandler = (event) =>
                 if @onKeyPress(event)
                     event.stopPropagation()
                     event.preventDefault()
 
-            $(document).on 'keydown', @onKeyPressHandler
+            $(document).on 'keydown', @_onKeyPressHandler
 
 
         ###
@@ -189,7 +190,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # @param event key event
         ###
         onKeyPress : (event) ->
-            return false unless @blockKeyCaptureFlg
+            return false unless @_blockKeyCaptureFlg
             # If a modifier key is pressed (except shift), ignore the event
             return false if event.metaKey or event.altKey or event.ctrlKey
             x = @_xCurrentPos
@@ -208,7 +209,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                             @blur()
                         return false
                     when -1, eventUtil.KEY_LEFT # left arrow
-                        return false if @_bInputFocused
+                        return false if @_isInputFocusedFlg
                         if @_xCurrentPos > 0
                             x = @_xCurrentPos - 1
                             y = @_yCurrentPos
@@ -217,7 +218,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                             y = @_yCurrentPos - 1
                         break
                     when eventUtil.KEY_UP # up arrow
-                        return false if @_bInputFocused
+                        return false if @_isInputFocusedFlg
                         if @_yCurrentPos > topLimit
                             x = @_xCurrentPos
                             y = @_yCurrentPos - 1
@@ -225,7 +226,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                             return true
                         break
                     when eventUtil.KEY_TAB, eventUtil.KEY_RIGHT # right arrow
-                        return false if @_bInputFocused
+                        return false if @_isInputFocusedFlg
                         if @_xCurrentPos < @_numberOfColumns - 1
                             x = @_xCurrentPos + 1
                             y = @_yCurrentPos
@@ -234,7 +235,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                             y = @_yCurrentPos + 1
                         break
                     when eventUtil.KEY_DOWN # down arrow
-                        return true if @_bInputFocused
+                        return false if @_isInputFocusedFlg
                         if @_yCurrentPos < @_numberOfRows - 1
                             x = @_xCurrentPos
                             y = @_yCurrentPos + 1
@@ -267,8 +268,8 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             # Remove old css focus class (with blur event if needed)
             @removeFocus(@_nCurrentFocus, false) if @_nCurrentFocus?
             # Add the focus css class to highlight the focused cell
-            element.addClass(@_sFocusClass)
-            element.closest('tr').addClass(@_sFocusClass)
+            element.addClass(@options.cellFocusClass)
+            element.closest('tr').addClass(@options.cellFocusClass)
             # Cache the information that we are interested in
             @_nOldFocus = @_nCurrentFocus
             @_nCurrentFocus = element
@@ -354,8 +355,8 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         ###
         removeFocus : (element, onlyCellFlg = true) ->
             return unless element
-            element.removeClass(@_sFocusClass)
-            element.closest('tr').removeClass(@_sFocusClass) unless onlyCellFlg
+            element.removeClass(@options.cellFocusClass)
+            element.closest('tr').removeClass(@options.cellFocusClass) unless onlyCellFlg
             @_eventFire("blur", element)
 
         ###
@@ -393,7 +394,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # @return TD target
         ###
         getCellFromCoords : (x, y) ->
-            element = $(@idPrefix + 'c' + x + 'r' + y, @_tableBody)
+            element = $(@options.idPrefix + 'c' + x + 'r' + y, @_tableBody)
             return null if element.length == 0
             return element
             # return @_targetTable.rows[y].cells[x] # <-- this sadly doesn't work
@@ -402,13 +403,13 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # Start capturing key events for this table
         ###
         captureKeys : ->
-            @blockKeyCaptureFlg = true
+            @_blockKeyCaptureFlg = true
 
         ###
         # Stop capturing key events for this table
         ###
         releaseKeys : ->
-            @blockKeyCaptureFlg = false
+            @_blockKeyCaptureFlg = false
 
         ###
         # Sets the top limit of the grid
@@ -426,5 +427,18 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             @_numberOfRows = numberOfRows
 
         stop : ->
-            $(document).unbind('keydown', @onKeyPressHandler)
-            $(document).unbind('click', @onClickHandler)
+            $(document).unbind('keydown', @_onKeyPressHandler)
+            $(document).unbind('click', @_onClickHandler)
+
+        _buildColumnModel : (table) ->
+            cm = []
+            firstRow = $('tr:first', table)
+            headerColumns = if firstRow.has('th').size() > 0 then firstRow.find('th') else firstRow.find('td')
+            if (headerColumns != null)
+                headerColumns.each (index) ->
+                    c = {}
+                    cell = $(this)
+                    c.id = if cell.is('[id]') then cell.attr('id') else 'column' + index
+                    c.title = cell.text()
+                    cm.push(c)
+            return cm

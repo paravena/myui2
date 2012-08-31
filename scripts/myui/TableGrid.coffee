@@ -985,7 +985,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # When a cell is edited
         ###
         _editCellElement : (element) ->
-            @keys._bInputFocused = true
+            @keys._isInputFocusedFlg = true
             cm = @columnModel
             coords = @getCurrentPosition()
             x = coords[0]
@@ -1034,7 +1034,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1 # if doesn't exist in the array the row is registered
 
                 editor.onClickCallback(value, input.is(':checked')) if editor instanceof TableGrid.CellCheckbox and editor.onClickCallback
-                @keys._bInputFocused = false
+                @keys._isInputFocusedFlg = false
                 @editedCellId = null
                 innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
             else if editor == 'radio' or editor instanceof TableGrid.CellRadioButton
@@ -1045,7 +1045,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 @setValueAt(value, x, y, false)
                 @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1 #if doesn't exist in the array the row is registered
                 editor.onClickCallback(value, input.is(':checked')) if editor instanceof TableGrid.CellRadioButton and editor.onClickCallback
-                @keys._bInputFocused = false
+                @keys._isInputFocusedFlg = false
                 @editedCellId = null
                 innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
             # end if
@@ -1054,7 +1054,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # When the cell is blured
         ###
         _blurCellElement : (element) ->
-            return unless @keys._bInputFocused
+            return unless @keys._isInputFocusedFlg
             console.log '_blurCellElement is called ' + element?
             return unless element?
             console.log 'element exist n  ow :-) ' + element.length + ' id: ' + element.attr('id')
@@ -1102,7 +1102,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 @newRowsAdded[Math.abs(y) - @rows.length][columnId] = value
             #end if
             editor.afterUpdateCallback(element, value) if (editor instanceof BrowseInput or editor instanceof TextField or editor instanceof DatePicker) and editor.afterUpdateCallback?
-            keys._bInputFocused = false
+            keys._isInputFocusedFlg = false
             return true
 
         ###
