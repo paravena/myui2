@@ -6,7 +6,8 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         constructor : (targetTable, options) ->
             @options = $.extend({
                 idPrefix : '',
-                cellFocusClass : 'focus'
+                cellFocusClass : 'focus',
+                firstRowElement : null
             }, options or {})
 
             @_tableGrid = null
@@ -48,17 +49,13 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             ###
             @events = {remove : {}}
 
-            ###
-            # Variable: _oaoEvents
-            # Purpose:  Event cache object, one array for each supported event for speed of searching
-            # Scope:    KeyTable - private
-            ###
-            @_eventsCache = {"action": [], "esc": [], "focus": [], "blur": []}
-
             # Use the template functions to add the event API functions
-            for sKey of @_eventsCache
-                @events[sKey] = @_insertAddEventTemplate(sKey)
-                @events.remove[sKey] = @_insertRemoveEventTemplate(sKey)
+            for eventName in ["action", "esc", "focus", "blur"]
+                @events[eventName] = @_insertAddEventTemplate(eventName)
+                @events.remove[eventName] = @_insertRemoveEventTemplate(eventName)
+
+            # adding events object to each column model element
+            c["events"] = {} for c in @_cm
 
             # Loose table focus when click outside the table
             @_onClickHandler = (event) =>
@@ -94,95 +91,57 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
 
 
         ###
-        # Purpose:  Create a function (with closure for sKey) event addition API
+        # Purpose:  Create a function (with closure for eventName) event addition API
         # Returns:  function: - template function
-        # Inputs:   string:sKey - type of event to detect
+        # Inputs:   string: eventName - type of event to detect
         ###
-        _insertAddEventTemplate : (sKey) ->
+        _insertAddEventTemplate : (eventName) ->
             ###
             # API function for adding event to cache
             # Notes: This function is (interally) overloaded (in as much as javascript allows for that)
-            #        the target cell can be given by either node or coords.
             #
-            # Parameters:  1. x - target node to add event for
-            #              2. y - callback function to apply
-            # or
-            #              1. x - x coord. of target cell
-            #              2. y - y coord. of target cell
-            #              3. z - callback function to apply
+            # Parameters:  1. c - column model element to add event for
+            #              2. f - callback function to apply
             ###
-            (x, y, z) =>
-                if typeof x is "number" and typeof y is "number" and typeof z is "function"
-                    @_addEvent(sKey, @getCellFromCoords(x, y), z)
-                else if typeof x is "object" and typeof y is "function"
-                    @_addEvent(sKey, x, y)
+            (c, f) => @_addEvent(eventName, c, f)
 
 
         ###
-        # Purpose:  Create a function (with closure for sKey) event removal API
+        # Purpose:  Create a function (with closure for eventName) event removal API
         # Returns:  function: - template function
-        # Inputs:   string:sKey - type of event to detect
+        # Inputs:   string: eventName - type of event to detect
         ###
-        _insertRemoveEventTemplate : (sKey) ->
+        _insertRemoveEventTemplate : (eventName) ->
             ###
             # API function for removing event from cache
             # Returns: number of events removed
             # Notes: This function is (internally) overloaded (in as much as javascript allows for that)
-            #        the target cell can be given by either node or coordinates and the function
-            #        to remove is optional
             #
-            # Parameters: 1. x - target node to remove event from
-            #             2. y - callback function to apply
-            # or
-            #             1. x - x coordinate. of target cell
-            #             2. y - y coordinate. of target cell
-            #             3. z - callback function to remove - optional
+            # Parameters: 1. c - column model element to remove event from
             ###
-            (x, y, z) =>
-                if typeof arguments[0] is 'number' and typeof arguments[1] is 'number'
-                    if ( typeof arguments[2] is 'function' )
-                        @_removeEvent(sKey, @getCellFromCoords(x, y), z)
-                    else
-                        @_removeEvent(sKey, @getCellFromCoords(x, y))
-                else if typeof arguments[0] is 'object'
-                    if typeof arguments[1] is 'function'
-                        @_removeEvent(sKey, x, y)
-                    else
-                        @_removeEvent(sKey, x)
+            (c) => @_removeEvent(eventName, c)
 
 
         ###
         # Add an event to the internal cache
         #
         # @param eventType type of event to add, given by the available elements in _oaoEvents
-        # @param element cell to add event too
-        # @param fn callback function for when triggered
+        # @param c column model element to add event too
+        # @param f callback function for when triggered
         ###
-        _addEvent : (eventType, element, fn) ->
-            return unless element
-            @_eventsCache[eventType].push({
-                "cell": element,
-                "fn": fn
-            })
+        _addEvent : (eventType, c, f) ->
+            c.events[eventType] = f
 
         ###
         # Removes an event from the event cache
         #
-        # @param type type of event to look for
-        # @param nTarget target table cell
-        # @param fn remove function. If not given all handlers of this type will be removed
-        # @return number of matching events removed
+        # @param eventType type of event to look for
+        # @param c column model element
+        # @param f remove function.
         ###
-        _removeEvent : (type, cell, fn) ->
-            eventsCache = @_eventsCache[type];
-            i = 0 # initial index
-            len = eventsCache.length
-            while (i < len)
-                if eventsCache[i]['cell'].is(cell)
-                    eventsCache.splice(i, 1)
-                    return 1
-                i++
-            return 0
+        _removeEvent : (eventType, c) ->
+            delete c.events[eventType]
+
 
         ###
         # Handles key events moving the focus from one cell to another
@@ -329,12 +288,14 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # @param nTarget target table cell
         # @return  number of events fired
         ###
-        _eventFire: (eventType, cell) ->
-            eventsCache = @_eventsCache[eventType]
-            for eventElement in eventsCache
-                if eventElement['cell'].is(cell)
-                    eventElement['fn'](cell)
-                    return true
+        _eventFire: (eventName, cell) ->
+            cm = @_cm
+            coords = @getCoordsFromCell(cell)
+            x = coords[0]
+            y = coords[1]
+            if cm[x].events[eventName]?
+                cm[x].events[eventName](cell)
+                return true
             return false
 
         ###
@@ -430,9 +391,13 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             $(document).unbind('keydown', @_onKeyPressHandler)
             $(document).unbind('click', @_onClickHandler)
 
+        ###
+        # Build column model for an html table
+        ###
         _buildColumnModel : (table) ->
             cm = []
-            firstRow = $('tr:first', table)
+            firstRow = @options.firstRowElement
+            firstRow = $('tr:first', table) unless firstRow?
             headerColumns = if firstRow.has('th').size() > 0 then firstRow.find('th') else firstRow.find('td')
             if (headerColumns != null)
                 headerColumns.each (index) ->
@@ -440,5 +405,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                     cell = $(this)
                     c.id = if cell.is('[id]') then cell.attr('id') else 'column' + index
                     c.title = cell.text()
+                    c.editable = false
+                    c.positionIndex = index
                     cm.push(c)
             return cm

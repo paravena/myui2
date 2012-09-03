@@ -614,7 +614,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             if renderedRows < @rows.length and (bodyTable.height() - bodyDiv.scrollTop() - 10) < bodyDiv[0].clientHeight
                 html = @_createTableBody(@rows)
                 bodyTable.find('tbody').append(html)
-                @_addKeyBehavior()
                 @_applyCellCallbacks()
 
         ###
@@ -935,51 +934,36 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Add Key behavior functionality to the table grid
         ###
         _addKeyBehavior : ->
-            rows = @rows
-            renderedRows = @renderedRows
-            renderedRowsAllowed = @renderedRowsAllowed
-            beginAtRow = renderedRows - renderedRowsAllowed
-            beginAtRow = 0 if beginAtRow < 0
-            @_addKeyBehaviorToRow(rows[j], j) for j in [beginAtRow...renderedRows]
-
-        ###
-        # Add key behavior to row.
-        ###
-        _addKeyBehaviorToRow : (row, j) ->
-            id = @_mtgId
             cm = @columnModel
+            rows = @rows
+            newRowsAdded = @newRowsAdded
             keys = @keys
-          
-            for i in [0...cm.length]
-                element = $('#mtgC' + id + '_c' + i + 'r' + j)
-                do (element, i, j) =>
-                    if cm[i].editable
-                        keys.events.remove.action(element)
-                        keys.events.remove.esc(element)
-                        keys.events.remove.blur(element)
-
-                        f_action = =>
-                            if @editedCellId == null or @editedCellId != element.attr('id')
-                                @editedCellId = element.attr('id')
-                                @_editCellElement(element)
+            for c in cm
+                do (c) =>
+                    if c.editable
+                        f_action = (cell) =>
+                            if @editedCellId == null or @editedCellId != cell.attr('id')
+                                @editedCellId = cell.attr('id')
+                                @_editCellElement(cell)
                             else
-                                @editedCellId = null if @_blurCellElement(element)
+                                @editedCellId = null if @_blurCellElement(cell)
+                        keys.events.action(c, f_action)
 
-                        keys.events.action(element, f_action)
+                        f_esc = (cell) => @editedCellId = null if @_blurCellElement(cell)
+                        keys.events.esc(c, f_esc)
 
-                        f_esc = (element) => @editedCellId = null if @_blurCellElement(element)
-                        keys.events.esc(element, f_esc)
+                        f_blur = (cell) =>
+                            @editedCellId = null if @_blurCellElement(cell)
+                            coords = @getCurrentPosition()
+                            row = @getRow(coords[1])
+                            @options.onCellBlur(cell,coords[0], coords[1], row, c.id) if @options.onCellBlur?
+                        keys.events.blur(c, f_blur)
 
-                        f_blur = =>
-                            @editedCellId = null if @_blurCellElement(element)
-                            @options.onCellBlur(element, row[i], i, j, cm[i].id) if @options.onCellBlur?
-
-                        keys.events.blur(element, f_blur)
-
-                    keys.events.remove.focus(element)
-                    f_focus = =>
-                        @options.onCellFocus(element, row[i], i, j, cm[i].id) if @options.onCellFocus?
-                    keys.events.focus(element, f_focus)
+                    f_focus = (cell) =>
+                        coords = @getCurrentPosition()
+                        row = @getRow(coords[1])
+                        @options.onCellFocus(cell, coords[0], coords[1], row, c.id) if @options.onCellFocus?
+                    keys.events.focus(c, f_focus)
 
         ###
         # When a cell is edited
@@ -1670,7 +1654,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         getRow : (y) ->
             result = null
-            result = if y >= 0 then @rows[y] else @newRowsAdded[-(y + 1)]
+            if y >= 0 and y < @rows.length
+                result = @rows[y]
+            else if y < 0
+                result = @newRowsAdded[-(y + 1)]
+            else if y >= @rows.length
+                result = @newRowsAdded[y - @rows.length]
             return result
 
         ###
@@ -1719,7 +1708,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 @keys.setNumberOfRows(numberOfRows)
                 @_scrollToRow(numberOfRows)
 
-            @_addKeyBehaviorToRow(newRow, index)
             @_applyCellCallbackToRow(-index)
 
 
@@ -1793,9 +1781,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             return result
     #end TableGrid
 
-    TableGrid::ADD_BTN = 1
-    TableGrid::DEL_BTN = 4
-    TableGrid::SAVE_BTN = 8
+    TableGrid.ADD_BTN = 1
+    TableGrid.DEL_BTN = 4
+    TableGrid.SAVE_BTN = 8
 
     class TableGrid.CellCheckbox
         constructor : (options) ->

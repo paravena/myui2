@@ -210,7 +210,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             i = 0
             html[idx++] = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
             html[idx++] = '<thead>'
-            html[idx++] = '<tr>'
+            html[idx++] = '<tr class="headerRow">'
             colspan = if showWeek then 8 else 7
             for i in [1..numberOfMonths]
                 html[idx++] = '<th colspan="'+colspan+'">'
@@ -234,7 +234,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 html[idx++] = '</th>'
 
             html[idx++] = '</tr>'
-            html[idx++] = '<tr>'
+            html[idx++] = '<tr class="weekDaysRow">'
             for i in [0...numberOfMonths]
                 if showWeek
                     if i > 0
@@ -247,7 +247,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     if i > 0 and index % 7 is 0 and !showWeek
                         html[idx++] = '<th class="new-month-separator">'+weekday+'</th>'
                     else
-                        html[idx++] = '<th>'+weekday+'</th>'
+                        html[idx++] = '<th class="weekday">'+weekday+'</th>'
 
             html[idx++] = '</tr>'
             html[idx++] = '</thead>'
@@ -798,7 +798,8 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             numberOfMonths = @options.numberOfMonths
             @_keys = new KeyTable(@daysTable, {
                 idPrefix : '#mdpC'+@_mdpId+'_',
-                numberOfColumns : numberOfMonths * 7
+                numberOfColumns : numberOfMonths * 7,
+                firstRowElement : $('tr.weekDaysRow', @_bodyDiv)
             })
 
             f_focus = (cell) =>
@@ -819,19 +820,16 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 cell = $(event.target).closest('td')
                 @_dayClick(cell)
 
-            for element in @_allCells
-                $(element).unbind 'mouseenter'
-                $(element).unbind 'mouseleave'
-                $(element).unbind 'click'
-                @_keys.events.remove.focus $(element)
-                @_keys.events.remove.action $(element)
-                if $(element).hasClass('day')
-                    $(element).mouseenter f_hover
-                    $(element).mouseleave f_hoverOut
-                    $(element).click f_click
-                    @_keys.events.focus $(element), f_focus
-                    @_keys.events.action $(element), f_action
-            # Select the first not empty cell
+            $('td', @_calendarDiv).unbind 'mouseenter'
+            $('td', @_calendarDiv).unbind 'mouseleave'
+            $('td', @_calendarDiv).unbind 'click'
+            $('td.day', @_calendarDiv).on 'mouseenter', f_hover
+            $('td.day', @_calendarDiv).on 'mouseleave', f_hoverOut
+            $('td.day', @_calendarDiv).on 'click', f_click
+
+            for c in @_keys._cm
+                @_keys.events.focus(c, f_focus)
+                @_keys.events.action(c, f_action)
+
             selectedCell = $('td.day:first', @_bodyDiv)
             @_dayHover(selectedCell)
-
