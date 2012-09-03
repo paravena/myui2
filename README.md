@@ -22,9 +22,3 @@ node r.js -o build.js
 * Then you can review samples
 
 
-<blockquote>
-<iframe
-        style="width: 100%; height: 500px"
-        src="http://jsfiddle.net/paravena/Cysu8/embedded/result,js,html/">
-</iframe>
-</blockquote>
