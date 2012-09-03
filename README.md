@@ -19,6 +19,8 @@ Steps to build the project
 
 node r.js -o build.js
 
-* Then you can review samples
+* Then you can review samples:
+
+** <a href="http://jsfiddle.net/paravena/Cysu8/embedded/result,js,html/">TableGrid</a>
 
 
