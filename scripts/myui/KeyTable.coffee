@@ -83,7 +83,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                 @_eventFire('action', cell)
 
             @_onKeyPressHandler = (event) =>
-                if @onKeyPress(event)
+                if @_onKeyPress(event)
                     event.stopPropagation()
                     event.preventDefault()
 
@@ -148,7 +148,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         #
         # @param event key event
         ###
-        onKeyPress : (event) ->
+        _onKeyPress : (event) ->
             return false unless @_blockKeyCaptureFlg
             # If a modifier key is pressed (except shift), ignore the event
             return false if event.metaKey or event.altKey or event.ctrlKey
@@ -175,6 +175,8 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                         else if @_yCurrentPos > topLimit
                             x = @_numberOfColumns - 1
                             y = @_yCurrentPos - 1
+                        else
+                            return true
                         break
                     when eventUtil.KEY_UP # up arrow
                         return false if @_isInputFocusedFlg
@@ -192,6 +194,8 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                         else if @_yCurrentPos < @_numberOfRows - 1
                             x = 0
                             y = @_yCurrentPos + 1
+                        else
+                            return true
                         break
                     when eventUtil.KEY_DOWN # down arrow
                         return false if @_isInputFocusedFlg
@@ -199,7 +203,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                             x = @_xCurrentPos
                             y = @_yCurrentPos + 1
                         else
-                            return false
+                            return true
                         break
                     else # Nothing we are interested in
                         return false

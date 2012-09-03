@@ -2,8 +2,8 @@
     baseUrl : 'scripts',
     stubModules: ['cs'],
     name : 'main',
-    optimize : 'none',
-    out : 'scripts/myui.js',
+    //optimize : 'none',
+    out : 'scripts/myui.min.js',
     paths : {
         'requireLib' : 'libs/require',
         'cs' : 'libs/cs',

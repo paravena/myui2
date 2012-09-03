@@ -1,5 +1,5 @@
 requirejs.config({
-   baseUrl : '/myui2/scripts',
+   baseUrl : '../../scripts',
    paths : {
        'jquery' : 'libs/jquery',
        'jquerypp.custom' : 'libs/jquerypp.custom'
