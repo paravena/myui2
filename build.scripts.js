@@ -11,6 +11,6 @@
         'jquery' : 'libs/jquery',
         'jquerypp.custom' : 'libs/jquerypp.custom'
     },
-    exclude : ['jquery', 'jquerypp.custom'],
+    //exclude : ['jquery', 'jquerypp.custom'],
     include : ['requireLib']
 })

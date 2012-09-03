@@ -9,7 +9,7 @@ Soon I will finish the migration from old Prototype to CoffeeScript and JQuery. 
 * Optimize and improve event handling
 * Replace CSS files with CSS <a href="lesscss.org">Less</a>
 * Include CSS Less files in RequireJS optimize process
-* Make look & feel closer to <a href="http://twitter.github.com/bootstrap/">boostrap</a>
+* Make look & feel closer to <a href="http://twitter.github.com/bootstrap/">bootstrap</a>
 
 Steps to build the project
 --------------------------------------
@@ -20,3 +20,11 @@ Steps to build the project
 node r.js -o build.js
 
 * Then you can review samples
+
+
+<blockquote>
+<iframe
+        style="width: 100%; height: 500px"
+        src="http://jsfiddle.net/paravena/Cysu8/embedded/result,js,html/">
+</iframe>
+</blockquote>

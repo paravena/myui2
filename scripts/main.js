@@ -1,3 +1,4 @@
+/*
 requirejs.config({
    baseUrl : '../../scripts',
    paths : {
@@ -5,7 +6,7 @@ requirejs.config({
        'jquerypp.custom' : 'libs/jquerypp.custom'
    }
 });
-
+*/
 require([
     'cs!myui/TextField',
     'cs!myui/Autocompleter',
