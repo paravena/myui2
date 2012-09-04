@@ -1,4 +1,4 @@
-MYUI2
+MyUI2
 ===============================
 This project is second phase from the one I have begun working two years ago <a href="http://pabloaravena.info">MYUI</a>. Now UI controls are implemented using CoffeeScript and JQuery as main tools and for gluing the code I'm using RequireJS.
 
