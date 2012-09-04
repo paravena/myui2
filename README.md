@@ -16,11 +16,18 @@ Steps to build the project
 
 * Download node 
 * execute following command:
+<br>
+<code>
+node r.js -o build.scripts.js
+</code>
+<br>
+<code>
+node r.js -o build.css.js
+</code>
 
-node r.js -o build.js
 
-* Then you can review samples:
-
-** <a href="http://jsfiddle.net/paravena/Cysu8/embedded/result,js,html/">TableGrid</a>
+Samples
+--------
+This is a first sample you can review <a href="http://jsfiddle.net/paravena/Cysu8/embedded/result,js,html/">here</a>
 
 
