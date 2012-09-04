@@ -15,7 +15,8 @@ Steps to build the project
 --------------------------------------
 
 * Download node 
-* execute following command:
+* execute the following commands:
+<br>
 <br>
 <code>
 node r.js -o build.scripts.js
