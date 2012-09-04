@@ -7,7 +7,7 @@ Route Map
 Soon I will finish the migration from old Prototype to CoffeeScript and JQuery. Following tasks are:
 
 * Optimize and improve event handling
-* Replace CSS files with CSS <a href="lesscss.org">Less</a>
+* Replace CSS files with CSS <a href="http://lesscss.org">Less</a>
 * Include CSS Less files in RequireJS optimize process
 * Make look & feel closer to <a href="http://twitter.github.com/bootstrap/">bootstrap</a>
 
