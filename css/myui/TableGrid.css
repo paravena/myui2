@@ -315,7 +315,7 @@ div.my-tablegrid-browse-button {
 
 }
 
-div.my-tablegrid-menu {
+div.tablegrid-menu {
     position: absolute;
     width: 130px;
     overflow: auto;
@@ -328,57 +328,49 @@ div.my-tablegrid-menu {
     border-radius: 3px;
 }
 
-div.my-tablegrid-menu ul {
+div.tablegrid-menu ul {
     margin: 3px;
     padding: 0;
 }
 
-div.my-tablegrid-menu ul li {
+div.tablegrid-menu ul li {
     position: relative;
     list-style-type: none;
-    padding: 0;
-}
-
-a.my-tablegrid-menu-item {
-    position: relative;
+    padding: 0 0 0 28px;
     display: block;
     color: black;
-    text-decoration: none;
     cursor: default;
     font-weight: bold;
     line-height: 20px;
 }
 
-a.my-tablegrid-menu-item:hover {
+div.tablegrid-menu ul li:hover {
     background-color: #90c;
-    text-decoration: none;
     color: white;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
-.my-tablegrid-menu-item-icon {
-    position: absolute;
-    top:0;
-    left:0;
-    margin: 2px;
-    padding: 0;
+span.menu-item-icon {
+    position : absolute;
+    left : 0;
+    padding: 2px;
 }
 
-span.my-tablegrid-menu-item-checkbox {
-    margin: 0;
-    padding: 0;
+span.menu-item-checkbox {
+    position : absolute;
+    left : 0;
 }
 
 span.sort-ascending-icon {
-    background: url(images/sort_ascending.png) no-repeat transparent;
+    background: url(images/sort_ascending.png) no-repeat transparent center;
     width: 16px;
     height: 16px;
 }
 
 span.sort-descending-icon {
-    background: url(images/sort_descending.png) no-repeat transparent;
+    background: url(images/sort_descending.png) no-repeat transparent center;
     width: 16px;
     height: 16px;
 }

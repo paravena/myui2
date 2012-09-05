@@ -257,28 +257,19 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html[idx++] = '<div id="mtgHB'+id+'" class="my-tablegrid-header-button" style="width:14px;height:'+@headerHeight+'px">'
             html[idx++] = '</div>'
             # Adding Header Button Menu
-            html[idx++] = '<div id="mtgHBM'+id+'" class="my-tablegrid-menu shadow">'
+            html[idx++] = '<div id="mtgHBM'+id+'" class="tablegrid-menu shadow">'
             html[idx++] = '<ul>'
-            html[idx++] = '<li>'
-            html[idx++] = '<a id="mtgSortAsc'+id+'" class="my-tablegrid-menu-item" href="javascript:void(0)">'
-            html[idx++] = '<table cellspacing="0" cellpadding="0" width="100%" border="0">'
-            html[idx++] = '<tr><td width="25"><span class="my-tablegrid-menu-item-icon sort-ascending-icon">&nbsp;</span></td>'
-            html[idx++] = '<td>'+i18n.getMessage('label.sortAsc')+'</td></tr></table>'
-            html[idx++] = '</a>'
+            html[idx++] = '<li id="mtgSortAsc'+id+'">'
+            html[idx++] = '<span class="menu-item-icon sort-ascending-icon">&nbsp;</span>'
+            html[idx++] = i18n.getMessage('label.sortAsc')
             html[idx++] = '</li>'
-            html[idx++] = '<li>'
-            html[idx++] = '<a id="mtgSortDesc'+id+'" class="my-tablegrid-menu-item" href="javascript:void(0)">'
-            html[idx++] = '<table cellspacing="0" cellpadding="0" width="100%" border="0">'
-            html[idx++] = '<tr><td width="25"><span class="my-tablegrid-menu-item-icon sort-descending-icon">&nbsp;</span></td>'
-            html[idx++] = '<td>'+i18n.getMessage('label.sortDesc')+'</td></tr></table>'
-            html[idx++] = '</a>'
+            html[idx++] = '<li id="mtgSortDesc'+id+'">'
+            html[idx++] = '<span class="menu-item-icon sort-descending-icon">&nbsp;</span>'
+            html[idx++] = i18n.getMessage('label.sortDesc')
             html[idx++] = '</li>'
             html[idx++] = '<li class="mtgSelectAll">'
-            html[idx++] = '<a class="my-tablegrid-menu-item" href="javascript:void(0)">'
-            html[idx++] = '<table cellspacing="0" cellpadding="0" width="100%" border="0">'
-            html[idx++] = '<tr><td width="25"><span class="my-tablegrid-menu-item-checkbox"><input type="checkbox" id="mtgSelectAll'+id+'"></span></td>'
-            html[idx++] = '<td>'+i18n.getMessage('label.selectAll')+'</td></tr></table>'
-            html[idx++] = '</a>'
+            html[idx++] = '<span class="menu-item-checkbox"><input type="checkbox" id="mtgSelectAll'+id+'"></span>'
+            html[idx++] = i18n.getMessage('label.selectAll')
             html[idx++] = '</li>'
             html[idx++] = '</ul>'
             html[idx++] = '</div>'
@@ -538,21 +529,17 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html = []
             idx = 0;
             if height > 0
-                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu shadow" style="height:'+height+'px">'
+                html[idx++] = '<div id="mtgSM'+id+'" class="tablegrid-menu shadow" style="height:'+height+'px">'
             else
-                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu shadow">'
+                html[idx++] = '<div id="mtgSM'+id+'" class="tablegrid-menu shadow">'
             html[idx++] = '<ul>'
             for c in cm
-                html[idx++] = '<li>' #TODO simplify this code, remove nested table
-                html[idx++] = '<a href="#" class="my-tablegrid-menu-item">'
-                html[idx++] = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
+                html[idx++] = '<li>'
                 if c.visible
-                    html[idx++] = '<tr><td width="25"><span><input id="'+c.id+'" type="checkbox" checked="checked"></span></td>'
+                    html[idx++] = '<span class="menu-item-checkbox"><input id="'+c.id+'" type="checkbox" checked="checked"></span>'
                 else
-                    html[idx++] = '<tr><td width="25"><span><input id="'+c.id+'" type="checkbox"></span></td>'
-                html[idx++] = '<td><label for="'+c.id+'">&nbsp;'+ c.title+'</label></td></tr>'
-                html[idx++] = '</table>'
-                html[idx++] = '</a>'
+                    html[idx++] = '<span class="menu-item-checkbox"><input id="'+c.id+'" type="checkbox"></span>'
+                html[idx++] = '&nbsp;'+ c.title
                 html[idx++] = '</li>'
 
             html[idx++] = '</ul>'
@@ -1039,9 +1026,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _blurCellElement : (element) ->
             return unless @keys._isInputFocusedFlg
-            console.log '_blurCellElement is called ' + element?
             return unless element?
-            console.log 'element exist n  ow :-) ' + element.length + ' id: ' + element.attr('id')
             id = @_mtgId
             keys = @keys
             cm = @columnModel
@@ -1075,7 +1060,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             # I hope I can find a better solution
             value = editor.getSelectedValue(value) if editor instanceof Autocompleter
-            console.log 'value : ' + value
             if y >= 0 and y < @rows.length and @rows[y][columnId] != value
                 @rows[y][columnId] = value
                 innerElement.addClass('modified-cell')
@@ -1227,7 +1211,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # @param columnId column id
         ###
         _toggleColumnVisibility : (columnId) ->
-            console.log 'toggleColumnVisibility: ' + columnId
             id = @_mtgId
             cm = @columnModel
             @_blurCellElement(@keys._nCurrentFocus) # in case there is a cell in editing mode
@@ -1236,7 +1219,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             bodyTable = $('#mtgBT' + id)
             index = -1
             index = i for i in [0...cm.length] when cm[i].id == columnId
-            console.log 'hiding index : ' + index
             targetColumn = $('#mtgHC' + id + '_c' + index)
             $('#mtgHB' + id).css('visibility', 'hidden')
             width = 0
