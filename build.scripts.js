@@ -2,7 +2,7 @@
     baseUrl : 'scripts',
     stubModules: ['cs'],
     name : 'main',
-    //optimize : 'none',
+    optimize : 'none',
     out : 'scripts/myui.min.js',
     paths : {
         'requireLib' : 'libs/require',

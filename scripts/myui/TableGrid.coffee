@@ -338,9 +338,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;padding:3px;text-align:{align}" class="my-tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
             checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x} mtgInputCheckbox" checked="{checked}">'
             radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x} mtgInputRadio">'
-            if $.browser.opera or $.browser.webkit # TODO review this issue
-                checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x}" checked="{checked}">'
-                radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x}">'
+            #if $.browser.opera or $.browser.webkit # TODO review this issue
+            #    checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x}" checked="{checked}">'
+            #    radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x}">'
 
             rs = @options.rowStyle # row style handler
             rc = @options.rowClass # row class handler
@@ -398,17 +398,17 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                             if row[columnId] == trueVal or selectAllFlg
                                 temp = temp.replace(/\{checked\}/, 'checked')
                             else
-                                temp = temp.replace(/checked=.*?>/, '')
+                                temp = temp.replace(/checked=.*?>/, '>')
                         else
                             if eval(row[columnId]) or selectAllFlg  #must be true or false
                                 temp = temp.replace(/\{checked\}/, 'checked')
                             else
-                                temp = temp.replace(/checked=.*?>/, '')
+                                temp = temp.replace(/checked=.*?>/, '>')
                     else # When is selectable
                         if cm[j].selectAllFlg
                             temp = temp.replace(/\{checked\}/, 'checked')
                         else
-                            temp = temp.replace(/checked=.*?>/, '')
+                            temp = temp.replace(/checked=.*?>/, '>')
 
                     html[idx++] = temp
                 else if (editor == 'radio' or editor instanceof TableGrid.CellRadioButton)
@@ -473,10 +473,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor = cm[i].editor
                 if (editor == 'radio' or editor instanceof TableGrid.CellRadioButton) or
                    (editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox)
-                    element = $('#mtgInput'+id + '_c' + i + 'r' + y)
-                    innerElement = $('#mtgIC'+id + '_c' + i + 'r' + y)
                     unless editor.selectable
-                        do (editor, element, innerElement) =>
+                        do (editor, i) =>
+                            element = $('#mtgInput'+id + '_c' + i + 'r' + y)
+                            innerElement = $('#mtgIC'+id + '_c' + i + 'r' + y)
                             element.on 'click', =>
                                 elementId = element.attr('id')
                                 match = elementId.match(/_c(\d*?)r(\-?\d*?)/)
@@ -885,7 +885,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             for c in [0...columnModelLength]
                 aTemp[k++] = columnModelEntry if c == targetColumnId
                 aTemp[k++] = cm[c] if c < (columnModelLength - 1)
-            cm = @columnModel = aTemp
+            @keys._cm = @columnModel = cm = aTemp
             $('#mtgHRT'+id + ' th').each (index, th) ->
                 if index < cm.length
                     $(th).attr('id', 'mtgHC'+ id + '_c' + index)
@@ -957,6 +957,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _editCellElement : (element) ->
             @keys._isInputFocusedFlg = true
+            id = @_mtgId
             cm = @columnModel
             coords = @getCurrentPosition()
             x = coords[0]
@@ -982,7 +983,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 innerElement.html('')
                 value = cm[x].renderer(value, editor.getItems(), @getRow(y)) if editor instanceof Autocompleter # when is a list
                 # Creating a normal input
-                inputId = 'mtgInput' + @_mtgId + '_c' + x + 'r' + y
+                inputId = 'mtgInput' + id + '_c' + x + 'r' + y
                 input = $('<input>').attr({'id' : inputId, 'type' : 'text', 'value' : value})
                 input.addClass('my-tablegrid-textfield')
                 input.css({
@@ -996,26 +997,26 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 input.focus()
                 input.select()
             else if editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox
-                input = $('#mtgInput' + @_mtgId + '_c' + x + 'r' + y)
-                input.attr('checked', !input.is(':checked'))
+                input = $('#mtgInput' + id + '_c' + x + 'r' + y)
+                isChecked = !input.is(':checked')
+                console.log 'is checked: ' + isChecked
+                if isChecked then input.attr('checked', 'checked') else input.removeAttr('checked')
                 if editor.selectable == undefined or !editor.selectable
-                    value = input.is(':checked')
-                    value = editor.getValueOf(input.is(':checked')) if editor.hasOwnProperty('getValueOf')
+                    value = editor.getValueOf(isChecked) if editor.hasOwnProperty('getValueOf')
                     @setValueAt(value, x, y, false)
-                    @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1 # if doesn't exist in the array the row is registered
-
-                editor.onClickCallback(value, input.is(':checked')) if editor instanceof TableGrid.CellCheckbox and editor.onClickCallback
+                    @modifiedRows.push(y) if y >= 0 and y < @rows.length and @modifiedRows.indexOf(y) == -1 # if doesn't exist in the array the row is registered
+                editor.onClickCallback(value, isChecked) if editor instanceof TableGrid.CellCheckbox and editor.onClickCallback?
                 @keys._isInputFocusedFlg = false
                 @editedCellId = null
                 innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
             else if editor == 'radio' or editor instanceof TableGrid.CellRadioButton
-                input = $('#mtgInput' + @_mtgId + '_c' + x + 'r' + y)
-                input.attr('checked', !input.is(':checked'))
-                value = input.is(':checked')
-                value = editor.getValueOf(input.is(':checked')) if editor.hasOwnProperty('getValueOf')
+                input = $('#mtgInput' + id + '_c' + x + 'r' + y)
+                isChecked = !input.is(':checked')
+                if isChecked then input.attr('checked', 'checked') else input.removeAttr('checked')
+                value = editor.getValueOf(isChecked) if editor.hasOwnProperty('getValueOf')
                 @setValueAt(value, x, y, false)
-                @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1 #if doesn't exist in the array the row is registered
-                editor.onClickCallback(value, input.is(':checked')) if editor instanceof TableGrid.CellRadioButton and editor.onClickCallback
+                @modifiedRows.push(y) if y >= 0 and y < @rows.length and @modifiedRows.indexOf(y) == -1 #if doesn't exist in the array the row is registered
+                editor.onClickCallback(value, isChecked) if editor instanceof TableGrid.CellRadioButton and editor.onClickCallback?
                 @keys._isInputFocusedFlg = false
                 @editedCellId = null
                 innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
