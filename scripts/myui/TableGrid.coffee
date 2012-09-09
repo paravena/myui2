@@ -6,7 +6,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         constructor : (tableModel) ->
             @_mtgId = $('.my-tablegrid').length + 1
             @tableModel = tableModel
-            @columnModel = tableModel.columnModel or []
+            @_columnModel = tableModel.columnModel or []
             @rows = tableModel.rows or []
             @name = tableModel.name or ''
 
@@ -18,6 +18,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 onCellFocus : null,
                 onCellBlur : null,
                 onPageChange : null,
+                toolbar : null,
                 afterRender : null,
                 onFailure : null,
                 rowStyle : ( ->  return ''),
@@ -30,7 +31,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             @pagerHeight = 24
             @titleHeight = 24
-            @toolbarHeight = 24
+            @toolbarHeight = 30
             @scrollBarWidth = 18
             @topPos = 0
             @leftPos = 0
@@ -48,25 +49,25 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @deletedRows = []
             @options.addLazyRenderingBehavior = false if @options.addNewRowsToEndBehaviour
             # Header builder
-            @hb = new HeaderBuilder(@_mtgId, @columnModel)
+            @hb = new HeaderBuilder(@_mtgId, @_columnModel)
             if @hb.getHeaderRowNestedLevel() > 1
                 @options.addSettingBehavior = false
                 @options.addDraggingBehavior = false
 
             @headerWidth = @hb.getTableHeaderWidth()
             @headerHeight = @hb.getTableHeaderHeight()
-            @columnModel = @hb.getLeafElements()
-            for i in [0...@columnModel.length]
-                @columnModel[i].editor = new TextField() if !@columnModel[i].hasOwnProperty('editor')
-                if !@columnModel[i].hasOwnProperty('editable')
-                    @columnModel[i].editable = false
-                    @columnModel[i].editable = true if @columnModel[i].editor == 'checkbox' or @columnModel[i].editor instanceof TableGrid.CellCheckbox or @columnModel[i].editor == 'radio' or @columnModel[i].editor instanceof TableGrid.CellRadioButton
-                @columnModel[i].visible = true if !@columnModel[i].hasOwnProperty('visible')
-                @columnModel[i].sortable= true if !@columnModel[i].hasOwnProperty('sortable')
-                @columnModel[i].type = 'string' if !@columnModel[i].hasOwnProperty('type')
-                @columnModel[i].selectAllFlg = false if !@columnModel[i].hasOwnProperty('selectAllFlg')
-                @columnModel[i].sortedAscDescFlg = 'DESC' if !@columnModel[i].hasOwnProperty('sortedAscDescFlg')
-                @columnModel[i].positionIndex = i
+            @_columnModel = @hb.getLeafElements()
+            for i in [0...@_columnModel.length]
+                @_columnModel[i].editor = new TextField() if !@_columnModel[i].hasOwnProperty('editor')
+                if !@_columnModel[i].hasOwnProperty('editable')
+                    @_columnModel[i].editable = false
+                    @_columnModel[i].editable = true if @_columnModel[i].editor == 'checkbox' or @_columnModel[i].editor instanceof TableGrid.CellCheckbox or @_columnModel[i].editor == 'radio' or @_columnModel[i].editor instanceof TableGrid.CellRadioButton
+                @_columnModel[i].visible = true if !@_columnModel[i].hasOwnProperty('visible')
+                @_columnModel[i].sortable= true if !@_columnModel[i].hasOwnProperty('sortable')
+                @_columnModel[i].type = 'string' if !@_columnModel[i].hasOwnProperty('type')
+                @_columnModel[i].selectAllFlg = false if !@_columnModel[i].hasOwnProperty('selectAllFlg')
+                @_columnModel[i].sortedAscDescFlg = 'DESC' if !@_columnModel[i].hasOwnProperty('sortedAscDescFlg')
+                @_columnModel[i].positionIndex = i
 
             @targetColumnId = null
             @editedCellId = null
@@ -125,45 +126,21 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     @_retrieveDataFromUrl(1, true)
             ), 0)
 
-            @options.toolbar = @options.toolbar or null
-          
             if @options.toolbar?
-                elements = @options.toolbar.elements or []
-                if elements.indexOf(TableGrid.ADD_BTN) >= 0
-                    $('#mtgAddBtn'+id).on 'click', =>
-                        addFlg = true
-                        if @options.toolbar.onAdd?
-                            addFlg = @options.toolbar.onAdd()
-                            addFlg = true if addFlg is undefined
+                buttons = @options.toolbar or []
+                for i in [0...buttons.length]
+                    b = buttons[i]
+                    do (i, b) =>
+                        btn = $('#toolbarBtn'+id+'_'+i)
+                        btn.on 'click', =>
+                            @_blurCellElement(@keys._nCurrentFocus)
+                            proceedFlg = true
+                            result = b.beforeClick(btn) if b.beforeClick?
+                            proceedFlg = result if result is false
+                            if proceedFlg
+                                b.onClick(btn) if b.onClick?
+                                b.afterClick(btn) if b.afterClick?
 
-                        if @options.toolbar.beforeAdd?
-                            addFlg = @options.toolbar.beforeAdd()
-                            addFlg = true if addFlg is undefined
-                        
-                        if addFlg
-                            @addNewRow()
-                            @options.toolbar.afterAdd() if @options.toolbar.afterAdd?
-              
-                if elements.indexOf(TableGrid.DEL_BTN) >= 0
-                    $('#mtgDelBtn'+id).on 'click', =>
-                        deleteFlg = true
-                        if @options.toolbar.onDelete?
-                            deleteFlg = @options.toolbar.onDelete()
-                            deleteFlg = true if deleteFlg is undefined
-
-                        if @options.toolbar.beforeDelete?
-                            deleteFlg = @options.toolbar.beforeDelete()
-                            deleteFlg = true if deleteFlg is undefined
-
-                        if deleteFlg
-                            @deleteRows()
-                            @options.toolbar.afterDelete() if @options.toolbar.afterDelete
-
-                if elements.indexOf(TableGrid.SAVE_BTN) >= 0
-                    $('#mtgSaveBtn'+id).on 'click', =>
-                        @_blurCellElement(@keys._nCurrentFocus)
-                        @options.toolbar.onSave() if @options.toolbar.onSave?
-            
             # Adding scrolling handler
             @bodyDiv.bind 'scroll', => @_syncScroll()
             # Adding resize handler
@@ -194,22 +171,16 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
 
             if @options.toolbar? # adding toolbar
-                elements = @options.toolbar.elements or []
+                buttons = @options.toolbar or []
                 html[idx++] = '<div id="mtgHeaderToolbar'+id+'" class="my-tablegrid-toolbar" style="position:absolute;top:'+@topPos+'px;left:'+@leftPos+'px;width:'+(@tableWidth - 4)+'px;height:'+(@toolbarHeight - 2)+'px;padding:1px 2px;z-index:10">'
                 beforeFlg = false
-                if elements.indexOf(TableGrid.SAVE_BTN) >= 0
-                    html[idx++] = '<a class="toolbar-button" id="mtgSaveBtn'+id+'"><span class="icon save-button">&nbsp;</span><span class="text">'+i18n.getMessage('label.save')+'</span></a>'
-                    beforeFlg = true
-
-                if elements.indexOf(TableGrid.ADD_BTN) >= 0
-                    html[idx++] = '<div class="toolbar-separator">&#160;</div>' if beforeFlg
-                    html[idx++] = '<a class="toolbar-button" id="mtgAddBtn'+id+'"><span class="icon add-button">&nbsp;</span><span class="text">'+i18n.getMessage('label.add')+'</span></a>'
-                    beforeFlg = true
-
-                if elements.indexOf(TableGrid.DEL_BTN) >= 0
-                    html[idx++] = '<div class="toolbar-separator">&#160;</div>' if beforeFlg
-                    html[idx++] = '<a class="toolbar-button" id="mtgDelBtn'+id+'"><span class="icon delete-button">&nbsp;</span><span class="text">'+i18n.getMessage('label.delete')+'</span></a>'
-
+                for i in [0...buttons.length]
+                    b = buttons[i]
+                    html[idx++] = '<a id="toolbarBtn'+id+'_'+i+'" class="toolbar-button">'
+                    html[idx++] = '<span class="icon '+b.iconClass+'">&nbsp;</span>' if b.iconClass?
+                    html[idx++] = '<span class="text">'+b.text+'</span>' if b.text?
+                    html[idx++] = '</a>'
+                    html[idx++] = '<div class="toolbar-separator">&#160;</div>' if i < buttons.length - 1
                 html[idx++] = '</div>'
                 @topPos += @toolbarHeight + 1
 
@@ -338,15 +309,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;padding:3px;text-align:{align}" class="my-tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
             checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x} mtgInputCheckbox" checked="{checked}">'
             radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x} mtgInputRadio">'
-            #if $.browser.opera or $.browser.webkit # TODO review this issue
-            #    checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x}" checked="{checked}">'
-            #    radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x}">'
-
             rs = @options.rowStyle # row style handler
             rc = @options.rowClass # row class handler
             cellHeight = @options.cellHeight
             iCellHeight = cellHeight - 6
-            cm = @columnModel
+            cm = @_columnModel
             html = []
             idx = 0
             html[idx++] = '<tr id="mtgRow'+id+'_r'+rowIdx+'" class="mtgRow'+id+' '+rc(rowIdx)+'" style="'+rs(rowIdx)+'">'
@@ -468,7 +435,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _applyCellCallbackToRow : (y) ->
             id = @_mtgId
-            cm = @columnModel
+            cm = @_columnModel
             for i in [0...cm.length]
                 editor = cm[i].editor
                 if (editor == 'radio' or editor instanceof TableGrid.CellRadioButton) or
@@ -523,7 +490,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _createSettingMenu : ->
             id = @_mtgId
-            cm = @columnModel
+            cm = @_columnModel
             bh = @bodyHeight + 30
             height = if cm.length * 25 > bh then bh else 0
             html = []
@@ -551,7 +518,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _applySettingMenuBehavior : ->
             id = @_mtgId
-            cm = @columnModel
+            cm = @_columnModel
             settingMenu = $('#mtgSM' + id)
             settingButton = $('#mtgSB' + id)
           
@@ -664,7 +631,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _resizeColumn: (index, newWidth) ->
             id = @_mtgId
-            cm = @columnModel
+            cm = @_columnModel
 
             oldWidth = $('#mtgHC' + id + '_c' + index).width()
             editor = cm[index].editor
@@ -699,7 +666,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             $('#mtgBT' + id).attr('width', @headerWidth)
             $('#mtgBT' + id).css('width', @headerWidth + 'px')
 
-            @columnModel[index].width = newWidth
+            @_columnModel[index].width = newWidth
             @_syncScroll()
 
         ###
@@ -764,7 +731,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             topPos += @headerHeight if @options.title?
             topPos += @headerHeight if @options.toolbar?
             sepLeftPos = 0
-            cm = @columnModel
+            cm = @_columnModel
             scrollLeft = @scrollLeft
             colMoveTopDiv = @colMoveTopDiv
             colMoveBottomDiv = @colMoveBottomDiv
@@ -799,10 +766,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _moveColumn : (fromColumnId, toColumnId) ->
             # Some validations
-            return if fromColumnId == null or toColumnId == null or fromColumnId == toColumnId or (toColumnId + 1 == fromColumnId and fromColumnId == @columnModel.length -1)
+            return if fromColumnId == null or toColumnId == null or fromColumnId == toColumnId or (toColumnId + 1 == fromColumnId and fromColumnId == @_columnModel.length -1)
           
             id = @_mtgId
-            cm = @columnModel
+            cm = @_columnModel
             keys = @keys
             renderedRows = @renderedRows
             numberOfRowsAdded = @newRowsAdded.length
@@ -885,7 +852,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             for c in [0...columnModelLength]
                 aTemp[k++] = columnModelEntry if c == targetColumnId
                 aTemp[k++] = cm[c] if c < (columnModelLength - 1)
-            @keys._cm = @columnModel = cm = aTemp
+            @keys._cm = @_columnModel = cm = aTemp
             $('#mtgHRT'+id + ' th').each (index, th) ->
                 if index < cm.length
                     $(th).attr('id', 'mtgHC'+ id + '_c' + index)
@@ -908,8 +875,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     $(div).attr('id', 'mtgIC' + id + '_c' + index + 'r' + i)
                     modifiedCellClass = if $(div).attr('class').match(/modified-cell/) then ' modified-cell' else ''
                     $(div).attr('class', 'my-tablegrid-inner-cell mtgIC' + id + ' mtgIC' + id + '_c' + index + ' mtgIR' + id + '_r' + i + modifiedCellClass)
-                    if $(div).first() and $(div).first().is(':input')  # when it contains a checkbox or radio button
-                        input = $(div).first()
+                    if $(div).find('input').size() > 0  # when it contains a checkbox or radio button
+                        input = $(div).find('input')
                         input.attr('id', 'mtgInput' + id + '_c' + index + 'r' + i)
                         input.attr('name', 'mtgInput' + id + '_c' + index + 'r' + i)
                         input.attr('class', 'mtgInput' + id + '_c' + index)
@@ -921,7 +888,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Add Key behavior functionality to the table grid
         ###
         _addKeyBehavior : ->
-            cm = @columnModel
+            cm = @_columnModel
             rows = @rows
             newRowsAdded = @newRowsAdded
             keys = @keys
@@ -958,7 +925,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         _editCellElement : (element) ->
             @keys._isInputFocusedFlg = true
             id = @_mtgId
-            cm = @columnModel
+            cm = @_columnModel
             coords = @getCurrentPosition()
             x = coords[0]
             y = coords[1]
@@ -966,7 +933,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             height = element.height()
             innerElement = element.find('div')
             value = @getValueAt(x, y)
-            editor = @columnModel[x].editor or 'input'
+            editor = @_columnModel[x].editor or 'input'
             input = null
             isInputFlg = !(editor == 'radio' or editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
           
@@ -999,7 +966,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             else if editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox
                 input = $('#mtgInput' + id + '_c' + x + 'r' + y)
                 isChecked = !input.is(':checked')
-                console.log 'is checked: ' + isChecked
                 if isChecked then input.attr('checked', 'checked') else input.removeAttr('checked')
                 if editor.selectable == undefined or !editor.selectable
                     value = editor.getValueOf(isChecked) if editor.hasOwnProperty('getValueOf')
@@ -1030,7 +996,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             return unless element?
             id = @_mtgId
             keys = @keys
-            cm = @columnModel
+            cm = @_columnModel
             width = element.width()
             height = element.height()
             coords = @getCurrentPosition()
@@ -1079,7 +1045,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _applyHeaderButtons : ->
             id = @_mtgId
-            cm = @columnModel
+            cm = @_columnModel
             headerHeight = @headerHeight
             headerButton = $('#mtgHB' + id)
             headerButtonMenu = $('#mtgHBM' + id)
@@ -1125,7 +1091,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
 
             headerButton.on 'click', =>
-                cm = @columnModel
+                cm = @_columnModel
                 if headerButtonMenu.css('visibility') == 'hidden'
                     if cm[selectedHCIndex].sortable
                         $('#mtgSortDesc' + id).show()
@@ -1183,7 +1149,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Sort data displayed in TableGrid.
         ###
         _sortData : (idx, ascDescFlg) ->
-            cm = @columnModel
+            cm = @_columnModel
             id = @_mtgId
             if cm[idx].sortable
                 $('#mtgSortIcon'+id+'_c'+idx).attr('class', if (ascDescFlg == 'ASC') then 'my-tablegrid-sort-asc-icon' else 'my-tablegrid-sort-desc-icon')
@@ -1201,7 +1167,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Toggle sorting between descendant and ascendant options.
         ###
         _toggleSortData : (idx) ->
-            cm = @columnModel
+            cm = @_columnModel
             if cm[idx].sortedAscDescFlg == 'DESC'
                 @_sortData(idx, 'ASC')
             else
@@ -1213,7 +1179,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _toggleColumnVisibility : (columnId) ->
             id = @_mtgId
-            cm = @columnModel
+            cm = @_columnModel
             @_blurCellElement(@keys._nCurrentFocus) # in case there is a cell in editing mode
             @keys.blur() #remove the focus of the selected cell
             headerRowTable = $('#mtgHRT' + id)
@@ -1263,7 +1229,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             pageParameter = @pager.pageParameter if @pager != null and @pager.pageParameter
             @request[pageParameter] = pageNumber
             @_toggleLoadingOverlay()
-            column.selectAllFlg = false for column in @columnModel
+            column.selectAllFlg = false for column in @_columnModel
             $.ajax({
                 url : @url,
                 data : @request,
@@ -1445,7 +1411,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         getValueAt : (x, y) ->
             value = null
-            columnId = @columnModel[x].id
+            columnId = @_columnModel[x].id
             rows = @rows
             newRowsAdded = @newRowsAdded
             if y >= 0 and y < rows.length
@@ -1461,7 +1427,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # change either visible or not.
         ###
         setValueAt : (value, x, y, refreshValueFlg) ->
-            cm = @columnModel
+            cm = @_columnModel
             id = @_mtgId
             editor = cm[x].editor
             columnId = cm[x].id
@@ -1498,9 +1464,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         getColumnIndex : (id) ->
             index = -1
-            for i in [0...@columnModel.length]
-                if @columnModel[i].id == id
-                    index = @columnModel[i].positionIndex
+            for i in [0...@_columnModel.length]
+                if @_columnModel[i].id == id
+                    index = @_columnModel[i].positionIndex
                     break
             return index;
 
@@ -1509,7 +1475,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         getIndexOf : (id) ->
             idx = -1
-            for column in @columnModel
+            for column in @_columnModel
                 if column.id == id
                     idx = i
                     break
@@ -1580,7 +1546,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         _getSelectedRowsIdx: (idx) ->
             result = []
             id = @_mtgId
-            cm = @columnModel
+            cm = @_columnModel
             newRowsAdded = @newRowsAdded
             renderedRows = @renderedRows
             addNewRowsToEndBehaviorFlg = @options.addNewRowsToEndBehaviour
@@ -1670,7 +1636,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         addNewRow : (newRow) ->
             keys = @keys
             bodyTable = @bodyTable
-            cm = @columnModel
+            cm = @_columnModel
             index = @newRowsAdded.length
             renderedRows = @renderedRows
 
@@ -1682,7 +1648,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             if !@options.addNewRowsToEndBehaviour
                 index = -(index + 1)
                 bodyTable.find('tbody').prepend(@_createRow(newRow, index))
-                keys.setTopLimit(-index)
+                keys.setTopLimit(index)
                 @bodyDiv.scrollTop(@scrollTop = 0)
             else
                 index = renderedRows + index
@@ -1754,7 +1720,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _fromArrayToObject : (row) ->
             result = null
-            cm = @columnModel
+            cm = @_columnModel
             if row instanceof Array
                 result = {}
                 for i in [0...cm.length]
@@ -1784,7 +1750,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
     class HeaderBuilder
         constructor: (id, cm) ->
-            @columnModel = cm
+            @_columnModel = cm
             @_mtgId = id
             @filledPositions = []
             @_leafElements = []
@@ -1805,7 +1771,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             ihcTmplLast = '<div class="my-tablegrid-inner-header-cell" style="position:relative;width:{width}px;height:{height}px;padding:3px;z-index:20">'
             hsTmpl = '<div id="mtgHS{id}_c{x}" class="mtgHS mtgHS{id}" style="float:right;width:1px;height:{height}px;z-index:30">'
             siTmpl = '<span id="mtgSortIcon{id}_c{x}" style="width:8px;height:4px;visibility:hidden">&nbsp;&nbsp;&nbsp;</span>'
-            cm = @columnModel
+            cm = @_columnModel
             id = @_mtgId
             rnl = @rnl #row nested level
 
@@ -1920,7 +1886,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # @param elements header elements
         ###
         _getHeaderRow : (nl, elements, column) ->
-            cm = @columnModel
+            cm = @_columnModel
             elements = elements or cm
             result = []
             idx = 0
@@ -1947,7 +1913,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Get header row nested level
         ###
         getHeaderRowNestedLevel : ->
-            cm = @columnModel
+            cm = @_columnModel
             result = 0
             for column in cm
                 nl = @_getHeaderColumnNestedLevel(column)
@@ -2006,9 +1972,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Validates header columns width
         ###
         _validateHeaderColumns : ->
-            cm = @columnModel
+            cm = @_columnModel
             cm[i] = @_validateHeaderColumnWidth(cm[i]) for i in [0...cm.length]  # foreach column
-            @columnModel = cm
+            @_columnModel = cm
 
 
         _validateHeaderColumnWidth : (column) ->

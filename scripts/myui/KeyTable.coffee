@@ -13,10 +13,10 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             @_tableGrid = null
             @_cm = null # column model
 
-            if targetTable.columnModel? # Is a TableGrid object?
-                @_cm = targetTable.columnModel
+            if targetTable._columnModel? # Is a TableGrid object?
+                @_cm = targetTable._columnModel
                 @_numberOfRows = targetTable.rows.length
-                @_numberOfColumns = targetTable.columnModel.length
+                @_numberOfColumns = targetTable._columnModel.length
                 @_tableGrid = targetTable
                 @_bodyDiv = $(targetTable.bodyDiv)
                 @_targetTable = $(targetTable.bodyTable)

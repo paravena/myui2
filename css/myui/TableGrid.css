@@ -24,7 +24,8 @@
 
 a.toolbar-button {
     display: inline-block;
-    padding:  2px;
+    padding:  4px;
+    height: 16px;
     float: left;
     text-decoration: none;
     border: 1px solid #bbb;
@@ -50,7 +51,7 @@ div.toolbar-separator  {
     height: 100%;
     border-left: 1px solid #ccc;
     border-right: 1px solid white;
-    margin: 0 5px;
+    margin: 0 3px;
 }
 
 a.toolbar-button span.icon {
@@ -58,7 +59,7 @@ a.toolbar-button span.icon {
     vertical-align: bottom;
     width: 16px;
     height: 16px;
-    margin-left: 3px;
+    margin: 0;
 }
 
 span.add-button {
@@ -88,6 +89,7 @@ a.toolbar-button span.text {
     line-height: 16px;
     vertical-align: middle;
     font-weight: bold;
+    cursor: default;
 }
 
 /* Setting button */
