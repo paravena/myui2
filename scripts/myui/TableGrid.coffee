@@ -4,7 +4,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # TableGrid constructor
         ###
         constructor : (tableModel) ->
-            @_mtgId = $('.my-tablegrid').length + 1
+            @_mtgId = $('.tablegrid').length + 1
             @tableModel = tableModel
             @_columnModel = tableModel.columnModel or []
             @rows = tableModel.rows or []
@@ -161,10 +161,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             idx = 0
             html = []
-            html[idx++] = '<div id="myTableGrid'+id+'" class="my-tablegrid" style="position:relative;width:'+@tableWidth+'"px;height:'+@tableHeight+'px;z-index:0">'
+            html[idx++] = '<div id="myTableGrid'+id+'" class="tablegrid" style="position:relative;width:'+@tableWidth+'"px;height:'+@tableHeight+'px;z-index:0">'
 
             if @options.title? # Adding header title
-                html[idx++] = '<div id="mtgHeaderTitle'+id+'" class="my-tablegrid-header-title" style="position:absolute;top:'+@topPos+'px;left:'+@leftPos+'px;width:'+(@tableWidth - 6)+'px;height:'+(@titleHeight - 6)+'px;padding:3px;z-index:10">'
+                html[idx++] = '<div id="mtgHeaderTitle'+id+'" class="tablegrid-header-title" style="position:absolute;top:'+@topPos+'px;left:'+@leftPos+'px;width:'+(@tableWidth - 6)+'px;height:'+(@titleHeight - 6)+'px;padding:3px;z-index:10">'
                 html[idx++] = @options.title
                 html[idx++] = '</div>'
                 @topPos += @titleHeight + 1
@@ -172,7 +172,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             if @options.toolbar? # adding toolbar
                 buttons = @options.toolbar or []
-                html[idx++] = '<div id="mtgHeaderToolbar'+id+'" class="my-tablegrid-toolbar" style="position:absolute;top:'+@topPos+'px;left:'+@leftPos+'px;width:'+(@tableWidth - 4)+'px;height:'+(@toolbarHeight - 2)+'px;padding:1px 2px;z-index:10">'
+                html[idx++] = '<div id="mtgHeaderToolbar'+id+'" class="tablegrid-toolbar" style="position:absolute;top:'+@topPos+'px;left:'+@leftPos+'px;width:'+(@tableWidth - 4)+'px;height:'+(@toolbarHeight - 2)+'px;padding:1px 2px;z-index:10">'
                 beforeFlg = false
                 for i in [0...buttons.length]
                     b = buttons[i]
@@ -186,7 +186,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             overlayTopPos = @topPos
             # Adding Header Row
-            html[idx++] = '<div id="headerRowDiv'+id+'" class="my-tablegrid-header-row" style="position:absolute;top:'+@topPos+'px;left:'+@leftPos+'px;width:'+@tableWidth+'px;height:'+@headerHeight+'px;padding:0;overflow:hidden;z-index:0">'
+            html[idx++] = '<div id="headerRowDiv'+id+'" class="tablegrid-header-row" style="position:absolute;top:'+@topPos+'px;left:'+@leftPos+'px;width:'+@tableWidth+'px;height:'+@headerHeight+'px;padding:0;overflow:hidden;z-index:0">'
             #header row box useful for drag and drop
 
             html[idx++] = '<div id="mtgHRB'+id+'" style="position:relative;padding:0;margin:0;width:'+(@headerWidth+21)+'px;height:'+@headerHeight+'px;">'
@@ -204,28 +204,28 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             overlayHeight = @bodyHeight + @headerHeight
 
             html[idx++] = '<div id="overlayDiv'+id+'" class="overlay" style="position:absolute;top:'+overlayTopPos+'px;width:'+(@tableWidth+2)+'px;height:'+(overlayHeight+2)+'px;overflow:none;">'
-            html[idx++] = '<div class="loadingBox" style="margin-top:'+((overlayHeight+2) / 2 - 14)+'px">'+i18n.getMessage('label.loading')+'</div>'
+            html[idx++] = '<div class="loading-box" style="margin-top:'+((overlayHeight+2) / 2 - 14)+'px">'+i18n.getMessage('label.loading')+'</div>'
             html[idx++] = '</div>' # closes overlay
-            html[idx++] = '<div id="bodyDiv'+id+'" class="my-tablegrid-body" style="position:absolute;top:'+@topPos+'px;left:'+@leftPos+'px;width:'+@tableWidth+'px;height:'+@bodyHeight+'px;overflow:auto;">'
-            html[idx++] = '<div id="innerBodyDiv'+id+'" class="my-tablegrid-inner-body" style="position:relative;top:0px;width:'+(@tableWidth - @scrollBarWidth)+'px;overflow:none;">'
+            html[idx++] = '<div id="bodyDiv'+id+'" class="tablegrid-body" style="position:absolute;top:'+@topPos+'px;left:'+@leftPos+'px;width:'+@tableWidth+'px;height:'+@bodyHeight+'px;overflow:auto;">'
+            html[idx++] = '<div id="innerBodyDiv'+id+'" class="tablegrid-inner-body" style="position:relative;top:0px;width:'+(@tableWidth - @scrollBarWidth)+'px;overflow:none;">'
             html[idx++] = '</div>' # closes innerBodyDiv
             html[idx++] = '</div>' # closes bodyDiv
 
             # Adding Pager Panel
             if @pager?
                 @topPos += @bodyHeight + 2
-                html[idx++] = '<div id="pagerDiv'+id+'" class="my-tablegrid-pager" style="position:absolute;top:'+@topPos+'px;left:0;bottom:0;width:'+(@tableWidth - 4)+'px;height:'+(@pagerHeight - 4)+'px">'
+                html[idx++] = '<div id="pagerDiv'+id+'" class="tablegrid-pager" style="position:absolute;top:'+@topPos+'px;left:0;bottom:0;width:'+(@tableWidth - 4)+'px;height:'+(@pagerHeight - 4)+'px">'
                 html[idx++] = @_updatePagerInfo(true)
                 html[idx++] = '</div>' # closes Pager Div
 
             # Adding Table Setting Button Control
             if @options.addSettingBehavior
-                html[idx++] = '<div id="mtgSB'+id+'" class="my-tablegrid-setting-button" style="left:'+(@tableWidth - 20)+'px"><div class="icon">&nbsp;</div></div>'
+                html[idx++] = '<div id="mtgSB'+id+'" class="tablegrid-setting-button" style="left:'+(@tableWidth - 20)+'px"><div class="icon">&nbsp;</div></div>'
                 # Adding Table Setting Menu
                 html[idx++] = @_createSettingMenu()
 
             # Adding Header Button Control
-            html[idx++] = '<div id="mtgHB'+id+'" class="my-tablegrid-header-button" style="width:14px;height:'+@headerHeight+'px">'
+            html[idx++] = '<div id="mtgHB'+id+'" class="tablegrid-header-button" style="width:14px;height:'+@headerHeight+'px">'
             html[idx++] = '</div>'
             # Adding Header Button Menu
             html[idx++] = '<div id="mtgHBM'+id+'" class="tablegrid-menu shadow">'
@@ -246,14 +246,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html[idx++] = '</div>'
 
             # Adding resize markers
-            html[idx++] = '<div id="resizeMarkerLeft'+id+'" class="my-tablegrid-resize-marker">'
+            html[idx++] = '<div id="resizeMarkerLeft'+id+'" class="tablegrid-resize-marker">'
             html[idx++] = '</div>'
-            html[idx++] = '<div id="resizeMarkerRight'+id+'" class="my-tablegrid-resize-marker">'
+            html[idx++] = '<div id="resizeMarkerRight'+id+'" class="tablegrid-resize-marker">'
             html[idx++] = '</div>'
 
             # Adding Dragging controls
-            html[idx++] = '<div id="mtgColMoveTop'+id+'" class="my-tablegrid-column-move-top">&nbsp;</div>'
-            html[idx++] = '<div id="mtgColMoveBottom'+id+'" class="my-tablegrid-column-move-bottom">&nbsp;</div>'
+            html[idx++] = '<div id="mtgColMoveTop'+id+'" class="tablegrid-column-move-top">&nbsp;</div>'
+            html[idx++] = '<div id="mtgColMoveBottom'+id+'" class="tablegrid-column-move-bottom">&nbsp;</div>'
           
             html[idx++] = '<div id="dragColumn'+id+'" class="dragColumn" style="width:100px;height:18px;">'
             html[idx++] = '<span class="columnTitle">&nbsp;</span>'
@@ -281,7 +281,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             if firstRenderingFlg
                 @innerBodyDiv.css('height',  (rows.length * cellHeight) + 'px')
-                html[idx++] = '<table id="mtgBT'+id+'" border="0" cellspacing="0" cellpadding="0" width="'+headerWidth+'" class="my-tablegrid-body-table">'
+                html[idx++] = '<table id="mtgBT'+id+'" border="0" cellspacing="0" cellpadding="0" width="'+headerWidth+'" class="tablegrid-body-table">'
                 html[idx++] = '<tbody>'
 
             lastRowToRender = renderedRows + renderedRowsAllowed
@@ -305,8 +305,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _createRow : (row, rowIdx) ->
             id = @_mtgId
-            tdTmpl = '<td id="mtgC{id}_c{x}r{y}" height="{height}" width="{width}" style="width:{width}px;height:{height}px;padding:0;margin:0;display:{display}" class="my-tablegrid-cell mtgC{id} mtgC{id}_c{x} mtgR{id}_r{y}">'
-            icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;padding:3px;text-align:{align}" class="my-tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
+            tdTmpl = '<td id="mtgC{id}_c{x}r{y}" height="{height}" width="{width}" style="width:{width}px;height:{height}px;padding:0;margin:0;display:{display}" class="tablegrid-cell mtgC{id} mtgC{id}_c{x} mtgR{id}_r{y}">'
+            icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;padding:3px;text-align:{align}" class="tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
             checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x} mtgInputCheckbox" checked="{checked}">'
             radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x} mtgInputRadio">'
             rs = @options.rowStyle # row style handler
@@ -411,7 +411,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         # Toggle loading overlay.
         ###
-        _toggleLoadingOverlay : ->
+        _toggleLoadingOverlay : (showLoadingBoxFlg = true) ->
             id = @_mtgId
             overlayDiv = $('#overlayDiv'+id)
             if overlayDiv.css('visibility') == 'hidden'
@@ -419,6 +419,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 overlayDiv.css('visibility', 'visible')
             else
                 overlayDiv.css('visibility', 'hidden')
+            if showLoadingBoxFlg
+                overlayDiv.find('.loading-box').show()
+            else
+                overlayDiv.find('.loading-box').hide()
 
         ###
         # Applies cell callbacks.
@@ -857,7 +861,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 if index < cm.length
                     $(th).attr('id', 'mtgHC'+ id + '_c' + index)
                     try
-                        ihc = $(th).find('div.my-tablegrid-inner-header-cell')
+                        ihc = $(th).find('div.tablegrid-inner-header-cell')
                         ihc.attr('id', 'mtgIHC' + id + '_c' + index)
                         ihc.find('span').attr('id', 'mtgSortIcon' + id + '_c' + index)
                         hs = $(th).find('div.mtgHS')
@@ -869,12 +873,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             for i in [-numberOfRowsAdded...renderedRows]
                 $('.mtgR'+id+'_r'+i).each (index) ->
                     $(this).attr('id', 'mtgC' + id + '_c' + index + 'r' + i)
-                    $(this).attr('class', 'my-tablegrid-cell mtgC' + id + ' mtgC' + id + '_c' + index + ' mtgR' + id + '_r' + i)
+                    $(this).attr('class', 'tablegrid-cell mtgC' + id + ' mtgC' + id + '_c' + index + ' mtgR' + id + '_r' + i)
 
                 $('.mtgIR'+id+'_r'+i).each (index, div) ->
                     $(div).attr('id', 'mtgIC' + id + '_c' + index + 'r' + i)
                     modifiedCellClass = if $(div).attr('class').match(/modified-cell/) then ' modified-cell' else ''
-                    $(div).attr('class', 'my-tablegrid-inner-cell mtgIC' + id + ' mtgIC' + id + '_c' + index + ' mtgIR' + id + '_r' + i + modifiedCellClass)
+                    $(div).attr('class', 'tablegrid-inner-cell mtgIC' + id + ' mtgIC' + id + '_c' + index + ' mtgIR' + id + '_r' + i + modifiedCellClass)
                     if $(div).find('input').size() > 0  # when it contains a checkbox or radio button
                         input = $(div).find('input')
                         input.attr('id', 'mtgInput' + id + '_c' + index + 'r' + i)
@@ -952,7 +956,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 # Creating a normal input
                 inputId = 'mtgInput' + id + '_c' + x + 'r' + y
                 input = $('<input>').attr({'id' : inputId, 'type' : 'text', 'value' : value})
-                input.addClass('my-tablegrid-textfield')
+                input.addClass('tablegrid-textfield')
                 input.css({
                     'padding' : '3px',
                     'width' : width + 'px'
@@ -1152,7 +1156,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             cm = @_columnModel
             id = @_mtgId
             if cm[idx].sortable
-                $('#mtgSortIcon'+id+'_c'+idx).attr('class', if (ascDescFlg == 'ASC') then 'my-tablegrid-sort-asc-icon' else 'my-tablegrid-sort-desc-icon')
+                $('#mtgSortIcon'+id+'_c'+idx).attr('class', if (ascDescFlg == 'ASC') then 'tablegrid-sort-asc-icon' else 'tablegrid-sort-desc-icon')
                 @request[@options.sortColumnParameter] = cm[idx].id;
                 @request[@options.ascDescFlagParameter] = ascDescFlg;
                 @_retrieveDataFromUrl(1)
@@ -1281,35 +1285,35 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             if @pager.total > 0
                 temp = i18n.getMessage('message.totalDisplay', {'total' : pager.total})
                 temp += i18n.getMessage('message.rowsDisplay', {'from' : pager.from, 'to' : pager.to}) if pager.from and pager.to
-                html[idx++] = '<span class="my-tablegrid-pager-message">'+temp+'</span>'
+                html[idx++] = '<span class="tablegrid-pager-message">'+temp+'</span>'
                 if pager.pages?
-                    input = '<input type="text" name="mtgPageInput'+id+'" id="mtgPageInput'+id+'" value="'+pager.currentPage+'" class="my-tablegrid-page-input" size="3" maxlength="3">'
+                    input = '<input type="text" name="mtgPageInput'+id+'" id="mtgPageInput'+id+'" value="'+pager.currentPage+'" class="tablegrid-page-input" size="3" maxlength="3">'
                     temp = i18n.getMessage('message.pagePrompt', {'pages' : pager.pages, 'input' : input})
-                    html[idx++] = '<table class="my-tablegrid-pager-table" border="0" cellpadding="0" cellspacing="0">'
+                    html[idx++] = '<table class="tablegrid-pager-table" border="0" cellpadding="0" cellspacing="0">'
                     html[idx++] = '<tbody>'
                     html[idx++] = '<tr>'
                     html[idx++] = '<td><div id="mtgLoader'+id+'" class="mtgLoader">&nbsp;</div></td>'
-                    html[idx++] = '<td><div class="my-tablegrid-pager-separator">&nbsp;</div></td>'
-                    html[idx++] = '<td><a id="mtgFirst'+id+'" class="my-tablegrid-pager-control"><div class="first-page">&nbsp;</div></a></td>'
-                    html[idx++] = '<td><a id="mtgPrev'+id+'" class="my-tablegrid-pager-control"><div class="previous-page">&nbsp;</div></a></td>'
-                    html[idx++] = '<td><div class="my-tablegrid-pager-separator">&nbsp;</div></td>'
+                    html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
+                    html[idx++] = '<td><a id="mtgFirst'+id+'" class="tablegrid-pager-control"><div class="first-page">&nbsp;</div></a></td>'
+                    html[idx++] = '<td><a id="mtgPrev'+id+'" class="tablegrid-pager-control"><div class="previous-page">&nbsp;</div></a></td>'
+                    html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
                     html[idx++] = temp
-                    html[idx++] = '<td><div class="my-tablegrid-pager-separator">&nbsp;</div></td>'
-                    html[idx++] = '<td><a id="mtgNext'+id+'" class="my-tablegrid-pager-control"><div class="next-page">&nbsp;</div></a></td>'
-                    html[idx++] = '<td><a id="mtgLast'+id+'" class="my-tablegrid-pager-control"><div class="last-page">&nbsp;</div></a></td>'
+                    html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
+                    html[idx++] = '<td><a id="mtgNext'+id+'" class="tablegrid-pager-control"><div class="next-page">&nbsp;</div></a></td>'
+                    html[idx++] = '<td><a id="mtgLast'+id+'" class="tablegrid-pager-control"><div class="last-page">&nbsp;</div></a></td>'
                     html[idx++] = '</tr>'
                     html[idx++] = '</tbody>'
                     html[idx++] = '</table>'
                 else
-                    html[idx++] = '<table class="my-tablegrid-pager-table" border="0" cellpadding="0" cellspacing="0">'
+                    html[idx++] = '<table class="tablegrid-pager-table" border="0" cellpadding="0" cellspacing="0">'
                     html[idx++] = '<tbody>'
                     html[idx++] = '<tr>'
-                    html[idx++] = '<td><div id="my-tablegrid-pager-loader'+id+'" class="mtgLoader">&nbsp;</div></td>'
+                    html[idx++] = '<td><div id="tablegrid-pager-loader'+id+'" class="mtgLoader">&nbsp;</div></td>'
                     html[idx++] = '</tr>'
                     html[idx++] = '</tbody>'
                     html[idx++] = '</table>'
             else
-                html[idx++] = '<span class="my-tablegrid-pager-message">'+i18n.getMessage('message.noRecordFound')+'</span>'
+                html[idx++] = '<span class="tablegrid-pager-message">'+i18n.getMessage('message.noRecordFound')+'</span>'
 
             return html.join('')
 
@@ -1765,10 +1769,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Creates header row
         ###
         _createHeaderRow : ->
-            thTmpl = '<th id="mtgHC{id}_c{x}" colspan="{colspan}" rowspan="{rowspan}" width="{width}" height="{height}" style="position:relative;width:{width}px;height:{height}px;padding:0;margin:0;border-bottom-color:{color};display:{display}" class="my-tablegrid-header-cell mtgHC{id}">'
-            thTmplLast = '<th id="mtgHC{id}_c{x}" colspan="{colspan}" rowspan="{rowspan}" width="{width}" height="{height}" style="width:{width}px;height:{height}px;padding:0;margin:0;border-right:none;border-bottom:1px solid #ccc;" class="my-tablegrid-header-cell mtgHC{id}">'
-            ihcTmpl = '<div id="mtgIHC{id}_c{x}" class="my-tablegrid-inner-header-cell mtgIHC{id}" style="float:left;width:{width}px;height:{height}px;padding:4px 3px;z-index:20">'
-            ihcTmplLast = '<div class="my-tablegrid-inner-header-cell" style="position:relative;width:{width}px;height:{height}px;padding:3px;z-index:20">'
+            thTmpl = '<th id="mtgHC{id}_c{x}" colspan="{colspan}" rowspan="{rowspan}" width="{width}" height="{height}" style="position:relative;width:{width}px;height:{height}px;padding:0;margin:0;border-bottom-color:{color};display:{display}" class="tablegrid-header-cell mtgHC{id}">'
+            thTmplLast = '<th id="mtgHC{id}_c{x}" colspan="{colspan}" rowspan="{rowspan}" width="{width}" height="{height}" style="width:{width}px;height:{height}px;padding:0;margin:0;border-right:none;border-bottom:1px solid #ccc;" class="tablegrid-header-cell mtgHC{id}">'
+            ihcTmpl = '<div id="mtgIHC{id}_c{x}" class="tablegrid-inner-header-cell mtgIHC{id}" style="float:left;width:{width}px;height:{height}px;padding:4px 3px;z-index:20">'
+            ihcTmplLast = '<div class="tablegrid-inner-header-cell" style="position:relative;width:{width}px;height:{height}px;padding:3px;z-index:20">'
             hsTmpl = '<div id="mtgHS{id}_c{x}" class="mtgHS mtgHS{id}" style="float:right;width:1px;height:{height}px;z-index:30">'
             siTmpl = '<span id="mtgSortIcon{id}_c{x}" style="width:8px;height:4px;visibility:hidden">&nbsp;&nbsp;&nbsp;</span>'
             cm = @_columnModel
@@ -1779,7 +1783,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             idx = 0
             @filledPositions = []
 
-            html[idx++] = '<table id="mtgHRT'+id+'" width="'+(@headerWidth+21)+'" cellpadding="0" cellspacing="0" border="0" class="my-tablegrid-header-row-table">'
+            html[idx++] = '<table id="mtgHRT'+id+'" width="'+(@headerWidth+21)+'" cellpadding="0" cellspacing="0" border="0" class="tablegrid-header-row-table">'
             html[idx++] = '<thead>'
 
             temp = null

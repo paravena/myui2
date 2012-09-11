@@ -13,7 +13,7 @@
 	box-shadow: 3px 3px 4px #ddd;
 }
 
-.loadingBox {
+.loading-box {
     background: #609 url(images/ajax-loader.gif) no-repeat 6px 4px;
     width: 80px;
 	height: 20px;
@@ -31,7 +31,7 @@
 
 .overlay {
     position: absolute;
-    background-color: dimgray;
+    background-color: #999;
     filter:alpha(opacity=60);
     -moz-opacity: 0.6;
     opacity: 0.6;
