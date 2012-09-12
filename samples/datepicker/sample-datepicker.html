@@ -17,9 +17,10 @@
 			changeMonth: true,
 			showWeek: true,
 			numberOfMonths: 1,
-			time : 'mixed',
+            selectOtherMonth : true,
+            numberOfMonths : 2,
 			validate: function(value, errors) {
-				if (value != null && value.isAfter(new Date())) {
+				if (value != null && $.util.date.isAfter(value, new Date())) {
 					errors.push('Selected date is after current');
 					return false;
 				}

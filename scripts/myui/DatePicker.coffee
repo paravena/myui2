@@ -239,9 +239,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             for i in [0...numberOfMonths]
                 if showWeek
                     if i > 0
-                        html[idx++] = '<th class="new-month-separator">Week</th>' # TODO hard coded
+                        html[idx++] = '<th class="new-month-separator">'+i18n.getMessage('label.week')+'</th>'
                     else
-                        html[idx++] = '<th>Week</th>' # TODO hard coded
+                        html[idx++] = '<th>'+i18n.getMessage('label.week')+'</th>'
 
 
                 $.each dateUtil.getWeekDays(), (index, weekday) ->
@@ -285,12 +285,12 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             html = []
             if @options.time
                 html[idx++] = '<span class="time-controls">'
-                timeItems = [if @options.time is 'mixed' then [' - ', ''] else []] # TODO check this
+                timeItems = [if @options.time is 'mixed' then [' - ', ''] else []]
                 currentTime = new Date()
                 html[idx++] = '<select class="hour">'
                 timeItems = [0..23].map (hour) ->
                     currentTime.setHours(hour)
-                    [dateUtil.getAmPmHour(currentTime) + ' ' + dateUtil.getAmPm(currentTime), hour] # TODO check this
+                    [dateUtil.getAmPmHour(currentTime) + ' ' + dateUtil.getAmPm(currentTime), hour]
                 html[idx++] = '<option value="'+hour[1]+'">'+hour[0]+'</option>' for hour in timeItems
                 html[idx++] = '</select>'
                 html[idx++] = '<span class="separator">&nbsp;:&nbsp;</span>'
@@ -302,7 +302,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 html[idx++] = '</select>'
                 html[idx++] = '</span>'
             else if !@options.buttons
-                footerDiv.remove() # TODO review this condition
+                footerDiv.remove()
 
             if @options.buttons
                 html[idx++] = '<span class="button-controls">'
