@@ -2,6 +2,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
     dateUtil = $.util.date
     mathUtil = $.util.math
     eventUtil = $.util.event
+    numberUtil = $.util.number
 
     class DatePicker extends TextField
         constructor : (options) ->
@@ -296,8 +297,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 html[idx++] = '<select class="minute">'
                 hours = [0..59].filter (min) =>
                     min % @options.minuteInterval is 0
-                timeItems = hours.map min ->
-                    [min.toPaddedString(2), min]
+                timeItems = ([numberUtil.toPaddedString(min, 2), min] for min in hours)
                 html[idx++] = '<option value="'+min[1]+'">'+min[0]+'</option>' for min in timeItems
                 html[idx++] = '</select>'
                 html[idx++] = '</span>'
@@ -489,7 +489,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                         month++
 
             if @options.changeYear
-                if @_flexibleYearRange() and (!@_setSelectBoxValue(@yearSelect, year) or @yearSelect.selectedIndex <= 1 or @yearSelect.selectedIndex >= @yearSelect.options.length - 2)
+                if @_flexibleYearRange() and (!@_setSelectBoxValue(@yearSelect, year) or @yearSelect[0].selectedIndex <= 1 or @yearSelect[0].selectedIndex >= @yearSelect[0].options.length - 2)
                     idx = 0
                     html = []
                     html[idx++] = '<option value="'+year+'">'+year+'</option>' for year in @_yearRange()
@@ -516,12 +516,8 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         # Generates select input box.
         ###
         _setSelectBoxValue: (selectElement, value) ->
-            matched = false
-            for i in [0...selectElement.options.length]
-                if selectElement.options[i].value == value.toString()
-                    selectElement.selectedIndex = i
-                    matched = true
-            return matched
+            matched = $('option[value='+value+']', selectElement).attr("selected", "selected").size()
+            return matched > 0
 
         ###
         # Is year range provided?

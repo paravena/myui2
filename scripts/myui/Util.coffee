@@ -24,6 +24,12 @@ define ['jquery'], ($) ->
         floorToInterval : (n, i) ->
             return Math.floor(n / i) * i
 
+    number =
+        toPaddedString : (num, length, radix) ->
+            string = num.toString(radix or 10)
+            times = length - string.length
+            return ('0' for i in [0...times]).join('') + string
+
     ###
     # Date functions
     # These functions are used to parse, format, and manipulate Date objects.
@@ -473,5 +479,6 @@ define ['jquery'], ($) ->
         math : math
         date : date
         event : event
+        number : number
 
     $.util = util

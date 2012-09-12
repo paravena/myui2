@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+		"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Test</title>
+	<link type="text/css" href="../../css/myui/myui.min.css" rel="stylesheet">
+	<script type="text/javascript" src="../../scripts/myui.min.js"></script>
+</head>
+<script type="text/javascript">
+	var datePicker1 = null;
+	$(window).load(function() {
+		datePicker1 = new MY.DatePicker({
+			input: '#arrivalDt',
+			format: 'dd-MMM-yyyy',
+			initialText : '22-June-2011',
+			changeYear: true,
+			changeMonth: true,
+			showWeek: true,
+			numberOfMonths: 1,
+			time : 'mixed',
+			validate: function(value, errors) {
+				if (value != null && value.isAfter(new Date())) {
+					errors.push('Selected date is after current');
+					return false;
+				}
+				return true;
+			}
+		});
+	});
+</script>
+<body>
+<h1>Date Picker Sample</h1>
+<label for="arrivalDt">Choose a date:</label>&nbsp;<input type="text" id="arrivalDt">
+</body>
+</html>
