@@ -4,6 +4,7 @@ define(function() {
     i18n['EN']['label.ok'] = 'OK';
     i18n['EN']['label.now'] = 'Now';
     i18n['EN']['label.today'] = 'Today';
+    i18n['EN']['label.week'] = 'Week';
     i18n['EN']['label.clear'] = 'Clear';
     i18n['EN']['label.add'] = 'Add';
     i18n['EN']['label.delete'] = 'Delete';
@@ -29,6 +30,7 @@ define(function() {
     i18n['ES']['label.ok'] = 'OK';
     i18n['ES']['label.now'] = 'Ahora';
     i18n['ES']['label.today'] = 'Hoy';
+    i18n['ES']['label.week'] = 'Sem';
     i18n['ES']['label.clear'] = 'Limpiar';
     i18n['ES']['label.add'] = 'Agregar';
     i18n['ES']['label.delete'] = 'Eliminar';

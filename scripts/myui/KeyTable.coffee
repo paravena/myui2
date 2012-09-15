@@ -250,23 +250,23 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
 
                 height = element.outerHeight()
                 width = element.outerWidth()
-                pos = @getPosition(element)
+                pos = element.position()
 
                 # Correct viewport positioning for vertical scrolling
-                if pos[1]+height > scrollTop+viewportHeight
+                if pos.top+height > scrollTop+viewportHeight
                     # Displayed element if off the bottom of the viewport
-                    @setScrollTop(pos[1]+height - viewportHeight)
-                else if pos[1] < scrollTop
+                    @setScrollTop(pos.top+height - viewportHeight)
+                else if pos.top < scrollTop
                     # Displayed element if off the top of the viewport
-                    @setScrollTop(pos[1])
+                    @setScrollTop(pos.top)
 
                 # Correct viewport positioning for horizontal scrolling
-                if pos[0] + width > scrollLeft + viewportWidth
+                if pos.left + width > scrollLeft + viewportWidth
                     # Displayed element is off the bottom of the viewport
-                    @setScrollLeft(pos[0] + width - viewportWidth)
-                else if pos[0] < scrollLeft
+                    @setScrollLeft(pos.left + width - viewportWidth)
+                else if pos.left < scrollLeft
                     # Displayed element if off the Left of the viewport
-                    @setScrollLeft(pos[0])
+                    @setScrollLeft(pos.left)
 
         ###
         # Set the vertical scrolling position
@@ -323,19 +323,6 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             element.removeClass(@options.cellFocusClass)
             element.closest('tr').removeClass(@options.cellFocusClass) unless onlyCellFlg
             @_eventFire("blur", element)
-
-        ###
-        # Get the position of an object on the rendered page
-        # @param obj element of interest
-        # @return the element position [left, right]
-        ###
-        getPosition : (element) ->
-            left = 0
-            top = 0
-            if element.position()
-                left = element.position().left
-                top = element.position().top
-            return [left, top]
 
         ###
         # Calculates the x and y position in a table from a TD cell
