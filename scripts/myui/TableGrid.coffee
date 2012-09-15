@@ -581,24 +581,22 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             id = @_mtgId
             headerHeight = @headerHeight
             scrollBarWidth = @scrollBarWidth
+            hc = null
             topPos = 0
             topPos += @titleHeight if @options.title
             topPos += @toolbarHeight if (@options.toolbar)
-            columnIndex = 0
             leftPos = 0
-            for separator in $('.mtgHS' + id)
-                do (separator) =>
-                    $(separator).on 'mousemove', =>
-                        separatorId = $(separator).attr('id')
-                        columnIndex = parseInt(separatorId.match(/_c(\d*)/)[1]) # extracts column index
-                        if columnIndex >= 0
-                            leftPos = $('#mtgHC' + id + '_c' + columnIndex).position().left - @scrollLeft
-                            leftPos += $('#mtgHC' + id + '_c' + columnIndex).outerWidth() - 1
-                            @resizeMarkerRight.css({
-                                'height' : (@bodyHeight + headerHeight) + 'px',
-                                'top' : (topPos + 2) + 'px',
-                                'left' : leftPos + 'px'
-                            })
+            $('.mtgHS' + id).on 'mousemove', (event) =>
+                separator = $(event.target)
+                hc = separator.parent('th')
+                if hc
+                    leftPos = hc.position().left - @scrollLeft
+                    leftPos += hc.outerWidth() - 1
+                    @resizeMarkerRight.css({
+                        'height' : (@bodyHeight + headerHeight) + 'px',
+                        'top' : (topPos + 2) + 'px',
+                        'left' : leftPos + 'px'
+                    })
 
             @resizeMarkerRight.on 'draginit', (event, drag) =>
                 drag.horizontal()
@@ -609,7 +607,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     'background-color' : 'dimgray'
                 })
 
-                leftPos = $('#mtgHC' + id + '_c' + columnIndex).position().left - @scrollLeft
+                leftPos = hc.position().left - @scrollLeft
 
                 @resizeMarkerLeft.css({
                     'height' : markerHeight + 'px',
@@ -620,7 +618,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             @resizeMarkerRight.on 'dragend', (event, drag) =>
                 newWidth = @resizeMarkerRight.position().left - @resizeMarkerLeft.position().left
-                @_resizeColumn(columnIndex, newWidth) if newWidth > 0 and columnIndex != null
+                @_resizeColumn(hc, newWidth) if newWidth > 0 and hc
                 @resizeMarkerLeft.css({
                     'background-color' : 'transparent',
                     'left' : '0'
@@ -633,34 +631,19 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # @param index the index column position
         # @param newWidth resizing width
         ###
-        _resizeColumn: (index, newWidth) ->
+        _resizeColumn: (headerColumn, newWidth) ->
             id = @_mtgId
             cm = @_columnModel
-
-            oldWidth = $('#mtgHC' + id + '_c' + index).width()
+            index = headerColumn.attr('id').match(/c(\d*)/)[1]
+            oldWidth = headerColumn.width()
             editor = cm[index].editor
-            checkboxOrRadioFlg = editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor == 'radio' or editor instanceof TableGrid.CellRadioButton
-
-            $('#mtgHC' + id + '_c' + index).attr('width', newWidth)
-            $('#mtgHC' + id + '_c' + index).css('width', newWidth + 'px')
-            $('#mtgIHC' + id + '_c' + index).css('width', (newWidth - 8) + 'px')
+            headerColumn.attr('width', newWidth)
+            headerColumn.css('width', newWidth + 'px')
+            $('.tablegrid-inner-header-cell', headerColumn).css('width', (newWidth - 8) + 'px')
 
             $('.mtgC' + id + '_c' + index).attr('width', newWidth)
             $('.mtgC' + id + '_c' + index).css('width', newWidth + 'px')
-
-            for cell in $('.mtgIC' + id + '_c' + index)
-                do (cell) =>
-                    cellId = $(cell).attr('id')
-                    y = parseInt(cellId.match(/r(\-?\d*)/)[1]) # extracts row index
-                    value = @getValueAt(index, y)
-                    $(cell).css('width', (newWidth - 6) + 'px')
-                    if !checkboxOrRadioFlg
-                        if cm[index].renderer?
-                            if editor instanceof ComboBox
-                                value = cm[index].renderer(value, editor.getItems(), @getRow(y))
-                            else
-                                value = cm[index].renderer(value, @getRow(y))
-                        $(cell).html(value)
+            $('.mtgIC' + id + '_c' + index).css('width', (newWidth - 6) + 'px')
 
             @headerWidth = @headerWidth - (oldWidth - newWidth)
 
@@ -731,7 +714,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # separator
         ###
         _detectDroppablePosition : (columnPos, width, dragColumn, index) ->
-            topPos = -10
+            topPos = -5
             topPos += @headerHeight if @options.title?
             topPos += @headerHeight if @options.toolbar?
             sepLeftPos = 0
@@ -1055,49 +1038,49 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             headerButtonMenu = $('#mtgHBM' + id)
             sortAscMenuItem = $('#mtgSortAsc'+id)
             sortDescMenuItem = $('#mtgSortDesc'+id)
-            selectedHCIndex = -1
-            for element in $('.mtgIHC' + id)
-                do (element) =>
-                    topPos = 0 # topPos is here because ouside mess with the other topPos var
-                    topPos += @titleHeight if @options.title?
-                    topPos += @toolbarHeight if @options.toolbar?
-                    editor = null
-                    sortable = true
-                    hbHeight = null
-                    $(element).on 'mousemove', =>
-                        return unless $(element).attr('id')
-                        elementId = $(element).attr('id')
-                        selectedHCIndex = parseInt(elementId.match(/_c(\d*)/)[1]) # extract column number from id
-                        editor = cm[selectedHCIndex].editor
-                        sortable = cm[selectedHCIndex].sortable
-                        hbHeight = cm[selectedHCIndex].height
-                        if sortable or editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox
-                            hc = $(element).closest('th') # header column
-                            leftPos = hc.position().left + hc.outerWidth()
-                            leftPos = leftPos - 16 - @scrollLeft
-                            if leftPos < @bodyDiv[0].clientWidth
-                                headerButton.css({
-                                    'top' : (topPos + 3 + headerHeight - hbHeight) + 'px',
-                                    'left' : leftPos + 'px',
-                                    'height' : hbHeight + 'px',
-                                    'visibility' : 'visible'
-                                })
+            columnIndex = -1
+            editor = null
+            sortable = true
+            hbHeight = null
+            topPos = headerHeight # topPos is here because ouside mess with the other topPos var
+            topPos += @titleHeight if @options.title?
+            topPos += @toolbarHeight if @options.toolbar?
 
-                            sortAscMenuItem.on 'click', => @_sortData(selectedHCIndex, 'ASC')
-                            sortDescMenuItem.on 'click', => @_sortData(selectedHCIndex, 'DESC')
+            $('.mtgIHC' + id).on 'mousemove', (event) =>
+                element = $(event.target)
+                return unless element.attr('id')
+                elementId = element.attr('id')
+                columnIndex = parseInt(elementId.match(/_c(\d*)/)[1]) # extract column number from id
+                editor = cm[columnIndex].editor
+                sortable = cm[columnIndex].sortable
+                hbHeight = cm[columnIndex].height
+                if sortable or editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox
+                    hc = element.parent('th') # header column
+                    leftPos = hc.position().left + hc.outerWidth()
+                    leftPos = leftPos - 16 - @scrollLeft
+                    if leftPos < @bodyDiv[0].clientWidth
+                        headerButton.css({
+                            'top' : (topPos + 3 - hbHeight) + 'px',
+                            'left' : leftPos + 'px',
+                            'height' : hbHeight + 'px',
+                            'visibility' : 'visible'
+                        })
 
-                    # Sorting when click on header column
-                    $(element).on 'click', =>
-                        return unless $(element).attr('id')
-                        elementId = $(element).attr('id')
-                        selectedHCIndex = parseInt(elementId.match(/_c(\d*)/)[1]) # extract column number from id
-                        @_toggleSortData(selectedHCIndex)
+                    sortAscMenuItem.on 'click', => @_sortData(columnIndex, 'ASC')
+                    sortDescMenuItem.on 'click', => @_sortData(columnIndex, 'DESC')
 
+            # Sorting when click on header column
+            $('.mtgIHC' + id).on 'click', (event) =>
+                element = $(event.target)
+                return unless element.attr('id')
+                elementId = element.attr('id')
+                columnIndex = parseInt(elementId.match(/_c(\d*)/)[1]) # extract column number from id
+                @_toggleSortData(columnIndex)
 
             headerButton.on 'click', =>
                 cm = @_columnModel
                 if headerButtonMenu.css('visibility') == 'hidden'
-                    if cm[selectedHCIndex].sortable
+                    if cm[columnIndex].sortable
                         $('#mtgSortDesc' + id).show()
                         $('#mtgSortAsc' + id).show()
                     else
@@ -1105,17 +1088,17 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         $('#mtgSortAsc' + id).hide()
 
                     selectAllItem = $('#mtgHBM' + id + ' .mtgSelectAll:first')
-                    if @renderedRows > 0 and (cm[selectedHCIndex].editor == 'checkbox' or cm[selectedHCIndex].editor instanceof TableGrid.CellCheckbox)
-                        selectAllItem.find('input').attr('checked', cm[selectedHCIndex].selectAllFlg)
+                    if @renderedRows > 0 and (cm[columnIndex].editor == 'checkbox' or cm[columnIndex].editor instanceof TableGrid.CellCheckbox)
+                        selectAllItem.find('input').attr('checked', cm[columnIndex].selectAllFlg)
                         selectAllItem.show()
                         selectAllItem.on 'click', => # onclick handler
-                            flag = cm[selectedHCIndex].selectAllFlg = $('#mtgSelectAll' + id).is(':checked')
+                            flag = cm[columnIndex].selectAllFlg = $('#mtgSelectAll' + id).is(':checked')
                             selectableFlg = false
-                            selectableFlg = true if cm[selectedHCIndex].editor instanceof TableGrid.CellCheckbox and cm[selectedHCIndex].editor.selectable
+                            selectableFlg = true if cm[columnIndex].editor instanceof TableGrid.CellCheckbox and cm[columnIndex].editor.selectable
                             renderedRows = @renderedRows
                             beginAtRow = 0
                             beginAtRow = -@newRowsAdded.length if @newRowsAdded.length > 0
-                            x = selectedHCIndex
+                            x = columnIndex
                             for y in [beginAtRow...renderedRows]
                                 element = $('#mtgInput' + id + '_c' + x + 'r' + y)
                                 element.attr('checked', flag)
@@ -1129,11 +1112,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         selectAllItem.hide()
 
                     leftPos = parseInt(headerButton.css('left'))
-                    topPos = @headerHeight + 2
-                    topPos += @titleHeight if @options.title?
-                    topPos += @toolbarHeight if @options.toolbar?
                     headerButtonMenu.css({
-                        'top' : topPos + 'px',
+                        'top' : (topPos + 2) + 'px',
                         'left' : leftPos + 'px',
                         'visibility' : 'visible'
                     })

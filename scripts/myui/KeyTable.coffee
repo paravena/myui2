@@ -343,14 +343,15 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # @param element cell of interest
         # @return [x, y] position of the element
         ###
-        getCoordsFromCell : (element) ->
-            id = $(element).attr('id')
+        getCoordsFromCell : (cell) ->
+            id = $(cell).attr('id')
             return null unless id?
             match = id.match(/c(\d*?)r(\-?\d*?)$/)
             return [
                 parseInt(match[1]),
                 parseInt(match[2])
             ]
+            #[cell.index(), cell.parent('tr').index()]
 
         ###
         # Calculates the target TD cell from x and y coordinates
@@ -359,10 +360,10 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # @return TD target
         ###
         getCellFromCoords : (x, y) ->
-            element = $(@options.idPrefix + 'c' + x + 'r' + y, @_tableBody)
-            return null if element.length == 0
-            return element
-            # return @_targetTable.rows[y].cells[x] # <-- this sadly doesn't work
+            cell = $(@options.idPrefix + 'c' + x + 'r' + y, @_tableBody)
+            return null if cell.length == 0
+            return cell
+            #return $('tr:eq('+y+')>td:eq('+x+')', @_targetTable)
 
         ###
         # Start capturing key events for this table
