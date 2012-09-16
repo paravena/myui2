@@ -25,6 +25,11 @@ define(function() {
     i18n['EN']['error.invalid.min'] = 'value #{value} is less than minimum value #{min}';
     i18n['EN']['error.invalid.max.size'] = 'value #{value} exceeds the maximum size of #{max}';
     i18n['EN']['error.invalid.min.size'] = 'value #{value} is less than the minimum size of #{min}';
+    i18n['EN']['date.monthAbbreviations'] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    i18n['EN']['date.monthNames'] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    i18n['EN']['date.dayNames'] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    i18n['EN']['date.dayAbbreviations'] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    i18n['EN']['date.weekDays'] = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
     i18n['ES'] = {};
     i18n['ES']['label.ok'] = 'OK';
@@ -51,6 +56,11 @@ define(function() {
     i18n['ES']['error.invalid.min'] = 'valor #{value} es menos que el minimo permitido #{min}';
     i18n['ES']['error.invalid.max.size'] = 'valor #{value} excede el maximo tamano de #{max}';
     i18n['ES']['error.invalid.min.size'] = 'valor #{value} es menos que el minimo tamano de #{min}';
+    i18n['ES']['date.monthAbbreviations'] = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    i18n['ES']['date.monthNames'] = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    i18n['ES']['date.dayNames'] = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+    i18n['ES']['date.dayAbbreviations'] = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'S&aacute;b'];
+    i18n['ES']['date.weekDays'] = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'S&aacute;'];
 
     i18n.getMessage = function(messageId, options) {
         options = options || {};

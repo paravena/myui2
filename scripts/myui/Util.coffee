@@ -1,4 +1,4 @@
-define ['jquery'], ($) ->
+define ['jquery', 'myui/i18n'], ($, i18n) ->
     event =
         KEY_BACKSPACE: 8
         KEY_TAB:       9
@@ -36,14 +36,8 @@ define ['jquery'], ($) ->
     # See documentation and examples at http://www.JavascriptToolbox.com/lib/date/
     ###
 
-    MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    MONTH_ABBREVIATIONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] #TODO weird
-    DAY_ABBREVIATIONS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     ONE_DAY = 24 * 60 * 60 * 1000
-    WEEK_DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
     FIRST_DAY_OF_WEEK = 0
-
     # Utility function to append a 0 to single-digit numbers
     LZ = (x) ->
         x = '0' + x if x >= 0 and x <= 9
@@ -63,6 +57,15 @@ define ['jquery'], ($) ->
             x--
         return null
 
+    rotate = (arr, n) ->
+        len = arr.length
+        newArr = []
+        for i in [n...len]
+           newArr.push arr[i]
+
+        for i in [0...n]
+           newArr.push arr[i]
+        return newArr
 
     preferAmericanFormat = true # TODO check this
 
@@ -165,25 +168,25 @@ define ['jquery'], ($) ->
         # Get the full name of the day for a date
         ###
         getDayName : (date) ->
-            return DAY_NAMES[date.getDay()]
+            return @getDayNames()[date.getDay()]
 
         ###
         # Get the abbreviation of the day for a date
         ###
         getDayAbbreviation : (date) ->
-            return DAY_ABBREVIATIONS[date.getDay()]
+            return @getDayAbbreviations()[date.getDay()]
 
         ###
         # Get the full name of the month for a date
         ###
         getMonthName : (date) ->
-            return MONTH_NAMES[date.getMonth()]
+            return @getMonthNames()[date.getMonth()]
 
         ###
         # Get the abbreviation of the month for a date
         ###
         getMonthAbbreviation : (date) ->
-            return MONTH_ABBREVIATIONS[date.getMonth()]
+            return @getMonthAbbreviations()[date.getMonth()]
 
         ###
         # Clear all time information in a date object
@@ -261,8 +264,8 @@ define ['jquery'], ($) ->
                             year = 2000 + (year - 0)
                 else if token == "MMM" or token == "NNN"
                     month = 0
-                    names = MONTH_ABBREVIATIONS
-                    names = MONTH_NAMES.concat MONTH_ABBREVIATIONS if token = "MMM"
+                    names = @getMonthAbbreviations()
+                    names = @getMonthNames().concat @getMonthAbbreviations() if token = "MMM"
                     for month_name, i in names
                         if (val.substring(i_val, i_val + month_name.length).toLowerCase() == month_name.toLowerCase())
                             month = (i % 12) + 1
@@ -270,8 +273,8 @@ define ['jquery'], ($) ->
                             break
                     return null if month < 1 or month > 12
                 else if token == "EE" or token == "E"
-                    names = DAY_ABBREVIATIONS
-                    names = DAY_NAMES if token == "EE"
+                    names = @getDayAbbreviations()
+                    names = @getDayNames() if token == "EE"
                     for day_name in names
                         if val.substring(i_val, i_val + day_name.length).toLowerCase() == day_name.toLowerCase()
                             i_val += day_name.length
@@ -368,12 +371,12 @@ define ['jquery'], ($) ->
             value["yy"] = y.substring(2, 4)
             value["M"] = M
             value["MM"] = LZ(M)
-            value["MMM"] = MONTH_NAMES[M - 1]
-            value["NNN"] = MONTH_ABBREVIATIONS[M - 1]
+            value["MMM"] = @getMonthNames()[M - 1]
+            value["NNN"] = @getMonthAbbreviations()[M - 1]
             value["d"] = d
             value["dd"] = LZ(d)
-            value["E"] = DAY_ABBREVIATIONS[E]
-            value["EE"] = DAY_NAMES[E]
+            value["E"] = @getDayAbbreviations()[E]
+            value["EE"] = @getDayNames()[E]
             value["H"] = H
             value["HH"] = LZ(H)
             if H == 0
@@ -467,13 +470,28 @@ define ['jquery'], ($) ->
             return 1 + Math.ceil((firstThursday - target) / 604800000) # 604800000 = 7 * 24 * 3600 * 1000
 
         getWeekDays : ->
-            return WEEK_DAYS
+            weekDays = i18n.getMessage('date.weekDays')
+            if FIRST_DAY_OF_WEEK > 0
+                weekDays = rotate(weekDays, FIRST_DAY_OF_WEEK)
+            return weekDays
 
         getMonthNames : ->
-            return MONTH_NAMES
+            return i18n.getMessage('date.monthNames')
+
+        getMonthAbbreviations : ->
+            return i18n.getMessage('date.monthAbbreviations')
+
+        getDayNames : ->
+            return i18n.getMessage('date.dayNames')
+
+        getDayAbbreviations : ->
+            return i18n.getMessage('date.dayAbbreviations')
 
         getFirstDayOfWeek : ->
-            return FIRST_DAY_OF_WEEK
+          return FIRST_DAY_OF_WEEK
+
+        setFirstDayOfWeek : (firstDayOfWeek) ->
+          return FIRST_DAY_OF_WEEK = firstDayOfWeek
 
     util =
         math : math

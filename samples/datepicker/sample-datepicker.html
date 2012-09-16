@@ -16,8 +16,8 @@
 			changeYear: true,
 			changeMonth: true,
 			showWeek: true,
-			numberOfMonths: 1,
             selectOtherMonth : true,
+			firstDayOfweek : 1,
             numberOfMonths : 2,
 			validate: function(value, errors) {
 				if (value != null && $.util.date.isAfter(value, new Date())) {

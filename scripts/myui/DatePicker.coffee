@@ -27,12 +27,14 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 changeYear: false,
                 showWeek: false,
                 numberOfMonths : 1,
-                selectOtherMonth : false,
-                validate: null
+                selectOtherMonth : true,
+                validate: null,
+                firstDayOfweek : 0 # Saturday is first
             }, options or {})
 
             @useTimeFlg = @options.time is 'mixed'
             @options.format += ' hh:mm' if @options.time is 'mixed'
+            dateUtil.setFirstDayOfWeek(@options.firstDayOfweek) if @options.firstDayOfweek > 0
 
             if !@options.embedded and @targetElement
                 @render(@targetElement)
@@ -190,19 +192,18 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 @_navMonth(@date.getMonth() - 1)
 
             @monthSelect = bodyDiv.find('.month')
-            if @monthSelect
-                @monthSelect.change (event) =>
-                    @_navMonth $(':selected', @monthSelect).val()
+            @monthSelect.change (event) =>
+                @_navMonth $(':selected', @monthSelect).val()
 
             @yearSelect = bodyDiv.find('.year')
-            if @yearSelect
-                @monthSelect.change (event) =>
-                    @_navYear $(':selected', @yearSelect).val()
+            @monthSelect.change (event) =>
+                @_navYear $(':selected', @yearSelect).val()
 
         ###
         # Initialize calendar months table.
         ###
         _initCalendarGrid : ->
+            id = @_mdpId
             bodyDiv = @_bodyDiv
             numberOfMonths = @options.numberOfMonths
             showWeek = @options.showWeek
@@ -220,7 +221,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     html[idx++] = '<option value="'+month+'">'+dateUtil.getMonthNames()[month]+'</option>' for month in [0..11]
                     html[idx++] = '</select>';
                 else
-                    html[idx++] = '<span id="mdpMonthLabel-'+@_mdpId+'_'+i+'" class="month-label">'
+                    html[idx++] = '<span id="mdpMonthLabel-'+id+'_'+i+'" class="month-label">'
                     html[idx++] = '</span>'
 
                 if @options.changeYear
@@ -229,7 +230,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     html[idx++] = '</select>'
                 else
                     html[idx++] = '&nbsp;'
-                    html[idx++] = '<span id="mdpYearLabel-'+@_mdpId+'_'+i+'" class="year-label">'
+                    html[idx++] = '<span id="mdpYearLabel-'+id+'_'+i+'" class="year-label">'
                     html[idx++] = '</span>'
 
                 html[idx++] = '</th>'
@@ -266,15 +267,15 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     className = 'day'
                     className += ' weekend' if (j % 7 is 0) or ((j + 1) % 7 is 0)
                     className += ' new-month-separator' if j > 0 and j % 7 is 0 and !showWeek
-                    html[idx++] = '<td id="mdpC'+@_mdpId+'_c'+j+'r'+i+'" class="'+className+'"><div></div></td>'
+                    html[idx++] = '<td id="mdpC'+id+'_c'+j+'r'+i+'" class="'+className+'"><div></div></td>'
 
                 html[idx++] = '</tr>'
 
             html[idx++] = '</tbody>'
             html[idx++] = '</table>'
             bodyDiv.append(html.join(''))
-            @daysTable = $('table', bodyDiv)
-            @_allCells = $('td.day', @daysTable)
+            @_daysTable = $('table', bodyDiv)
+            @_allCells = $('td.day', @_daysTable)
 
         ###
         # Initialize calendar buttons structure.
@@ -792,7 +793,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         ###
         _applyKeyboardBehavior : ->
             numberOfMonths = @options.numberOfMonths
-            @_keys = new KeyTable(@daysTable, {
+            @_keys = new KeyTable(@_daysTable, {
                 idPrefix : '#mdpC'+@_mdpId+'_',
                 numberOfColumns : numberOfMonths * 7,
                 firstRowElement : $('tr.weekDaysRow', @_bodyDiv)
