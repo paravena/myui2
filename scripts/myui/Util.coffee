@@ -488,10 +488,11 @@ define ['jquery', 'myui/i18n'], ($, i18n) ->
             return i18n.getMessage('date.dayAbbreviations')
 
         getFirstDayOfWeek : ->
-          return FIRST_DAY_OF_WEEK
+            return FIRST_DAY_OF_WEEK
 
         setFirstDayOfWeek : (firstDayOfWeek) ->
-          return FIRST_DAY_OF_WEEK = firstDayOfWeek
+            firstDayOfWeek = 1 if firstDayOfWeek > 1 # little validation only allow 0 or 1
+            return FIRST_DAY_OF_WEEK = firstDayOfWeek
 
     util =
         math : math

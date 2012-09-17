@@ -29,22 +29,21 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 numberOfMonths : 1,
                 selectOtherMonth : true,
                 validate: null,
-                firstDayOfweek : 0 # Saturday is first
+                firstDayOfWeek : 0 # Saturday is first
             }, options or {})
 
             @useTimeFlg = @options.time is 'mixed'
             @options.format += ' hh:mm' if @options.time is 'mixed'
-            dateUtil.setFirstDayOfWeek(@options.firstDayOfweek) if @options.firstDayOfweek > 0
+            dateUtil.setFirstDayOfWeek(@options.firstDayOfWeek) if @options.firstDayOfWeek > 0
 
-            if !@options.embedded and @targetElement
+            if !@options.embedded and @targetElement?
                 @render(@targetElement)
-            else if @options.embedded
-                if !@targetElement
-                    inputId = if @options.input then @options.input else 'myDatePicker' + @_mdpId
-                    parent = if @options.embeddedId then @options.embeddedId else document.body
-                    $(parent).append('<input type="hidden" id="'+inputId+'" name="'+inputId+'">')
-                    @options.input = inputId
-                    @targetElement = $(inputId)
+            else if @options.embedded and @targetElement?
+                inputId = if @options.input then @options.input else 'myDatePicker' + @_mdpId
+                parent = if @options.embeddedId then @options.embeddedId else document.body
+                $(parent).append('<input type="hidden" id="'+inputId+'" name="'+inputId+'">')
+                @options.input = inputId
+                @targetElement = $(inputId)
                 @show()
 
         render : (input) ->
@@ -368,6 +367,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_updateHeader()
             @_applyKeyboardBehavior()
 
+
         ###
         # Refresh calendar table, determines month days and position.
         ###
@@ -379,16 +379,24 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             beginningMonth = @date.getMonth()
             beginningYear = @date.getFullYear()
             today = dateUtil.stripTime(new Date())
-            @todayCell.removeClass('today') if @todayCell
+            # cleaning before painting
+            @_daysTable.find('td').removeAttr('id').removeAttr('class')
+            @_daysTable.find('td div').html('')
+
             for m in [1..numberOfMonths]
                 beginningDate = new Date(beginningYear, beginningMonth, 1)
                 beginningDate.setHours(12) # Prevent daylight savings time boundaries from showing a duplicate day
                 preDays = beginningDate.getDay() # draw some days before the fact
                 beginningDate.setDate(1 - preDays + dateUtil.getFirstDayOfWeek())
+                # When starting  on Sunday  and first day of week is Monday
+                if preDays is 0 and dateUtil.getFirstDayOfWeek() is 1
+                    preDays = 6 if preDays is 0 and dateUtil.getFirstDayOfWeek() is 1
+                    beginningDate.setDate(0 - preDays + dateUtil.getFirstDayOfWeek())
+
                 setTodayFlg = false
                 daysUntil = dateUtil.daysDistance(beginningDate, today)
                 if daysUntil in [0..41] and !setTodayFlg and today.getMonth() == beginningMonth
-                    @todayCell = @_getCellByIndex(daysUntil, m).addClass('today')
+                    @_getCellByIndex(daysUntil, m).addClass('today')
                     setTodayFlg = true
 
                 for i in [0...42]
@@ -400,35 +408,21 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     if i % 7 == 0 and showWeek and (month == beginningMonth or i == 0)
                         weekCell = cell.prev()
                         weekCell.addClass('week-number')
-                        weekCell.children().first().html(dateUtil.getWeek(beginningDate))
-                    else
-                        weekCell = cell.prev()
-                        weekCell.removeClass('week-number') if weekCell
+                        weekCell.find('div').html(dateUtil.getWeek(beginningDate))
 
-                    div = cell.children().first() # div element
                     if month != beginningMonth
-                        div.addClass('other')
+                        cell.addClass('other')
                         updateFlg = false unless selectOtherMonth
-                    else
-                        div.removeClass('other')
 
                     if updateFlg
                         {x, y} = @_getCellCoords(i, m)
                         cell.addClass('day')
                         cell.addClass('weekend') if (x % 7 is 0) or ((x + 1) % 7 is 0)
                         cell.attr('id', 'mdpC'+@_mdpId+'_c'+x+'r'+y)
-                        div.html(day)
+                        cell.find('div').html(day)
                         cell.data('day', day)
                         cell.data('month', month)
                         cell.data('year', beginningDate.getFullYear())
-                    else
-                        cell.removeClass('day')
-                        cell.removeClass('weekend')
-                        cell.removeAttr('id')
-                        div.html('&nbsp;')
-                        if (showWeek && i % 7 == 0 && i > 7 * numberOfMonths)
-                            weekCell = cell.prev()
-                            weekCell.children().first().html('&nbsp;')
 
                     beginningDate.setDate(day + 1)
 

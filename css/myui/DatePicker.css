@@ -122,24 +122,23 @@
 /* Week day */
 .my-datepicker-body td {
     font-size: 11px;
+    color: black;
     background-color: white;
     text-align: center;
     vertical-align: middle;
 }
 
 .my-datepicker-body td div {
-    color: black;
     padding: 2px 4px;
 }
 
-.my-datepicker-body td div.other {
+.my-datepicker-body td.other div {
     color: #aaa;
 }
 
 /* Weekend */
 .my-datepicker-body td.weekend {
     background-color: white;
-    padding: 1px;
 }
 
 /* selected date */
@@ -165,7 +164,7 @@
     cursor: default;
 }
 
-.my-datepicker-body td.focus div {
+.my-datepicker-body td.focus {
     color: white;
 }
 
