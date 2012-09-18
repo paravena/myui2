@@ -27,48 +27,19 @@
     position: relative;
     padding: 3px 0;
     background-color: #ddd;
-    text-align: center;
     height: 27px;
 }
 
-.my-datepicker-header span.selected-date {
-    font-size: 12px;
-    color: #609;
-    font-weight: bold;
-    padding: 4px;
-    display: block;
-    margin: 0 30px;
-}
-
 .my-datepicker-header select {
-    font-size: 11px;
-}
-
-.my-datepicker-header a:hover {
-    color: white;
-}
-
-.my-datepicker-header a {
-    width: 18px;
-    height: 17px;
-    text-decoration: none;
-    font-size: 11px;
-    color: black !important;
-}
-
-.my-datepicker-header a.close {
-    float: right;
-    display: none;
+    font-size: 12px;
 }
 
 .my-datepicker-header select.month {
-    width: 80px;
-    margin: 0 1px;
+    width: 90px;
 }
 
 .my-datepicker-header select.year {
-    width: 50px;
-    margin: 0 2px;
+    width: 55px;
 }
 
 .my-datepicker-header a.prev {
@@ -89,24 +60,26 @@
     background: url(images/next.gif) center no-repeat transparent;
 }
 
+.my-datepicker-header .month-year {
+    display: inline-block;
+    text-align: center;
+    font-size: 12px;
+    width: 170px;
+    padding: 5px 0;
+    text-shadow: 0 1px 1px #ddd;
+}
+
 /*************************************************/
 /* DatePicker Body                               */
 /*************************************************/
 .my-datepicker-body th {
     font-weight: bold;
     font-size: 11px;
-
     color: #000;
     background-color: #fff;
     border-bottom: 1px #ddd solid;
     padding: 2px;
 }
-
-.my-datepicker-body .month-label {
-    text-transform: uppercase;
-    text-shadow: 0 1px 1px #ddd;
-}
-
 
 .my-datepicker-body td.week-number {
     padding: 2px;

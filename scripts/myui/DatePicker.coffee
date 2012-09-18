@@ -8,7 +8,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         constructor : (options) ->
             @baseInitialize(options)
             @_mdpId = $('.my-datepicker-container').length + $('.my-datepicker').length + 1
-            @targetElement = $(options.input) # make sure it's an element, not a string
+            @_targetElement = $(options.input) # make sure it's an element, not a string
             @visibleFlg = false
             # initialize the date control
 
@@ -36,26 +36,26 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @options.format += ' hh:mm' if @options.time is 'mixed'
             dateUtil.setFirstDayOfWeek(@options.firstDayOfWeek) if @options.firstDayOfWeek > 0
 
-            if !@options.embedded and @targetElement?
-                @render(@targetElement)
-            else if @options.embedded and @targetElement?
+            if !@options.embedded and @_targetElement?
+                @render(@_targetElement)
+            else if @options.embedded and @_targetElement?
                 inputId = if @options.input then @options.input else 'myDatePicker' + @_mdpId
                 parent = if @options.embeddedId then @options.embeddedId else document.body
                 $(parent).append('<input type="hidden" id="'+inputId+'" name="'+inputId+'">')
                 @options.input = inputId
-                @targetElement = $(inputId)
+                @_targetElement = $(inputId)
                 @show()
 
         render : (input) ->
             super(input)
-            @targetElement = $(input)
-            @targetElement = @targetElement.find('input') unless @targetElement.is('input')
-            @options.popupBy = @targetElement
-            @options.onchange = @targetElement.onchange
+            @_targetElement = $(input)
+            @_targetElement = @_targetElement.find('input') unless @_targetElement.is('input')
+            @options.popupBy = @_targetElement
+            @options.onchange = @_targetElement.onchange
             unless @options.embedded
                 @keyPressHandler = (event) => @_keyPress(event)
-                @targetElement.keydown @keyPressHandler
-                @decorate @targetElement
+                @_targetElement.keydown @keyPressHandler
+                @decorate @_targetElement
 
         decorate : (element) ->
             width = $(element).width()
@@ -104,7 +104,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             parent = null
             style = ''
             if @options.embedded
-                parent = @targetElement.parent()
+                parent = @_targetElement.parent()
             else
                 parent = if @options.embeddedId then $(@options.embeddedId) else $(document.body)
                 style = 'position: absolute; visibility: hidden; left:0; top:0;'
@@ -129,7 +129,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 @_initButtonDivBehavior()
             @_initCalendarGrid()
             @_initHeaderDivBehavior()
-            @_updateHeader('&#160;')
             @setUseTime(@useTimeFlg)
             @_refresh()
 
@@ -170,9 +169,20 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
             idx = 0
             html = []
+            for i in [1..numberOfMonths]
+                html[idx++] = '<span id="mdpMonthYear-'+id+'_'+i+'" class="month-year">'
+                if @options.changeMonth
+                    html[idx++] = '<select class="month">'
+                    html[idx++] = '<option value="'+month+'">'+dateUtil.getMonthNames()[month]+'</option>' for month in [0..11]
+                    html[idx++] = '</select>';
+
+                if @options.changeYear
+                    html[idx++] = '<select class="year">';
+                    html[idx++] = '<option value="'+year+'">'+year+'</option>' for year in @_yearRange()
+                    html[idx++] = '</select>'
+                html[idx++] = '</span>'
             html[idx++] = '<a class="toolbar-button prev"><span class="icon" style="margin: 1px 0">&nbsp;</span></a>'
             html[idx++] = '<a class="toolbar-button next"><span class="icon" style="margin: 1px 0">&nbsp;</span></a>'
-            html[idx++] = '<span id="mdpSelectedDate_'+id+'" class="selected-date"></span>'
             headerDiv.append html.join('')
 
         ###
@@ -180,23 +190,18 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         ###
         _initHeaderDivBehavior : ->
             headerDiv = @_headerDiv
-            bodyDiv = @_bodyDiv
-            nextMonthButton = headerDiv.find('.next')
-            prevMonthButton = headerDiv.find('.prev')
 
-            nextMonthButton.click (event) =>
+            $('.next', headerDiv).click (event) =>
                 @_navMonth(@date.getMonth() + 1)
 
-            prevMonthButton.click (event) =>
+            $('.prev', headerDiv).click (event) =>
                 @_navMonth(@date.getMonth() - 1)
 
-            @monthSelect = bodyDiv.find('.month')
-            @monthSelect.change (event) =>
-                @_navMonth $(':selected', @monthSelect).val()
+            @monthSelect = $('.month', headerDiv)
+            @monthSelect.change => @_navMonth $(':selected', @monthSelect).val()
 
-            @yearSelect = bodyDiv.find('.year')
-            @monthSelect.change (event) =>
-                @_navYear $(':selected', @yearSelect).val()
+            @yearSelect = $('.year', headerDiv)
+            @yearSelect.change => @_navYear $(':selected', @yearSelect).val()
 
         ###
         # Initialize calendar months table.
@@ -211,30 +216,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             i = 0
             html[idx++] = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
             html[idx++] = '<thead>'
-            html[idx++] = '<tr class="headerRow">'
-            colspan = if showWeek then 8 else 7
-            for i in [1..numberOfMonths]
-                html[idx++] = '<th colspan="'+colspan+'">'
-                if @options.changeMonth
-                    html[idx++] = '<select class="month">'
-                    html[idx++] = '<option value="'+month+'">'+dateUtil.getMonthNames()[month]+'</option>' for month in [0..11]
-                    html[idx++] = '</select>';
-                else
-                    html[idx++] = '<span id="mdpMonthLabel-'+id+'_'+i+'" class="month-label">'
-                    html[idx++] = '</span>'
-
-                if @options.changeYear
-                    html[idx++] = '<select class="year">';
-                    html[idx++] = '<option value="'+year+'">'+year+'</option>' for year in @_yearRange()
-                    html[idx++] = '</select>'
-                else
-                    html[idx++] = '&nbsp;'
-                    html[idx++] = '<span id="mdpYearLabel-'+id+'_'+i+'" class="year-label">'
-                    html[idx++] = '</span>'
-
-                html[idx++] = '</th>'
-
-            html[idx++] = '</tr>'
             html[idx++] = '<tr class="weekDaysRow">'
             for i in [0...numberOfMonths]
                 if showWeek
@@ -364,7 +345,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_refreshMonthYear()
             @_refreshCalendarGrid()
             @_setSelectedClass()
-            @_updateHeader()
             @_applyKeyboardBehavior()
 
 
@@ -470,14 +450,18 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         # Refresh months and years at header bar area
         ###
         _refreshMonthYear : ->
+            id = @_mdpId
             month = @date.getMonth()
             year = @date.getFullYear()
             numberOfMonths = @options.numberOfMonths
+            totalWidth = @_calendarDiv.width()
+            width = totalWidth / numberOfMonths
             if @options.changeMonth
+                $('#mdpMonthYear-'+id+'_1').width(width).css('padding','3px 0')
                 @_setSelectBoxValue(@monthSelect, month)
             else
                 for i in [1..numberOfMonths]
-                    $('#mdpMonthLabel-'+@_mdpId+'_'+i).html(dateUtil.getMonthNames()[month])
+                    $('#mdpMonthYear-'+id+'_'+i).width(width).html(dateUtil.getMonthNames()[month])
                     if (month + 1) > 11
                         month = 0
                     else
@@ -493,7 +477,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             else
                 month = @date.getMonth()
                 for i in [1..numberOfMonths]
-                    $('#mdpYearLabel-'+@_mdpId+'_'+i).html(year)
+                    $('#mdpMonthYear-'+id+'_'+i).append('&nbsp;' + year)
                     if (month + 1) > 11
                         month = 0
                         year++
@@ -538,7 +522,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             hoverDate.setYear(cell.data('year'))
             hoverDate.setMonth(cell.data('month'))
             hoverDate.setDate(cell.data('day'))
-            @_updateHeader(dateUtil.format(hoverDate, @options.format)) if dateUtil.isDate(hoverDate)
             @_keys.setFocus(cell, false)
 
         ###
@@ -546,7 +529,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         ###
         _dayHoverOut : (cell) ->
             @_keys.removeFocus(cell)
-            @_updateHeader()
 
         ###
         # On click handler.
@@ -608,7 +590,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         # Returns selected date.
         ###
         _parseDate : ->
-            value = @targetElement.val().trim()
+            value = @_targetElement.val().trim()
             @selectionMade = (value != '')
             @date = if value == '' then NaN else dateUtil.parseString(@options.date or value, @options.format)
             @date = new Date() if isNaN(@date) or @date == null
@@ -619,28 +601,20 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @selectedDate = @date
 
         ###
-        # Updates calendar header text.
-        ###
-        _updateHeader : (text) ->
-            text = @dateString() unless text
-            $('#mdpSelectedDate-'+@_mdpId).html(text)
-
-        ###
         # Clears calendar date.
         ###
         clearDate : ->
-            return false if @targetElement.is(':disabled') or @targetElement.attr('readonly')
-            lastValue = @targetElement.val()
-            @targetElement.val('')
+            return false if @_targetElement.is(':disabled') or @_targetElement.attr('readonly')
+            lastValue = @_targetElement.val()
+            @_targetElement.val('')
             @_clearSelectedClass()
-            @_updateHeader('&#160;')
-            @_callback('onchange') if lastValue != @targetElement.val()
+            @_callback('onchange') if lastValue != @_targetElement.val()
 
         ###
         # Update selected date from calendar.
         ###
         _updateSelectedDate : (partsOrElement, viaClickFlg) ->
-            return if @targetElement.is(':disabled') or @targetElement.attr('readonly')
+            return if @_targetElement.is(':disabled') or @_targetElement.attr('readonly')
             @setUseTime(false)
             selectedDate = null
             if partsOrElement['day']
@@ -656,7 +630,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 @selectedDate = selectedDate
                 @selectionMade = true
 
-            @_updateHeader()
             @_setSelectedClass()
 
             if @selectionMade
@@ -664,12 +637,15 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 @validate()
 
             @_close() if @_closeOnClick()
-            @options.afterUpdate(@targetElement, selectedDate) if @options.afterUpdate
+            @options.afterUpdate(@_targetElement, selectedDate) if @options.afterUpdate
 
             return unless viaClickFlg and !@options.embedded
             @_close()
-            @targetElement.focus()
+            @_targetElement.focus()
 
+        ###
+        # Close on click handler
+        ###    
         _closeOnClick : ->
             return false if @options.embedded
             if @options.closeOnClick is null
@@ -721,9 +697,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         # Updates input element.
         ###
         _updateValue : ->
-            lastValue = @targetElement.val()
-            @targetElement.val(@dateString())
-            @_callback('onchange') if lastValue != @targetElement.val()
+            lastValue = @_targetElement.val()
+            @_targetElement.val(@dateString())
+            @_callback('onchange') if lastValue != @_targetElement.val()
 
         ###
         # Today button click handler.
@@ -780,7 +756,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         # Callback handler.
         ###
         _callback : (name, param) ->
-           @options[name].bind(@targetElement)(param) if @options[name]
+           @options[name].bind(@_targetElement)(param) if @options[name]
 
         ###
         # Apply keyboard behavior.
