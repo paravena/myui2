@@ -109,7 +109,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 parent = if @options.embeddedId then $(@options.embeddedId) else $(document.body)
                 style = 'position: absolute; visibility: hidden; left:0; top:0;'
 
-            style += 'width: 270px;' if @options.numberOfMonths is 1
+            style += 'width: 220px;' if @options.numberOfMonths is 1
 
             html[idx++] = '<div id="my-datepicker-div'+@_mdpId+'" class="my-datepicker shadow all-round-corners" style="'+style+'">'
             html[idx++] = '    <div class="my-datepicker-top" style="clear:left"></div>'
@@ -274,10 +274,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     [dateUtil.getAmPmHour(currentTime) + ' ' + dateUtil.getAmPm(currentTime), hour]
                 html[idx++] = '<option value="'+hour[1]+'">'+hour[0]+'</option>' for hour in timeItems
                 html[idx++] = '</select>'
-                html[idx++] = '<span class="separator">&nbsp;:&nbsp;</span>'
+                html[idx++] = '<span class="separator">:</span>'
                 html[idx++] = '<select class="minute">'
-                hours = [0..59].filter (min) =>
-                    min % @options.minuteInterval is 0
+                hours = [0..59].filter (min) => min % @options.minuteInterval is 0
                 timeItems = ([numberUtil.toPaddedString(min, 2), min] for min in hours)
                 html[idx++] = '<option value="'+min[1]+'">'+min[0]+'</option>' for min in timeItems
                 html[idx++] = '</select>'
@@ -287,18 +286,11 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
             if @options.buttons
                 html[idx++] = '<span class="button-controls">'
-                if @options.time == 'mixed' or !@options.time
-                    html[idx++] = '<a href="#" class="toolbar-button today-button"><span class="text">'+i18n.getMessage('label.today')+'</span></a>'
-
-                if @options.time
-                    html[idx++] = '<a href="#" class="toolbar-button now-button"><span class="text">'+i18n.getMessage('label.now')+'</span></a>'
-
                 if !@options.embedded and !@_closeOnClick()
                     html[idx++] = '<a href="#" class="toolbar-button close-button"><span class="text">'+i18n.getMessage('label.ok')+'</span></a>'
 
                 if @options.clearButton
                     html[idx++] = '<a href="#" class="toolbar-button clear-button"><span class="text">'+i18n.getMessage('label.clear')+'</span></a>'
-
                 html[idx++] = '</span>';
 
             footerDiv.append html.join('')
@@ -308,42 +300,21 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         ###
         _initButtonDivBehavior : ->
             footerDiv = @_footerDiv
-            @hourSelect = footerDiv.find('.hour')
-            @minuteSelect = footerDiv.find('.minute')
-
-            if @hourSelect
-                @hourSelect.change (event) =>
-                    @_updateSelectedDate {hour: $(':selected', @hourSelect).val()}
-
-            if @minuteSelect
-                @minuteSelect.change (event) =>
-                    @_updateSelectedDate {minute: $(':selected', @minuteSelect)}
-
-            todayButton = footerDiv.find('.today-button')
-            if todayButton
-                todayButton.click (event) => @_today(false)
-
-            nowButton = footerDiv.find('.now-button')
-            if nowButton
-                nowButton.click (event) => @_today(true)
-
-            closeButton = footerDiv.find('.close-button')
-            if closeButton
-                closeButton.click (event) => @_close()
-
-            clearButton = footerDiv.find('.clear-button')
-            if clearButton
-                clearButton.click (event) =>
-                    @clearDate()
-                    @_close() unless @options.embedded
-            return
+            @hourSelect = $('.hour', footerDiv)
+            @minuteSelect = $('.minute', footerDiv)
+            @hourSelect.change (event) => @_updateSelectedDate {hour: $(':selected', @hourSelect).val()}
+            @minuteSelect.change (event) => @_updateSelectedDate {minute: $(':selected', @minuteSelect)}
+            $('.close-button', footerDiv).click (event) => @_close()
+            $('.clear-button', footerDiv).click (event) =>
+                @clearDate()
+                @_close() unless @options.embedded
 
         ###
         # Refresh all areas od the calendar.
         ###
         _refresh : ->
-            @_refreshMonthYear()
             @_refreshCalendarGrid()
+            @_refreshMonthYear()
             @_setSelectedClass()
             @_applyKeyboardBehavior()
 
@@ -457,7 +428,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             totalWidth = @_calendarDiv.width()
             width = totalWidth / numberOfMonths
             if @options.changeMonth
-                $('#mdpMonthYear-'+id+'_1').width(width).css('padding','3px 0')
+                $('#mdpMonthYear-'+id+'_1').width(width).css('padding','2px 0')
                 @_setSelectBoxValue(@monthSelect, month)
             else
                 for i in [1..numberOfMonths]

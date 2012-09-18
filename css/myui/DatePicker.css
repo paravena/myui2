@@ -64,9 +64,10 @@
     display: inline-block;
     text-align: center;
     font-size: 12px;
-    width: 170px;
+    font-weight: bold;
     padding: 5px 0;
-    text-shadow: 0 1px 1px #ddd;
+    text-shadow: 1px 1px 0 white;
+    color: #333;
 }
 
 /*************************************************/
@@ -86,7 +87,7 @@
 }
 
 .my-datepicker-body td.week-number div {
-    background-color: #96dd3b;
+    background-color: fuchsia;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     border-radius: 2px;
@@ -131,6 +132,7 @@
 /* day under cursor */
 .my-datepicker-body td.focus div {
     background-color: #90c;
+    color : #fff;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     border-radius: 2px;
@@ -138,7 +140,7 @@
 }
 
 .my-datepicker-body td.focus {
-    color: white;
+    color: #fff;
 }
 
 /*************************************************/
@@ -146,12 +148,9 @@
 /*************************************************/
 .my-datepicker-footer {
     position: relative;
-    color: #609;
-    font-weight: bold;
     padding: 3px;
-    vertical-align: middle;
     background-color: #ddd;
-    height: 24px;
+    height: 27px;
 }
 
 .my-datepicker-footer select {
@@ -166,6 +165,14 @@
 
 .my-datepicker-footer .button-controls {
     float: right;
+}
+
+.my-datepicker-footer .separator {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 0;
+    text-shadow: 1px 1px 0 white;
+    color: #333;
 }
 
 .my-datepicker-select-button {
