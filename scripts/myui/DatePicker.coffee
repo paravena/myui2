@@ -579,7 +579,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         # Update selected date from calendar.
         ###
         _updateSelectedDate : (partsOrElement, viaClickFlg) ->
-            console.log item + ' = ' + partsOrElement[item] for item of partsOrElement
             return if @_targetElement.is(':disabled') or @_targetElement.attr('readonly')
             selectedDate = null
             if partsOrElement instanceof jQuery
