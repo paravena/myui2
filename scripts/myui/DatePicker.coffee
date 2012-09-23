@@ -21,10 +21,10 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 buttons: true,
                 clearButton: true,
                 yearRange: 10,
-                closeOnClick: null,
                 minuteInterval: 5,
                 changeMonth: false,
                 changeYear: false,
+                changeTime: false,
                 showWeek: false,
                 numberOfMonths : 1,
                 selectOtherMonth : true,
@@ -32,8 +32,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 firstDayOfWeek : 0 # Saturday is first
             }, options or {})
 
-            @useTimeFlg = @options.time is 'mixed'
-            @options.format += ' hh:mm' if @options.time is 'mixed'
+            @options.format += ' hh:mm' if @options.changeTime
             dateUtil.setFirstDayOfWeek(@options.firstDayOfWeek) if @options.firstDayOfWeek > 0
 
             if !@options.embedded and @_targetElement?
@@ -129,7 +128,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 @_initButtonDivBehavior()
             @_initCalendarGrid()
             @_initHeaderDivBehavior()
-            @setUseTime(@useTimeFlg)
+            @_updateTime(true)
             @_refresh()
 
 
@@ -224,7 +223,6 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                     else
                         html[idx++] = '<th>'+i18n.getMessage('label.week')+'</th>'
 
-
                 $.each dateUtil.getWeekDays(), (index, weekday) ->
                     if i > 0 and index % 7 is 0 and !showWeek
                         html[idx++] = '<th class="new-month-separator">'+weekday+'</th>'
@@ -264,9 +262,9 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             footerDiv = @_footerDiv
             idx = 0
             html = []
-            if @options.time
+            if @options.changeTime
                 html[idx++] = '<span class="time-controls">'
-                timeItems = [if @options.time is 'mixed' then [' - ', ''] else []]
+                timeItems = [[' - ', '']]
                 currentTime = new Date()
                 html[idx++] = '<select class="hour">'
                 timeItems = [0..23].map (hour) ->
@@ -281,14 +279,10 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 html[idx++] = '<option value="'+min[1]+'">'+min[0]+'</option>' for min in timeItems
                 html[idx++] = '</select>'
                 html[idx++] = '</span>'
-            else if !@options.buttons
-                footerDiv.remove()
 
-            if @options.buttons
+            if !@options.embedded
                 html[idx++] = '<span class="button-controls">'
-                if !@options.embedded and !@_closeOnClick()
-                    html[idx++] = '<a href="#" class="toolbar-button close-button"><span class="text">'+i18n.getMessage('label.ok')+'</span></a>'
-
+                html[idx++] = '<a href="#" class="toolbar-button close-button"><span class="text">'+i18n.getMessage('label.ok')+'</span></a>'
                 if @options.clearButton
                     html[idx++] = '<a href="#" class="toolbar-button clear-button"><span class="text">'+i18n.getMessage('label.clear')+'</span></a>'
                 html[idx++] = '</span>';
@@ -302,8 +296,8 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             footerDiv = @_footerDiv
             @hourSelect = $('.hour', footerDiv)
             @minuteSelect = $('.minute', footerDiv)
-            @hourSelect.change (event) => @_updateSelectedDate {hour: $(':selected', @hourSelect).val()}
-            @minuteSelect.change (event) => @_updateSelectedDate {minute: $(':selected', @minuteSelect)}
+            @hourSelect.change (event) => @_updateSelectedDate {'hour': $(':selected', @hourSelect).val(), 'minute': $(':selected', @minuteSelect).val()}
+            @minuteSelect.change (event) => @_updateSelectedDate {'hour': $(':selected', @hourSelect).val(), 'minute': $(':selected', @minuteSelect).val()}
             $('.close-button', footerDiv).click (event) => @_close()
             $('.clear-button', footerDiv).click (event) =>
                 @clearDate()
@@ -585,17 +579,19 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         # Update selected date from calendar.
         ###
         _updateSelectedDate : (partsOrElement, viaClickFlg) ->
+            console.log item + ' = ' + partsOrElement[item] for item of partsOrElement
             return if @_targetElement.is(':disabled') or @_targetElement.attr('readonly')
-            @setUseTime(false)
             selectedDate = null
-            if partsOrElement['day']
-                selectedDate = new Date(partsOrElement['year'], partsOrElement['month'], partsOrElement['day'])
+            if partsOrElement instanceof jQuery
+                selectedDate = new Date(partsOrElement.data('year'), partsOrElement.data('month'), partsOrElement.data('day'))
+            else
+                if partsOrElement['day']
+                    selectedDate = new Date(partsOrElement['year'], partsOrElement['month'], partsOrElement['day'])
+
                 if !isNaN(partsOrElement['hour']) and !isNaN(partsOrElement['minute'])
+                    selectedDate = new Date(@selectedDate.getTime()) if selectedDate is null # cloning selected date
                     selectedDate.setHours(partsOrElement['hour'])
                     selectedDate.setMinutes(mathUtil.floorToInterval(partsOrElement['minute'], @options.minuteInterval))
-                    @setUseTime(true)
-            else if partsOrElement instanceof jQuery
-                selectedDate = new Date(partsOrElement.data('year'), partsOrElement.data('month'), partsOrElement.data('day'))
 
             unless dateUtil.equals(selectedDate, @selectedDate)
                 @selectedDate = selectedDate
@@ -605,24 +601,13 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
             if @selectionMade
                 @_updateValue()
-                @validate()
 
-            @_close() if @_closeOnClick()
+            @_close()
             @options.afterUpdate(@_targetElement, selectedDate) if @options.afterUpdate
 
             return unless viaClickFlg and !@options.embedded
             @_close()
             @_targetElement.focus()
-
-        ###
-        # Close on click handler
-        ###    
-        _closeOnClick : ->
-            return false if @options.embedded
-            if @options.closeOnClick is null
-                return !@options.time
-
-            return @options.closeOnClick
 
         ###
         # Displays given month.
@@ -651,18 +636,16 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_callback('after_navigate', @date)
             return true;
 
-        setUseTime : (turnOnFlg) ->
+        ###
+        # Updates hour and minutes drop downs from selected date hour and minutes
+        ###
+        _updateTime : (turnOnFlg) ->
             return if @options.embedded
-            @useTimeFlg = true
-            @useTimeFlg = turnOnFlg if @options.time and @options.time == 'mixed'
-            if @useTimeFlg and @selectedDate # only set hour/minute if a date is already selected
+            if turnOnFlg and @options.changeTime and @selectedDate # only set hour/minute if a date is already selected
                 minute = mathUtil.floorToInterval(@selectedDate.getMinutes(), @options.minuteInterval)
                 hour = @selectedDate.getHours()
                 @hourSelect.val(hour)
                 @minuteSelect.val(minute)
-            else if @options.time == 'mixed'
-                @hourSelect.val('')
-                @minuteSelect.val('')
 
         ###
         # Updates input element.
