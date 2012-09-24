@@ -110,7 +110,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 @_makeAllColumnsResizable()
                 @_makeAllColumnDraggable() if @options.addDraggingBehavior
                 @_applySettingMenuBehavior() if @options.addSettingBehavior
-                @keys = new KeyTable(@) # TODO verify if this is correct
+                @keys = new KeyTable(@)
                 @_addKeyBehavior()
                 @_addPagerBehavior() if @pager
                 @options.afterRender() if @options.afterRender?
@@ -305,8 +305,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _createRow : (row, rowIdx) ->
             id = @_mtgId
-            tdTmpl = '<td id="mtgC{id}_c{x}r{y}" height="{height}" width="{width}" style="width:{width}px;height:{height}px;padding:0;margin:0;display:{display}" class="tablegrid-cell mtgC{id} mtgC{id}_c{x} mtgR{id}_r{y}">'
-            icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;padding:3px;text-align:{align}" class="tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
+            tdTmpl = '<td id="mtgC{id}_c{x}r{y}" height="{height}" width="{width}" style="width:{width}px;height:{height}px;display:{display}" class="tablegrid-cell mtgC{id} mtgC{id}_c{x} mtgR{id}_r{y}">'
+            icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;text-align:{align}" class="tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
             checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x} mtgInputCheckbox" checked="{checked}">'
             radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x} mtgInputRadio">'
             rs = @options.rowStyle # row style handler
@@ -847,7 +847,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         ihc = $(th).find('div.tablegrid-inner-header-cell')
                         ihc.attr('id', 'mtgIHC' + id + '_c' + index)
                         ihc.find('span').attr('id', 'mtgSortIcon' + id + '_c' + index)
-                        hs = $(th).find('div.mtgHS')
+                        hs = $(th).find('div.header-separator')
                         hs.attr('id', 'mtgHS' + id + '_c' + index)
                     catch ihc_ex
                         # exception of ihc.find('div') being non existant
@@ -1232,7 +1232,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         @bodyTable = $('#mtgBT' + @_mtgId)
                         if tableModel.rows.length > 0 and !firstTimeFlg
                             @_applyCellCallbacks()
-                            @keys = new KeyTable(@) # TODO not sure if this work
+                            @keys = new KeyTable(@)
                             @_addKeyBehavior()
 
                         if @pager?
@@ -1749,12 +1749,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Creates header row
         ###
         _createHeaderRow : ->
-            thTmpl = '<th id="mtgHC{id}_c{x}" colspan="{colspan}" rowspan="{rowspan}" width="{width}" height="{height}" style="position:relative;width:{width}px;height:{height}px;padding:0;margin:0;border-bottom-color:{color};display:{display}" class="tablegrid-header-cell mtgHC{id}">'
-            thTmplLast = '<th id="mtgHC{id}_c{x}" colspan="{colspan}" rowspan="{rowspan}" width="{width}" height="{height}" style="width:{width}px;height:{height}px;padding:0;margin:0;border-right:none;border-bottom:1px solid #ccc;" class="tablegrid-header-cell mtgHC{id}">'
-            ihcTmpl = '<div id="mtgIHC{id}_c{x}" class="tablegrid-inner-header-cell mtgIHC{id}" style="float:left;width:{width}px;height:{height}px;padding:4px 3px;z-index:20">'
-            ihcTmplLast = '<div class="tablegrid-inner-header-cell" style="position:relative;width:{width}px;height:{height}px;padding:3px;z-index:20">'
-            hsTmpl = '<div id="mtgHS{id}_c{x}" class="mtgHS mtgHS{id}" style="float:right;width:1px;height:{height}px;z-index:30">'
-            siTmpl = '<span id="mtgSortIcon{id}_c{x}" style="width:8px;height:4px;visibility:hidden">&nbsp;&nbsp;&nbsp;</span>'
+            thTmpl = '<th id="mtgHC{id}_c{x}" colspan="{colspan}" rowspan="{rowspan}" width="{width}" height="{height}" style="width:{width}px;height:{height}px;border-bottom-color:{color};display:{display}" class="tablegrid-header-cell mtgHC{id}">'
+            thTmplLast = '<th id="mtgHC{id}_c{x}" colspan="{colspan}" rowspan="{rowspan}" width="{width}" height="{height}" style="width:{width}px;height:{height}px;border-right:none;" class="tablegrid-header-cell mtgHC{id}">'
+            ihcTmpl = '<div id="mtgIHC{id}_c{x}" class="tablegrid-inner-header-cell mtgIHC{id}" style="width:{width}px;height:{height}px;">'
+            ihcTmplLast = '<div class="tablegrid-inner-header-cell" style="width:{width}px;height:{height}px;">'
+            hsTmpl = '<div id="mtgHS{id}_c{x}" class="header-separator mtgHS{id}" style="height:{height}px;">'
+            siTmpl = '<span id="mtgSortIcon{id}_c{x}" class="sort-icon">&nbsp;&nbsp;&nbsp;</span>'
             cm = @_columnModel
             id = @_mtgId
             rnl = @rnl #row nested level

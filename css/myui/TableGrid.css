@@ -143,6 +143,8 @@ th.tablegrid-header-cell {
     border-bottom-color: #ddd;
     color: #696969;
     text-shadow: 1px 1px 0 #ddd;
+    margin: 0;
+    padding: 0;
 }
 
 th div.tablegrid-inner-header-cell {
@@ -152,6 +154,21 @@ th div.tablegrid-inner-header-cell {
     height: 18px;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding: 4px 3px;
+    float: left;
+    text-align: left;
+}
+
+div.header-separator {
+    float: right;
+    width: 1px;
+    z-index: 30;
+}
+
+span.sort-icon {
+    width: 8px;
+    height: 4px;
+    visibility: hidden;
 }
 
 div.tablegrid-header-separator {
@@ -191,7 +208,7 @@ div.tablegrid-column-move-bottom {
     visibility: hidden
 }
 
- /* Body definition */
+/* Body definition */
 div.tablegrid-body {
     border: solid 1px #ccc;
     border-top: solid 1px #eee;
@@ -203,15 +220,12 @@ table.tablegrid-body-table {
     z-index: 0;
 }
 
-table.tablegrid-body-table td  {
-    border-bottom: solid 1px #ddd;
-    padding: 0;
-}
-
 td.tablegrid-cell {
     border-left: 1px solid transparent;
-    /*border-left: 1px solid transparent;*/
     border-right: 1px solid #ddd;
+    border-bottom: solid 1px #ddd;
+    padding: 0;
+    margin: 0;
 }
 
 td div.tablegrid-inner-cell {
@@ -220,6 +234,7 @@ td div.tablegrid-inner-cell {
     font-size: 11px;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding: 3px;
 }
 
 tr.hightlight {
@@ -237,10 +252,6 @@ td.focus {
 td.focus div.tablegrid-inner-cell {
     background-color: #90c;
     color: white;
-}
-
-td div.more {
-   background: url(images/more.gif) no-repeat right bottom;
 }
 
 div.tablegrid-resize-marker {
