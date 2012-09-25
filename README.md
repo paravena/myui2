@@ -31,6 +31,6 @@ Samples
 --------
 * This is a first sample, you can review it <a href="http://jsfiddle.net/paravena/Cysu8/embedded/result,js,html/">here</a>
 
-* Second sample showing nested header columns, you can review it <a href="http://jsfiddle.net/paravena/3raSc/embedded/result,js,html/">here</a>
+* Second sample showing nested header columns, you can review it <a href="http://jsfiddle.net/paravena/3raSc/4/embedded/result,js,html/">here</a>
 
 
