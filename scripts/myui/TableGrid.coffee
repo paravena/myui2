@@ -22,7 +22,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 afterRender : null,
                 onFailure : null,
                 rowStyle : ( ->  return ''),
-                rowClass : ( ->  return ''),
+                rowClass : ((rowIdx) ->  return if rowIdx % 2 == 0 then 'hightlight' else ''),
                 addSettingBehavior : true,
                 addDraggingBehavior : true,
                 addLazyRenderingBehavior : true,
@@ -444,10 +444,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor = cm[i].editor
                 if (editor == 'radio' or editor instanceof TableGrid.CellRadioButton) or
                    (editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox)
-                    unless editor.selectable
-                        do (editor, i) =>
-                            element = $('#mtgInput'+id + '_c' + i + 'r' + y)
-                            innerElement = $('#mtgIC'+id + '_c' + i + 'r' + y)
+                    element = $('#mtgInput'+id + '_c' + i + 'r' + y)
+                    innerElement = $('#mtgIC'+id + '_c' + i + 'r' + y)
+                    do (editor, i, element, innerElement) =>
+                        unless editor.selectable
                             element.on 'click', =>
                                 elementId = element.attr('id')
                                 match = elementId.match(/_c(\d*?)r(\-?\d*?)/)
@@ -457,8 +457,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                                 value = editor.getValueOf(element.is(':checked')) if editor.getValueOf?
                                 @setValueAt(value, x, y, false);
                                 @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1  # if doesn't exist in the array the row is registered
-                    editor.onClickCallback(element.value, element.is(':checked')) if editor.onClickCallback?
-                    innerElement.addClass('modified-cell') unless editor.selectable
+                        editor.onClickCallback(element.value, element.is(':checked')) if editor.onClickCallback?
+                        innerElement.addClass('modified-cell') unless editor.selectable
 
         ###
         # Returns TableGrid id.
@@ -1217,9 +1217,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             $.ajax({
                 url : @url,
                 data : @request,
-                context : @, # TODO here it maybe will be a problem
                 dataType : 'json',
-                complete : (response) ->
+                complete : (response) =>
                     tableModel = $.parseJSON(response.responseText)
                     try
                         @rows = tableModel.rows or []
