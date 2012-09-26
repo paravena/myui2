@@ -67,6 +67,11 @@ define ['jquery', 'myui/i18n'], ($, i18n) ->
            newArr.push arr[i]
         return newArr
 
+
+    template = (str , params) ->
+        str = str.replace(new RegExp('{'+p+'}','g'), params[p]) for p of params
+        return str
+
     preferAmericanFormat = true # TODO check this
 
     date =
@@ -499,5 +504,6 @@ define ['jquery', 'myui/i18n'], ($, i18n) ->
         date : date
         event : event
         number : number
+        template : template
 
     $.util = util

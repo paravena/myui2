@@ -1,4 +1,7 @@
 define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myui/TextField', 'cs!myui/BrowseInput', 'cs!myui/Autocompleter', 'cs!myui/ComboBox', 'cs!myui/DatePicker', 'myui/i18n'], ($, jquerypp, Util, KeyTable, TextField, BrowseInput, Autocompleter, ComboBox, DatePicker, i18n) ->
+    eventUtil = $.util.event
+    template = $.util.template
+
     class TableGrid
         ###
         # TableGrid constructor
@@ -334,30 +337,15 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
                 alignment = cm[j].align if cm[j].hasOwnProperty('align')
                 display = 'none' if !cm[j].visible
-                temp = tdTmpl.replace(/\{id\}/g, id)
-                temp = temp.replace(/\{x\}/g, j)
-                temp = temp.replace(/\{y\}/g, rowIdx)
-                temp = temp.replace(/\{width\}/g, cellWidth)
-                temp = temp.replace(/\{height\}/g, cellHeight)
-                temp = temp.replace(/\{display\}/g, display)
-                html[idx++] = temp
-                temp = icTmpl.replace(/\{id\}/g, id)
-                temp = temp.replace(/\{x\}/g, j)
-                temp = temp.replace(/\{y\}/g, rowIdx)
-                temp = temp.replace(/\{width\}/, iCellWidth)
-                temp = temp.replace(/\{height\}/, iCellHeight)
-                temp = temp.replace(/\{align\}/, alignment)
-                html[idx++] = temp
+                html[idx++] = template(tdTmpl, {'id' : id, 'x': j, 'y': rowIdx, 'width' : cellWidth, 'height' : cellHeight, 'display' : display})
+                html[idx++] = template(icTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'width' : iCellWidth, 'height' : iCellHeight, 'align' : alignment})
                 if normalEditorFlg # checkbox is an special case
                     if !cm[j].hasOwnProperty('renderer')
                         html[idx++] = row[columnId]
                     else
                         html[idx++] = cm[j].renderer(row[columnId], @getRow(rowIdx))
                 else if editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox
-                    temp = checkboxTmpl.replace(/\{id\}/g, id)
-                    temp = temp.replace(/\{x\}/g, j)
-                    temp = temp.replace(/\{y\}/g, rowIdx)
-                    temp = temp.replace(/\{value\}/, row[columnId])
+                    temp = template(checkboxTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId]})
                     if editor.selectable is undefined or !editor.selectable
                         selectAllFlg = cm[j].selectAllFlg
                         if editor.hasOwnProperty('getValueOf')
@@ -376,14 +364,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                             temp = temp.replace(/\{checked\}/, 'checked')
                         else
                             temp = temp.replace(/checked=.*?>/, '>')
-
                     html[idx++] = temp
                 else if (editor == 'radio' or editor instanceof TableGrid.CellRadioButton)
-                    temp = radioTmpl.replace(/\{id\}/g, id)
-                    temp = temp.replace(/\{x\}/g, j)
-                    temp = temp.replace(/\{y\}/g, rowIdx)
-                    temp = temp.replace(/\{value\}/, row[columnId])
-                    html[idx++] = temp
+                    html[idx++] = template(radioTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId]})
                 else if editor instanceof ComboBox
                     if !cm[j].hasOwnProperty('renderer')
                         listTextPropertyName = cm[j].editor.options.listTextPropertyName
@@ -1781,35 +1764,19 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         cell.height = rowspan * (@cellHeight + 2)
                         x = @_getNextIndexPosition(x)
                         display = if !cell.visible then 'none' else ''
-                        temp = thTmpl.replace(/\{id\}/g, id)
-                        temp = temp.replace(/\{x\}/g, x)
-                        temp = temp.replace(/\{colspan\}/g, colspan)
-                        temp = temp.replace(/\{rowspan\}/g, rowspan)
-                        temp = temp.replace(/\{color\}/g, '#ccc')
-                        temp = temp.replace(/\{display\}/g, display)
-
+                        temp = thTmpl
                         cellWidth = cell.width or '80'
                         cellWidth = parseInt(cellWidth)
-                        temp = temp.replace(/\{width\}/g, cellWidth)
-                        temp = temp.replace(/\{height\}/g, cell.height)
-                        html[idx++] = temp
-
-                        temp = ihcTmpl.replace(/\{id\}/g, id)
-                        temp = temp.replace(/\{x\}/g, x)
-                        temp = temp.replace(/\{width\}/g,  cellWidth - 8)
-                        temp = temp.replace(/\{height\}/g, cell.height - 6)
-                        html[idx++] = temp
+                        html[idx++] = template(temp, {'id' : id, 'x': x, 'colspan': colspan, 'rowspan' : rowspan, 'display' : display, 'width' : cellWidth, 'height' : cell.height, 'color' : '#ccc'})
+                        temp = ihcTmpl
+                        html[idx++] = template(temp, {'id' : id, 'x' : x, 'width' : (cellWidth - 8), 'height' : (cell.height - 6)})
                         html[idx++] = row[j].title
                         html[idx++] = '&nbsp;'
-                        temp = siTmpl.replace(/\{id\}/g, id)
-                        temp = temp.replace(/\{x\}/g, x)
-                        html[idx++] = temp
+                        temp = siTmpl
+                        html[idx++] = template(temp, {'id' : id, 'x' : x})
                         html[idx++] = '</div>'
-
-                        temp = hsTmpl.replace(/\{id\}/g, id)
-                        temp = temp.replace(/\{x\}/g, x)
-                        temp = temp.replace(/\{height\}/g, cell.height)
-                        html[idx++] = temp
+                        temp = hsTmpl
+                        html[idx++] = template(temp, {'id' : id, 'x' : x, 'height' : cell.height})
                         html[idx++] = '&nbsp;'
                         html[idx++] = '</div>'
                         html[idx++] = '</th>'
@@ -1841,17 +1808,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 # end for
 
                 if i == 0  # Last Header Element added in nested level 0
-                    temp = thTmplLast.replace(/\{id\}/g, id)
-                    temp = temp.replace(/\{x\}/g, @filledPositions.length)
-                    temp = temp.replace(/\{colspan\}/g, '1')
-                    temp = temp.replace(/\{rowspan\}/g, rnl)
-                    temp = temp.replace(/\{width\}/g, 20)
-                    temp = temp.replace(/\{height\}/g, rnl*@cellHeight)
-                    html[idx++] = temp
-                    temp = ihcTmplLast.replace(/\{id\}/g, id)
-                    temp = temp.replace(/\{height\}/g, rnl*@cellHeight-6)
-                    temp = temp.replace(/\{width\}/g, 14)
-                    html[idx++] = temp
+                    temp = thTmplLast
+                    html[idx++] = template(temp, {'id' : id, 'x' : @filledPositions.length, 'colspan' : '1', 'rowspan' : rnl, 'width' : 20, 'height' : rnl*@cellHeight})
+                    temp = ihcTmplLast
+                    html[idx++] = template(temp, {'id' : id, 'height' : (rnl*@cellHeight-6), 'width' : 14})
                     html[idx++] = '&nbsp;'
                     html[idx++] = '</div>'
                     html[idx++] = '</th>'
