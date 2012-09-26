@@ -2,7 +2,7 @@ MyUI2
 ===============================
 This project is second phase from the one I have begun working two years ago <a href="http://pabloaravena.info">MYUI</a>. Now UI controls are implemented using CoffeeScript and JQuery as main tools and for gluing the code I'm using RequireJS.
 
-Route Map
+Road Map
 -------------------------
 Soon I will finish the migration from old Prototype to CoffeeScript and JQuery. Following tasks are:
 
@@ -29,6 +29,8 @@ node r.js -o build.css.js
 
 Samples
 --------
-This is a first sample you can review <a href="http://jsfiddle.net/paravena/Cysu8/embedded/result,js,html/">here</a>
+* This is a first sample, you can review it <a href="http://jsfiddle.net/paravena/Cysu8/embedded/result,js,html/">here</a>
+
+* Second sample showing nested header columns, you can review it <a href="http://jsfiddle.net/paravena/3raSc/4/embedded/result,js,html/">here</a>
 
 
