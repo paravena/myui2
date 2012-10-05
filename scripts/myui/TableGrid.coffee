@@ -62,9 +62,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @_columnModel = @hb.getLeafElements()
             for i in [0...@_columnModel.length]
                 @_columnModel[i].editor = new TextField() if !@_columnModel[i].hasOwnProperty('editor')
+                @_columnModel[i].editor = new TableGrid.CellCheckbox() if @_columnModel[i].editor is 'checkbox'
+                @_columnModel[i].editor = new TableGrid.CellRadioButton() if @_columnModel[i].editor is 'radio'
                 if !@_columnModel[i].hasOwnProperty('editable')
                     @_columnModel[i].editable = false
-                    @_columnModel[i].editable = true if @_columnModel[i].editor == 'checkbox' or @_columnModel[i].editor instanceof TableGrid.CellCheckbox or @_columnModel[i].editor == 'radio' or @_columnModel[i].editor instanceof TableGrid.CellRadioButton
+                    @_columnModel[i].editable = true if @_columnModel[i].editor instanceof TableGrid.CellCheckbox or @_columnModel[i].editor instanceof TableGrid.CellRadioButton
                 @_columnModel[i].visible = true if !@_columnModel[i].hasOwnProperty('visible')
                 @_columnModel[i].sortable= true if !@_columnModel[i].hasOwnProperty('sortable')
                 @_columnModel[i].type = 'string' if !@_columnModel[i].hasOwnProperty('type')
@@ -326,7 +328,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 cellWidth = parseInt(cm[j].width) # consider border at both sides
                 iCellWidth = cellWidth - 6 # consider padding at both sides
                 editor = cm[j].editor or null
-                normalEditorFlg = !(editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor == 'radio' or editor instanceof TableGrid.CellRadioButton or editor instanceof ComboBox)
+                normalEditorFlg = !(editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton or editor instanceof ComboBox)
                 alignment = 'left'
                 display = '\'\''
                 if !cm[j].hasOwnProperty('renderer')
@@ -344,7 +346,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         html[idx++] = row[columnId]
                     else
                         html[idx++] = cm[j].renderer(row[columnId], @getRow(rowIdx))
-                else if editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox
+                else if editor instanceof TableGrid.CellCheckbox
                     temp = template(checkboxTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId]})
                     if editor.selectable is undefined or !editor.selectable
                         selectAllFlg = cm[j].selectAllFlg
@@ -365,7 +367,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         else
                             temp = temp.replace(/checked=.*?>/, '>')
                     html[idx++] = temp
-                else if (editor == 'radio' or editor instanceof TableGrid.CellRadioButton)
+                else if editor instanceof TableGrid.CellRadioButton
                     html[idx++] = template(radioTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId]})
                 else if editor instanceof ComboBox
                     if !cm[j].hasOwnProperty('renderer')
@@ -425,8 +427,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             cm = @_columnModel
             for i in [0...cm.length]
                 editor = cm[i].editor
-                if (editor == 'radio' or editor instanceof TableGrid.CellRadioButton) or
-                   (editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox)
+                if editor instanceof TableGrid.CellRadioButton or editor instanceof TableGrid.CellCheckbox
                     element = $('#mtgInput'+id + '_c' + i + 'r' + y)
                     innerElement = $('#mtgIC'+id + '_c' + i + 'r' + y)
                     do (editor, i, element, innerElement) =>
@@ -905,7 +906,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             value = @getValueAt(x, y)
             editor = @_columnModel[x].editor or 'input'
             input = null
-            isInputFlg = !(editor == 'radio' or editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
+            isInputFlg = !(editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
           
             if isInputFlg
                 element.css('height', @options.cellHeight + 'px')
@@ -933,7 +934,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor.validate() if editor.validate
                 input.focus()
                 input.select()
-            else if editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox
+            else if editor instanceof TableGrid.CellCheckbox
                 input = $('#mtgInput' + id + '_c' + x + 'r' + y)
                 isChecked = !input.is(':checked')
                 if isChecked then input.attr('checked', 'checked') else input.removeAttr('checked')
@@ -945,7 +946,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 @keys._isInputFocusedFlg = false
                 @editedCellId = null
                 innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
-            else if editor == 'radio' or editor instanceof TableGrid.CellRadioButton
+            else if editor instanceof TableGrid.CellRadioButton
                 input = $('#mtgInput' + id + '_c' + x + 'r' + y)
                 isChecked = !input.is(':checked')
                 if isChecked then input.attr('checked', 'checked') else input.removeAttr('checked')
@@ -982,7 +983,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             columnId = cm[x].id
             alignment = if type == 'number' then 'right' else 'left'
           
-            isInputFlg = !(editor == 'radio' or editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
+            isInputFlg = !(editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
             if isInputFlg
                 editor.hide() if editor.hide? # this only happen when editor is a Combobox
                 return false if editor instanceof DatePicker and editor.visibleFlg
@@ -1037,7 +1038,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor = cm[columnIndex].editor
                 sortable = cm[columnIndex].sortable
                 hbHeight = cm[columnIndex].height
-                if sortable or editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox
+                if sortable or editor instanceof TableGrid.CellCheckbox
                     hc = element.parent('th') # header column
                     leftPos = hc.position().left + hc.outerWidth()
                     leftPos = leftPos - 16 - @scrollLeft
@@ -1071,7 +1072,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         $('#mtgSortAsc' + id).hide()
 
                     selectAllItem = $('#mtgHBM' + id + ' .mtgSelectAll:first')
-                    if @renderedRows > 0 and (cm[columnIndex].editor == 'checkbox' or cm[columnIndex].editor instanceof TableGrid.CellCheckbox)
+                    if @renderedRows > 0 and cm[columnIndex].editor instanceof TableGrid.CellCheckbox
                         selectAllItem.find('input').attr('checked', cm[columnIndex].selectAllFlg)
                         selectAllItem.show()
                         selectAllItem.on 'click', => # onclick handler
@@ -1401,7 +1402,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             newRowsAdded = @newRowsAdded
 
             if refreshValueFlg == undefined or refreshValueFlg
-                if editor != null and (editor == 'checkbox' or editor instanceof TableGrid.CellCheckbox or editor == 'radio' or editor instanceof TableGrid.CellRadioButton)
+                if editor != null and (editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
                     input = $('#mtgInput'+id+'_c'+x+'r'+y)
                     if editor.hasOwnProperty('getValueOf')
                         trueVal = editor.getValueOf(true)
@@ -1521,7 +1522,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             selectAllFlg = false
             if idx == -1
                 for column in cm
-                    if column.editor == 'checkbox' or column.editor instanceof TableGrid.CellCheckbox and column.editor.selectable
+                    if column.editor instanceof TableGrid.CellCheckbox and column.editor.selectable
                         idx = column.positionIndex
                         selectAllFlg = column.selectAllFlg
                         break
