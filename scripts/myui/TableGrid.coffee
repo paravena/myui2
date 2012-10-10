@@ -436,12 +436,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                                 elementId = element.attr('id')
                                 match = elementId.match(/_c(\d*?)r(\-?\d*?)/)
                                 x = parseInt(match[1]);
-                                y = parseInt(match[2]);
                                 value = element.is(':checked')
                                 value = editor.getValueOf(element.is(':checked')) if editor.getValueOf?
                                 @setValueAt(value, x, y, false);
                                 @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1  # if doesn't exist in the array the row is registered
-                        editor.onClickCallback(element.value, element.is(':checked')) if editor.onClickCallback?
+                        editor.onClick(element.val(), element.is(':checked')) if editor.onClick?
                         innerElement.addClass('modified-cell') unless editor.selectable
 
         ###
@@ -942,7 +941,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     value = editor.getValueOf(isChecked) if editor.hasOwnProperty('getValueOf')
                     @setValueAt(value, x, y, false)
                     @modifiedRows.push(y) if y >= 0 and y < @rows.length and @modifiedRows.indexOf(y) == -1 # if doesn't exist in the array the row is registered
-                editor.onClickCallback(value, isChecked) if editor instanceof TableGrid.CellCheckbox and editor.onClickCallback?
+                editor.onClick(value, isChecked) if editor instanceof TableGrid.CellCheckbox and editor.onClick?
                 @keys._isInputFocusedFlg = false
                 @editedCellId = null
                 innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
@@ -953,7 +952,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 value = editor.getValueOf(isChecked) if editor.hasOwnProperty('getValueOf')
                 @setValueAt(value, x, y, false)
                 @modifiedRows.push(y) if y >= 0 and y < @rows.length and @modifiedRows.indexOf(y) == -1 #if doesn't exist in the array the row is registered
-                editor.onClickCallback(value, isChecked) if editor instanceof TableGrid.CellRadioButton and editor.onClickCallback?
+                editor.onClick(value, isChecked) if editor instanceof TableGrid.CellRadioButton and editor.onClick?
                 @keys._isInputFocusedFlg = false
                 @editedCellId = null
                 innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
@@ -1044,9 +1043,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     leftPos = leftPos - 16 - @scrollLeft
                     if leftPos < @bodyDiv[0].clientWidth
                         headerButton.css({
-                            'top' : (topPos + 3 - hbHeight) + 'px',
+                            'top' : (topPos + 4 - hbHeight) + 'px',
                             'left' : leftPos + 'px',
-                            'height' : hbHeight + 'px',
+                            'height' : (hbHeight - 1) + 'px',
                             'visibility' : 'visible'
                         })
 
@@ -1697,23 +1696,27 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             return result
     #end TableGrid
 
-    TableGrid.ADD_BTN = 1
-    TableGrid.DEL_BTN = 4
-    TableGrid.SAVE_BTN = 8
-
     class TableGrid.CellCheckbox
         constructor : (options) ->
-            options = options or {}
-            @onClickCallback = options.onClick or null
-            @selectable = options.selectable or false
-            @getValueOf = options.getValueOf if options.getValueOf?
+            options = $.extend({
+                onClick : null,
+                getValueOf : null,
+                selectable : null
+            }, options or {})
+            @onClick = options.onClick
+            @getValueOf = options.getValueOf
+            @selectable = options.selectable
 
     class TableGrid.CellRadioButton
         constructor : (options) ->
-            options = options or {}
-            @onClickCallback = options.onClick or null
-            @selectable = options.selectable or false
-            @getValueOf = options.getValueOf if options.getValueOf?
+            options = $.extend({
+                onClick : null,
+                getValueOf : null,
+                selectable : null
+            }, options or {})
+            @onClick = options.onClick
+            @getValueOf = options.getValueOf
+            @selectable = options.selectable
 
     class HeaderBuilder
         constructor: (id, cm) ->

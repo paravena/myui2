@@ -141,7 +141,6 @@ th.tablegrid-header-cell {
     border: 1px solid transparent;
     border-right-color: #ddd;
     border-bottom-color: #ddd;
-    color: #696969;
     text-shadow: 1px 1px 0 #ddd;
     margin: 0;
     padding: 0;
@@ -238,7 +237,7 @@ td div.tablegrid-inner-cell {
 }
 
 tr.hightlight {
-    background-color: #eef;
+    background-color: #eee;
 }
 
 tr.focus {
