@@ -1,6 +1,7 @@
 define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myui/TextField', 'cs!myui/BrowseInput', 'cs!myui/Autocompleter', 'cs!myui/ComboBox', 'cs!myui/DatePicker', 'myui/i18n'], ($, jquerypp, Util, KeyTable, TextField, BrowseInput, Autocompleter, ComboBox, DatePicker, i18n) ->
     eventUtil = $.util.event
     template = $.util.template
+    arrayUtil = $.util.array
 
     class TableGrid
         ###
@@ -106,20 +107,23 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @scrollLeft = 0
             @scrollTop = 0
             @targetColumnId = null
+            @alreadyLoadedFlg = false
           
             @bodyDiv.bind 'dom:dataLoaded', =>
                 @_showLoaderSpinner()
                 @bodyTable = $('#mtgBT' + id)
-                @_applyCellCallbacks()
-                @_applyHeaderButtons()
-                @_makeAllColumnsResizable()
-                @_makeAllColumnDraggable() if @options.addDraggingBehavior
-                @_applySettingMenuBehavior() if @options.addSettingBehavior
+                if !@alreadyLoadedFlg
+                    @_applyCellCallbacks()
+                    @_applyHeaderButtons()
+                    @_makeAllColumnsResizable()
+                    @_makeAllColumnDraggable() if @options.addDraggingBehavior
+                    @_applySettingMenuBehavior() if @options.addSettingBehavior
                 @keys = new KeyTable(@)
                 @_addKeyBehavior()
                 @_addPagerBehavior() if @pager
                 @options.afterRender() if @options.afterRender?
                 @_hideLoaderSpinner()
+                @alreadyLoadedFlg = true
           
             setTimeout(( =>
                 @renderedRowsAllowed = Math.floor((@bodyHeight - @scrollBarWidth - 3)  / @options.cellHeight) + 1
@@ -1117,18 +1121,44 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _sortData : (idx, ascDescFlg) ->
             cm = @_columnModel
+            return if !cm[idx].sortable
             id = @_mtgId
-            if cm[idx].sortable
-                $('#mtgSortIcon'+id+'_c'+idx).attr('class', if (ascDescFlg == 'ASC') then 'tablegrid-sort-asc-icon' else 'tablegrid-sort-desc-icon')
+            $('#mtgSortIcon'+id+'_c'+idx).attr('class', if (ascDescFlg == 'ASC') then 'tablegrid-sort-asc-icon' else 'tablegrid-sort-desc-icon')
+            $('#mtgSortIcon'+id+'_c'+@sortedColumnIndex).css('visibility', 'hidden')
+            $('#mtgIHC'+id+'_c'+@sortedColumnIndex).css('color', 'dimgray')
+            $('#mtgSortIcon'+id+'_c'+idx).css('visibility', 'visible')
+            $('#mtgIHC'+id+'_c'+idx).css('color', 'black')
+            if @url
                 @request[@options.sortColumnParameter] = cm[idx].id;
                 @request[@options.ascDescFlagParameter] = ascDescFlg;
                 @_retrieveDataFromUrl(1)
-                $('#mtgSortIcon'+id+'_c'+@sortedColumnIndex).css('visibility', 'hidden')
-                $('#mtgIHC'+id+'_c'+@sortedColumnIndex).css('color', 'dimgray')
-                $('#mtgSortIcon'+id+'_c'+idx).css('visibility', 'visible')
-                $('#mtgIHC'+id+'_c'+idx).css('color', 'black')
-                @sortedColumnIndex = idx
-                cm[idx].sortedAscDescFlg = ascDescFlg
+            else if @rows and @rows.length > 0
+                columnValues = @getColumnValues(cm[idx].id, false)
+                hashIndex = {}
+                word = null
+                i = 0
+                for word in columnValues
+                    if hashIndex[word] is undefined
+                        hashIndex[word] = []
+                    hashIndex[word].push(i++)
+                columnValues = columnValues.sort()
+                columnValues = columnValues.reverse() if ascDescFlg is 'DESC'
+                result = []
+                rows = @rows
+                positions = null
+                pos = null
+                columnValues = arrayUtil.unique(columnValues)
+                for word in columnValues
+                    positions = hashIndex[word]
+                    result.push(rows[pos]) for pos in positions
+                @rows = result
+                @renderedRows = 0
+                @innerBodyDiv.html(@_createTableBody(@rows))
+                @pagerDiv.html(@_updatePagerInfo()) if @pager
+                @bodyDiv.scrollTop(@scrollTop = 0)
+                @bodyDiv.trigger 'dom:dataLoaded'
+            @sortedColumnIndex = idx
+            cm[idx].sortedAscDescFlg = ascDescFlg
 
         ###
         # Toggle sorting between descendant and ascendant options.
@@ -1580,11 +1610,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         # Returns column values as an array.
         ###
-        getColumnValues : (id) ->
+        getColumnValues : (id, includeAddedFlg = true) ->
             result = []
             j = 0
             i = 0
-            result[j++] = @newRowsAdded[i][id] for i in [0...@newRowsAdded.length]
+            if includeAddedFlg
+                result[j++] = @newRowsAdded[i][id] for i in [0...@newRowsAdded.length]
             result[j++] = @rows[i][id] for i in [0...@rows.length]
             return result
 

@@ -30,6 +30,11 @@ define ['jquery', 'myui/i18n'], ($, i18n) ->
             times = length - string.length
             return ('0' for i in [0...times]).join('') + string
 
+    array =
+        unique : ->
+            output = {}
+            output[@[key]] = @[key] for key in [0...@length]
+            value for key, value of output
     ###
     # Date functions
     # These functions are used to parse, format, and manipulate Date objects.
@@ -505,5 +510,6 @@ define ['jquery', 'myui/i18n'], ($, i18n) ->
         event : event
         number : number
         template : template
+        array : array
 
     $.util = util
