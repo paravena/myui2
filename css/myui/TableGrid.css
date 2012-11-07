@@ -63,7 +63,7 @@ a.toolbar-button span.icon {
 }
 
 span.add-button {
-    background: url(images/sprite-icons.png) -64px -16px;
+    background: url(images/glyphicons-halflings.png) 62px -96px;
     top: 1px;
     margin-right: 1px;
     margin-bottom: 0;
@@ -71,7 +71,7 @@ span.add-button {
 }
 
 span.delete-button {
-    background: url(images/sprite-icons.png) -80px -16px;
+    background: url(images/glyphicons-halflings.png) 15px 0;
     top: 1px;
     margin-right: 1px;
     margin-bottom: 0;
@@ -79,7 +79,11 @@ span.delete-button {
 }
 
 span.save-button {
-    background: url(images/save.png) left center no-repeat;
+    background: url(images/glyphicons-halflings.png) 374px -24px;
+    top: 1px;
+    margin-right: 1px;
+    margin-bottom: 0;
+    position: relative;
 }
 
 a.toolbar-button span.text {
@@ -109,7 +113,7 @@ div.tablegrid-setting-button {
 }
 
 div.tablegrid-setting-button div.icon {
-    background: url(images/sprite-icons.png) -30px -64px;
+    background: url(images/glyphicons-halflings.png) 38px -1px;
     top: 2px;
     margin-right: 1px;
     margin-bottom: 0;
