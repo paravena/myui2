@@ -31,9 +31,9 @@ define ['jquery', 'myui/i18n'], ($, i18n) ->
             return ('0' for i in [0...times]).join('') + string
 
     array =
-        unique : ->
+        unique : (array) ->
             output = {}
-            output[@[key]] = @[key] for key in [0...@length]
+            output[key] = key for key in array
             value for key, value of output
     ###
     # Date functions
