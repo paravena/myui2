@@ -60,7 +60,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             width = $(element).width()
             height = $(element).height()
             $(element).wrap('<div></div>') # date picker container
-            $(element).css {width : (width - 29)+'px'}
+            $(element).css {width : (width - 30)+'px'}
             @container = $(element).parent()
             @container.addClass('my-datepicker-container');
             @container.id = @id + '-container';

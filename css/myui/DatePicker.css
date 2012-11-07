@@ -48,7 +48,7 @@
 }
 
 .my-datepicker-header a.prev span {
-    background: url(images/prev.gif) center no-repeat transparent;
+    background: url(images/glyphicons-halflings.png) no-repeat -239px -96px;
 }
 
 .my-datepicker-header a.next {
@@ -57,7 +57,7 @@
 }
 
 .my-datepicker-header a.next span {
-    background: url(images/next.gif) center no-repeat transparent;
+    background: url(images/glyphicons-halflings.png) no-repeat -263px -96px;
 }
 
 .my-datepicker-header .month-year {
@@ -79,7 +79,7 @@
     color: #000;
     background-color: #fff;
     border-bottom: 1px #ddd solid;
-    padding: 2px;
+    padding: 4px;
 }
 
 .my-datepicker-body td.week-number {
@@ -103,7 +103,7 @@
 }
 
 .my-datepicker-body td div {
-    padding: 2px 4px;
+    padding: 4px;
 }
 
 .my-datepicker-body td.other div {
@@ -179,8 +179,8 @@
     position: absolute;
     top: 0;
     right : 0;
-    background: #fff url(images/calb.png) no-repeat 1px 1px;
-    width: 20px;
+    background: #ddd url(images/glyphicons-halflings.png) no-repeat -188px -116px;
+    width: 21px;
     height: 22px;
     margin: 0;
     border: solid #609 1px;
