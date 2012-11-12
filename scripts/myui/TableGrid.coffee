@@ -51,6 +51,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @renderedRowsAllowed = 0 #Use for lazy rendering depends on bodyDiv height
             @newRowsAdded = []
             @deletedRows = []
+            @editRowFlg = false
             @options.addLazyRenderingBehavior = false if @options.addNewRowsToEndBehaviour
             # Header builder
             @hb = new HeaderBuilder(@_mtgId, @_columnModel)
@@ -900,18 +901,20 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @keys._isInputFocusedFlg = true
             id = @_mtgId
             cm = @_columnModel
-            coords = @getCurrentPosition()
+            coords = @keys.getCoordsFromCell(element)
             x = coords[0]
             y = coords[1]
+            console.log 'element.id ' + element.attr('id')
             width = element.width()
             height = element.height()
             innerElement = element.find('div')
             value = @getValueAt(x, y)
-            editor = @_columnModel[x].editor or 'input'
+            editor = @_columnModel[x].editor
             input = null
             isInputFlg = !(editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
-          
+            console.log 'step 0'
             if isInputFlg
+                console.log 'step 1'
                 element.css('height', @options.cellHeight + 'px')
                 innerElement.css({
                     'position': 'relative',
@@ -968,6 +971,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         _blurCellElement : (element) ->
             return unless @keys._isInputFocusedFlg
             return unless element?
+            return if @editRowFlg
             id = @_mtgId
             keys = @keys
             cm = @_columnModel
@@ -1692,6 +1696,16 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 to -= selectedRows.length
                 toDiv.html(to)
             @_syncScroll()
+
+        editRow : (idx) ->
+            @editRowFlg = true
+            id = @_mtgId
+            @_editCellElement $(cell) for cell in $('td', '#mtgRow'+id+'_r'+idx)
+
+        saveRow : (idx) ->
+            @editRowFlg = false
+            id = @_mtgId
+            @_blurCellElement $(cell) for cell in $('td', '#mtgRow'+id+'_r'+idx)
 
         ###
         # Refresh data displayed in TableGrid.

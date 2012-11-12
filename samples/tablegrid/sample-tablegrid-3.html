@@ -31,7 +31,7 @@
                 text : 'Add',
                 beforeClick : null,
                 onClick : function() {
-                    tableGrid1.addNewRow();
+                    tableGrid.addNewRow();
                 },
                 afterClick : null
             },
@@ -43,6 +43,30 @@
                 afterClick : null
             }
         ];
+
+		var actionColumnToolbar = [
+			{
+				iconClass : 'edit-button',
+				text : 'Edit',
+				beforeClick : null,
+				onClick : null,
+				afterClick : null
+			},
+			{
+				iconClass : 'save-button',
+				text : 'Save',
+				beforeClick : null,
+				onClick : null,
+				afterClick : null
+			},
+			{
+				iconClass : 'delete-button',
+				text : 'Delete',
+				beforeClick : null,
+				onClick : null,
+				afterClick : null
+			}
+		];
 
         var tableModel = {
             options : {
@@ -62,7 +86,8 @@
                     return className;
                 },
                 addNewRowsToEndBehaviour : true,
-                toolbar : defaultToolbar
+                toolbar : defaultToolbar,
+	            actionColumnToolbar : actionColumnToolbar
             },
             columnModel : [
                 {
