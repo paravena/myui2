@@ -871,6 +871,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 do (c) =>
                     if c.editable
                         f_action = (cell) =>
+                            return if @editRowFlg
                             if @editedCellId == null or @editedCellId != cell.attr('id')
                                 @editedCellId = cell.attr('id')
                                 @_editCellElement(cell)
@@ -878,10 +879,13 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                                 @editedCellId = null if @_blurCellElement(cell)
                         keys.events.action(c, f_action)
 
-                        f_esc = (cell) => @editedCellId = null if @_blurCellElement(cell)
+                        f_esc = (cell) =>
+                            return if @editRowFlg
+                            @editedCellId = null if @_blurCellElement(cell)
                         keys.events.esc(c, f_esc)
 
                         f_blur = (cell) =>
+                            return if @editRowFlg
                             @editedCellId = null if @_blurCellElement(cell)
                             coords = @getCurrentPosition()
                             row = @getRow(coords[1])
@@ -889,6 +893,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         keys.events.blur(c, f_blur)
 
                     f_focus = (cell) =>
+                        return if @editRowFlg
                         coords = @getCurrentPosition()
                         row = @getRow(coords[1])
                         @options.onCellFocus(cell, coords[0], coords[1], row, c.id) if @options.onCellFocus?
@@ -897,14 +902,13 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         # When a cell is edited
         ###
-        _editCellElement : (element) ->
-            @keys._isInputFocusedFlg = true
+        _editCellElement : (element, editRowMode = false) ->
+            @keys._isInputFocusedFlg = true # TODO use encapsulation here
             id = @_mtgId
             cm = @_columnModel
             coords = @keys.getCoordsFromCell(element)
             x = coords[0]
             y = coords[1]
-            console.log 'element.id ' + element.attr('id')
             width = element.width()
             height = element.height()
             innerElement = element.find('div')
@@ -912,9 +916,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             editor = @_columnModel[x].editor
             input = null
             isInputFlg = !(editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
-            console.log 'step 0'
             if isInputFlg
-                console.log 'step 1'
                 element.css('height', @options.cellHeight + 'px')
                 innerElement.css({
                     'position': 'relative',
@@ -940,7 +942,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor.validate() if editor.validate
                 input.focus()
                 input.select()
-            else if editor instanceof TableGrid.CellCheckbox
+            else if editor instanceof TableGrid.CellCheckbox and !@editRowFlg
                 input = $('#mtgInput' + id + '_c' + x + 'r' + y)
                 isChecked = !input.is(':checked')
                 if isChecked then input.attr('checked', 'checked') else input.removeAttr('checked')
@@ -952,7 +954,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 @keys._isInputFocusedFlg = false
                 @editedCellId = null
                 innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
-            else if editor instanceof TableGrid.CellRadioButton
+            else if editor instanceof TableGrid.CellRadioButton and !@editRowFlg
                 input = $('#mtgInput' + id + '_c' + x + 'r' + y)
                 isChecked = !input.is(':checked')
                 if isChecked then input.attr('checked', 'checked') else input.removeAttr('checked')
@@ -968,16 +970,15 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         # When the cell is blured
         ###
-        _blurCellElement : (element) ->
-            return unless @keys._isInputFocusedFlg
-            return unless element?
-            return if @editRowFlg
+        _blurCellElement : (element, editRowMode = false) ->
+            return if !editRowMode and !@keys._isInputFocusedFlg
+            return if editRowMode and !@editRowFlg
             id = @_mtgId
             keys = @keys
             cm = @_columnModel
             width = element.width()
             height = element.height()
-            coords = @getCurrentPosition()
+            coords = @keys.getCoordsFromCell(element)
             x = coords[0]
             y = coords[1]
             cellHeight = @cellHeight
@@ -1004,11 +1005,13 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 }).html(value)
 
             # I hope I can find a better solution
-            value = editor.getSelectedValue(value) if editor instanceof Autocompleter
+            value = editor.getSelectedValue(value) if editor.getSelectedValue?
+            value = editor.getValueOf(element.is(':checked')) if editor.getValueOf?
             if y >= 0 and y < @rows.length and @rows[y][columnId] != value
-                @rows[y][columnId] = value
-                innerElement.addClass('modified-cell')
-                @modifiedRows.push(y) if @modifiedRows.indexOf(y) == -1 # if doesn't exist in the array the row is registered
+                if isInputFlg or !editor.selectable
+                    @rows[y][columnId] = value
+                    innerElement.addClass('modified-cell')
+                    @modifiedRows.push(y) if @modifiedRows.indexOf(y) == -1 # if doesn't exist in the array the row is registered
             else if y < 0
                 @newRowsAdded[Math.abs(y) - 1][columnId] = value
             else if y >= @rows.length
@@ -1700,12 +1703,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         editRow : (idx) ->
             @editRowFlg = true
             id = @_mtgId
-            @_editCellElement $(cell) for cell in $('td', '#mtgRow'+id+'_r'+idx)
+            @_editCellElement($(cell), true) for cell in $('td', '#mtgRow'+id+'_r'+idx)
 
         saveRow : (idx) ->
-            @editRowFlg = false
             id = @_mtgId
-            @_blurCellElement $(cell) for cell in $('td', '#mtgRow'+id+'_r'+idx)
+            @_blurCellElement($(cell), true) for cell in $('td', '#mtgRow'+id+'_r'+idx)
+            @editRowFlg = false
 
         ###
         # Refresh data displayed in TableGrid.

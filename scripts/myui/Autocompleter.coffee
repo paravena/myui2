@@ -516,16 +516,13 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         getSelectedValue : (text) ->
             items = @options.items
-            listTextPropertyName = @options.listTextPropertyName
-            listValuePropertyName = @options.listValuePropertyName
             result = text
-
-            for item of items
-                # This check prevents the case when items is just an array of strings
-                if item instanceof Object
-                    if item[listTextPropertyName] is text
+            # only applicable when items is an array of objects
+            if items[0] instanceof Object
+                listTextPropertyName = @options.listTextPropertyName
+                listValuePropertyName = @options.listValuePropertyName
+                for item in items
+                    if item[listTextPropertyName] == text
                         result = item[listValuePropertyName]
                         break
-                else
-                    break
             return result
