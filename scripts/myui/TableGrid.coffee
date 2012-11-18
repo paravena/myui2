@@ -23,6 +23,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 onCellBlur : null,
                 onPageChange : null,
                 toolbar : null,
+                actionColumnToolbar : null,
                 afterRender : null,
                 onFailure : null,
                 rowStyle : ( ->  return ''),
@@ -230,7 +231,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             # Adding Table Setting Button Control
             if @options.addSettingBehavior
-                html[idx++] = '<div id="mtgSB'+id+'" class="tablegrid-setting-button" style="left:'+(@tableWidth - 20)+'px"><div class="icon">&nbsp;</div></div>'
+                html[idx++] = '<div id="mtgSB'+id+'" class="mini-button" style="position:absolute;z-index:100;top:3px;left:'+(@tableWidth - 20)+'px"><span class="icon setting-button">&nbsp;</span></div>'
                 # Adding Table Setting Menu
                 html[idx++] = @_createSettingMenu()
 

@@ -13,6 +13,7 @@ define(function() {
     i18n['EN']['label.sortDesc'] = 'Sort descending';
     i18n['EN']['label.selectAll'] = 'Select all';
     i18n['EN']['label.loading'] = 'Loading ...';
+    i18n['EN']['label.actions'] = 'Actions';
     i18n['EN']['message.totalDisplay'] = '<strong><span id="mtgTotal">#{total}</span></strong> records found';
     i18n['EN']['message.rowsDisplay'] = ', displaying <strong><span id="mtgFrom">#{from}</span></strong>&nbsp;to&nbsp;<strong><span id="mtgTo">#{to}</span></strong>';
     i18n['EN']['message.pagePrompt'] = '<td><strong>Page:</strong></td><td>#{input}</td><td>of&nbsp;<strong>#{pages}</strong></td>';
@@ -44,6 +45,7 @@ define(function() {
     i18n['ES']['label.sortDesc'] = 'Ordenar desc';
     i18n['ES']['label.selectAll'] = 'Seleccionar todo';
     i18n['ES']['label.loading'] = 'Espere ...';
+    i18n['ES']['label.actions'] = 'Acciones';
     i18n['ES']['message.totalDisplay'] = '<strong><span id="mtgTotal">#{total}</span></strong> filas encontradas';
     i18n['ES']['message.rowsDisplay'] = ', mostrando <strong><span id="mtgFrom">#{from}</span></strong>&nbsp;a&nbsp;<strong><span id="mtgTo">#{to}</span></strong>';
     i18n['ES']['message.pagePrompt'] = '<td><strong>P&aacute;gina:</strong></td><td>#{input}</td><td>de&nbsp;<strong>#{pages}</strong></td>';
@@ -58,9 +60,41 @@ define(function() {
     i18n['ES']['error.invalid.min.size'] = 'valor #{value} es menos que el minimo tamano de #{min}';
     i18n['ES']['date.monthAbbreviations'] = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     i18n['ES']['date.monthNames'] = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    i18n['ES']['date.dayNames'] = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+    i18n['ES']['date.dayNames'] = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'S&aacute;bado'];
     i18n['ES']['date.dayAbbreviations'] = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'S&aacute;b'];
     i18n['ES']['date.weekDays'] = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'S&aacute;'];
+
+    i18n['PT'] = {};
+    i18n['PT']['label.ok'] = 'OK';
+    i18n['PT']['label.now'] = 'Agora';
+    i18n['PT']['label.today'] = 'Hoje';
+    i18n['PT']['label.week'] = 'Sem';
+    i18n['PT']['label.clear'] = 'Limpar';
+    i18n['PT']['label.add'] = 'Adicionar';
+    i18n['PT']['label.delete'] = 'Excluir';
+    i18n['PT']['label.save'] = 'Salvar';
+    i18n['PT']['label.sortAsc'] = 'Ordem asc';
+    i18n['PT']['label.sortDesc'] = 'Ordem desc';
+    i18n['PT']['label.selectAll'] = 'Selecionar tudo';
+    i18n['PT']['label.loading'] = 'Aguarde ...';
+    i18n['PT']['label.actions'] = 'A&ccedil;&otilde;es';
+    i18n['PT']['message.totalDisplay'] = '<strong><span id="mtgTotal">#{total}</span></strong> registros encontrados';
+    i18n['PT']['message.rowsDisplay'] = ', mostrando <strong><span id="mtgFrom">#{from}</span></strong>&nbsp;at&eacute;&nbsp;<strong><span id="mtgTo">#{to}</span></strong>';
+    i18n['PT']['message.pagePrompt'] = '<td><strong>P&aacute;gina:</strong></td><td>#{input}</td><td>de&nbsp;<strong>#{pages}</strong></td>';
+    i18n['PT']['message.noRecordFound'] = '<strong>Sem registros</strong>';
+    i18n['PT']['error.required.field'] = '#{field} &eacute; obrigat&oacute;rio';
+    i18n['PT']['error.invalid.creditCard'] = 'valor #{value} n&atilde;o &eacute; um n&uacute;mero de cart&atilde;o v&aacute;lido';
+    i18n['PT']['error.invalid.range'] = 'valor #{value} est&aacute; fora do intervalo de #{from} at&eacute; #{to}';
+    i18n['PT']['error.invalid.size'] = 'valor #{value} n&atilde;o &eacute; um tamanho v&aacute;lido entre #{from} e #{to}';
+    i18n['PT']['error.invalid.max'] = 'valor #{value} excede o m&aacute;ximo valor #{max}';
+    i18n['PT']['error.invalid.min'] = 'valor #{value} &eacute; menor que o m&iacute;nimo permitido #{min}';
+    i18n['PT']['error.invalid.max.size'] = 'valor #{value} excede o m&aacute;ximo tamanho de #{max}';
+    i18n['PT']['error.invalid.min.size'] = 'valor #{value} &eacute; menor que o m&iacute;nimo tamanho de #{min}';
+    i18n['PT']['date.monthAbbreviations'] = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    i18n['PT']['date.monthNames'] = ['Janeiro', 'Fevereiro', 'Mar&ccedil;o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    i18n['PT']['date.dayNames'] = ['Domingo', 'Segunda', 'Ter&ccedil;a', 'Quarta', 'Quinta', 'Sexta', 'S&aacute;bado'];
+    i18n['PT']['date.dayAbbreviations'] = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'S&aacute;b'];
+    i18n['PT']['date.weekDays'] = ['Do', 'Se', 'Te', 'Qua', 'Qui', 'Sex', 'S&aacute;'];
 
     i18n.getMessage = function(messageId, options) {
         options = options || {};
