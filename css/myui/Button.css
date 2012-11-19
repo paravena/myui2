@@ -61,6 +61,7 @@ a.toolbar-button span.text {
 
 /* Mini button */
 div.mini-button {
+    display: inline-block;
     padding: 1px;
     border: 1px solid #bbb;
     border-bottom-color: #999;

@@ -23,7 +23,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 onCellBlur : null,
                 onPageChange : null,
                 toolbar : null,
-                actionColumnToolbar : null,
+                actionsColumnToolbar : null,
                 afterRender : null,
                 onFailure : null,
                 rowStyle : ( ->  return ''),
@@ -54,6 +54,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @deletedRows = []
             @editRowFlg = false
             @options.addLazyRenderingBehavior = false if @options.addNewRowsToEndBehaviour
+
+            @_columnModel.push {'id' : 'actions' + @_mtgId, 'title' : i18n.getMessage('label.actions')} if @options.actionsColumnToolbar?
+
             # Header builder
             @hb = new HeaderBuilder(@_mtgId, @_columnModel)
             if @hb.getHeaderRowNestedLevel() > 1
@@ -320,6 +323,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;text-align:{align}" class="tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
             checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x} mtgInputCheckbox" checked="{checked}">'
             radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x} mtgInputRadio">'
+            actionBtnTmpl = '<div class="mini-button"><span class="icon {iconClass}">&nbsp;</span></div>'
             rs = @options.rowStyle # row style handler
             rc = @options.rowClass # row class handler
             cellHeight = @options.cellHeight
@@ -334,7 +338,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 cellWidth = parseInt(cm[j].width) # consider border at both sides
                 iCellWidth = cellWidth - 6 # consider padding at both sides
                 editor = cm[j].editor or null
-                normalEditorFlg = !(editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton or editor instanceof ComboBox)
+                normalEditorFlg = !(editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton or editor instanceof ComboBox or columnId is 'actions'+id)
                 alignment = 'left'
                 display = '\'\''
                 if !cm[j].hasOwnProperty('renderer')
@@ -392,6 +396,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                             return result
                         # end renderer
                     html[idx++] = cm[j].renderer(row[columnId], editor.getItems(), @getRow(rowIdx))
+                else if columnId is 'actions' + id
+                    for action in @options.actionsColumnToolbar
+                        html[idx++] = template(actionBtnTmpl, action) + '&nbsp;'
 
                 html[idx++] = '</div>'
                 html[idx++] = '</td>'
