@@ -27,6 +27,7 @@ a.toolbar-button span.icon {
     width: 16px;
     height: 16px;
     margin: 0;
+    background-image: url(images/glyphicons-halflings.png);
 }
 
 div.toolbar-separator  {
@@ -36,18 +37,6 @@ div.toolbar-separator  {
     border-left: 1px solid #ccc;
     border-right: 1px solid white;
     margin: 0 3px;
-}
-
-span.add-button {
-    background: url(images/glyphicons-halflings.png) 62px -96px;
-}
-
-span.delete-button {
-    background: url(images/glyphicons-halflings.png) 15px 0;
-}
-
-span.save-button {
-    background: url(images/glyphicons-halflings.png) 374px -24px;
 }
 
 a.toolbar-button span.text {
@@ -83,10 +72,26 @@ div.mini-button span.icon {
     width: 16px;
     height: 16px;
     margin: 0;
-    background-repeat: no-repeat;
+    background-image: url(images/glyphicons-halflings.png);
+}
+
+span.add-button {
+    background-position: 62px -96px;
+}
+
+span.delete-button {
+    background-position: 14px 1px;
+}
+
+span.save-button {
+    background-position: 375px -24px;
 }
 
 span.setting-button {
-    background: url(images/glyphicons-halflings.png) -431px 1px;
+    background-position: -431px 1px;
+}
+
+span.edit-button {
+    background-position: 1px -72px;
 }
 
