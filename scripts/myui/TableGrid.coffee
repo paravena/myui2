@@ -321,8 +321,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             id = @_mtgId
             tdTmpl = '<td id="mtgC{id}_c{x}r{y}" height="{height}" width="{width}" style="width:{width}px;height:{height}px;display:{display}" class="tablegrid-cell mtgC{id} mtgC{id}_c{x} mtgR{id}_r{y}">'
             icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;text-align:{align}" class="tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
-            checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x} mtgInputCheckbox" checked="{checked}">'
-            radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x} mtgInputRadio">'
+            checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x} my-checkbox {isSelectable}" checked="{checked}">'
+            radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x} my-radio">'
             actionBtnTmpl = '<div class="mini-button"><span class="icon {iconClass}">&nbsp;</span></div>'
             rs = @options.rowStyle # row style handler
             rc = @options.rowClass # row class handler
@@ -357,7 +357,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     else
                         html[idx++] = cm[j].renderer(row[columnId], @getRow(rowIdx))
                 else if editor instanceof TableGrid.CellCheckbox
-                    temp = template(checkboxTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId]})
+                    selectable = if editor.selectable then 'selectable' else ''
+                    temp = template(checkboxTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId], 'isSelectable' : selectable})
                     if editor.selectable is undefined or !editor.selectable
                         selectAllFlg = cm[j].selectAllFlg
                         if editor.hasOwnProperty('getValueOf')
@@ -426,35 +427,26 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Applies cell callbacks.
         ###
         _applyCellCallbacks : ->
-            renderedRows = @renderedRows
-            renderedRowsAllowed = @renderedRowsAllowed
-            beginAtRow = renderedRows - renderedRowsAllowed
-            beginAtRow = 0 if beginAtRow < 0
-            @_applyCellCallbackToRow(j) for j in [beginAtRow...renderedRows]
-
-        ###
-        # Apply callback to rows.
-        ###
-        _applyCellCallbackToRow : (y) ->
-            id = @_mtgId
             cm = @_columnModel
-            for i in [0...cm.length]
-                editor = cm[i].editor
-                if editor instanceof TableGrid.CellRadioButton or editor instanceof TableGrid.CellCheckbox
-                    element = $('#mtgInput'+id + '_c' + i + 'r' + y)
-                    innerElement = $('#mtgIC'+id + '_c' + i + 'r' + y)
-                    do (editor, i, element, innerElement) =>
-                        unless editor.selectable
-                            element.on 'click', =>
-                                elementId = element.attr('id')
-                                match = elementId.match(/_c(\d*?)r(\-?\d*?)/)
-                                x = parseInt(match[1]);
-                                value = element.is(':checked')
-                                value = editor.getValueOf(element.is(':checked')) if editor.getValueOf?
-                                @setValueAt(value, x, y, false);
-                                @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1  # if doesn't exist in the array the row is registered
-                        editor.onClick(element.val(), element.is(':checked')) if editor.onClick?
-                        innerElement.addClass('modified-cell') unless editor.selectable
+            @bodyTable.delegate 'td input.my-checkbox', 'click', (event) =>
+                element = $(event.target)
+                elementId = element.attr('id')
+                coords = elementId.match(/_c(\d*?)r(\-?\d*?)/)
+                x = parseInt(coords[1])
+                y = parseInt(coords[2])
+                unless element.is('.selectable')
+                    value = element.is(':checked')
+                    value = editor.getValueOf(element.is(':checked')) if editor.getValueOf?
+                    @setValueAt(value, x, y, false)
+                    # if doesn't exist in the array the row is registered
+                    @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1
+                    element.parent('div').addClass('modified-cell')
+                editor = cm[x].editor
+                editor.onClick(element.val(), element.is(':checked')) if editor.onClick?
+
+            @bodyTable.delegate 'td div.mini-button', 'click', (event) =>
+                console.log 'click in a row button'
+
 
         ###
         # Returns TableGrid id.
@@ -568,7 +560,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             if renderedRows < @rows.length and (bodyTable.height() - bodyDiv.scrollTop() - 10) < bodyDiv[0].clientHeight
                 html = @_createTableBody(@rows)
                 bodyTable.find('tbody').append(html)
-                @_applyCellCallbacks()
 
         ###
         # Makes all columns resizable
@@ -865,7 +856,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         input.attr('class', 'mtgInput' + id + '_c' + index)
 
             @sortedColumnIndex = toColumnId if fromColumnId == @sortedColumnIndex
-
 
         ###
         # Add Key behavior functionality to the table grid
@@ -1257,11 +1247,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         @renderedRows = 0
                         @innerBodyDiv.html(@_createTableBody(tableModel.rows))
                         @bodyTable = $('#mtgBT' + @_mtgId)
-                        if tableModel.rows.length > 0 and !firstTimeFlg
-                            @_applyCellCallbacks()
-                            @keys = new KeyTable(@)
-                            @_addKeyBehavior()
-
                         if @pager?
                             @pagerDiv.html(@_updatePagerInfo()) # update pager info panel
                             @_addPagerBehavior()
@@ -1414,8 +1399,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             if tallerFlg
                 html = @_createTableBody(@rows);
                 @bodyTable.find('tbody').append(html)
-                @_addKeyBehavior()
-                @_applyCellCallbacks()
 
         ###
         # Returns value at given coordinates.
@@ -1486,10 +1469,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         getIndexOf : (id) ->
             idx = -1
+            i = 0
             for column in @_columnModel
                 if column.id == id
                     idx = i
                     break
+                i++
             return idx
 
         ###
