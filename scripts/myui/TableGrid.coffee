@@ -323,7 +323,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;text-align:{align}" class="tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
             checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x} my-checkbox {isSelectable}" checked="{checked}">'
             radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x} my-radio">'
-            actionBtnTmpl = '<div class="mini-button"><span class="icon {iconClass}">&nbsp;</span></div>'
+            actionBtnTmpl = '<div id="{iconClass}{id}_c{x}r{y}" class="mini-button"><span class="icon {iconClass}">&nbsp;</span></div>'
             rs = @options.rowStyle # row style handler
             rc = @options.rowClass # row class handler
             cellHeight = @options.cellHeight
@@ -399,6 +399,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     html[idx++] = cm[j].renderer(row[columnId], editor.getItems(), @getRow(rowIdx))
                 else if columnId is 'actions' + id
                     for action in @options.actionsColumnToolbar
+                        action['id'] = id
+                        action['x'] = j
+                        action['y'] = rowIdx
                         html[idx++] = template(actionBtnTmpl, action) + '&nbsp;'
 
                 html[idx++] = '</div>'
@@ -431,7 +434,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @bodyTable.delegate 'td input.my-checkbox', 'click', (event) =>
                 element = $(event.target)
                 elementId = element.attr('id')
-                coords = elementId.match(/_c(\d*?)r(\-?\d*?)/)
+                coords = elementId.match(/_c(\d+?)r(\-?\d+?)/)
+                console.log 'coords: ' + coords
                 x = parseInt(coords[1])
                 y = parseInt(coords[2])
                 unless element.is('.selectable')
@@ -446,7 +450,15 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             @bodyTable.delegate 'td div.mini-button', 'click', (event) =>
                 console.log 'click in a row button'
-
+                element = $(event.target).closest('.mini-button')
+                console.log element.html()
+                elementId = element.attr('id')
+                console.log 'elementId: ' + elementId
+                match = elementId.match(/([A-Za-z\-_]*?)\d+?_c(\d+?)r(\-?\d+?)/)
+                elementName = match[1]
+                x = parseInt(match[2])
+                y = parseInt(match[3])
+                console.log 'calling ' + elementName + ' x: ' + x + ' y: ' + y
 
         ###
         # Returns TableGrid id.
