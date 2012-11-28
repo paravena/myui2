@@ -55,7 +55,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @editRowFlg = false
             @options.addLazyRenderingBehavior = false if @options.addNewRowsToEndBehaviour
 
-            @_columnModel.push {'id' : 'actions' + @_mtgId, 'title' : i18n.getMessage('label.actions')} if @options.actionsColumnToolbar?
+            if @options.actionsColumnToolbar?
+                @_columnModel.push {'id' : 'actions' + @_mtgId, 'title' : i18n.getMessage('label.actions')}
+                action.name = action.iconClass for action in @options.actionsColumnToolbar when action.name is undefined
 
             # Header builder
             @hb = new HeaderBuilder(@_mtgId, @_columnModel)
@@ -130,15 +132,13 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 @_hideLoaderSpinner()
                 @alreadyLoadedFlg = true
           
-            setTimeout(( =>
-                @renderedRowsAllowed = Math.floor((@bodyHeight - @scrollBarWidth - 3)  / @options.cellHeight) + 1
-                if @tableModel.hasOwnProperty('rows')
-                    @innerBodyDiv.html(@_createTableBody(@rows))
-                    @pagerDiv.html(@_updatePagerInfo()) if @pager
-                    @bodyDiv.trigger 'dom:dataLoaded'
-                else
-                    @_retrieveDataFromUrl(1, true)
-            ), 0)
+            @renderedRowsAllowed = Math.floor((@bodyHeight - @scrollBarWidth - 3)  / @options.cellHeight) + 1
+            if @tableModel.hasOwnProperty('rows')
+                @innerBodyDiv.html @_createTableBody(@rows)
+                @pagerDiv.html @_updatePagerInfo() if @pager
+                @bodyDiv.trigger 'dom:dataLoaded'
+            else
+                @_retrieveDataFromUrl(1, true)
 
             if @options.toolbar?
                 buttons = @options.toolbar or []
@@ -154,6 +154,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                             if proceedFlg
                                 b.onClick(btn) if b.onClick?
                                 b.afterClick(btn) if b.afterClick?
+
+            temp = {}
+            if @options.actionsColumnToolbar?
+               temp[action.name] = action for action in @options.actionsColumnToolbar
+               @options.actionsColumnToolbar = temp
 
             # Adding scrolling handler
             @bodyDiv.bind 'scroll', => @_syncScroll()
@@ -323,7 +328,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;text-align:{align}" class="tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
             checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x} my-checkbox {isSelectable}" checked="{checked}">'
             radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x} my-radio">'
-            actionBtnTmpl = '<div id="{iconClass}{id}_c{x}r{y}" class="mini-button"><span class="icon {iconClass}">&nbsp;</span></div>'
+            actionBtnTmpl = '<div id="{name}{id}_c{x}r{y}" class="mini-button"><span class="icon {iconClass}">&nbsp;</span></div>'
             rs = @options.rowStyle # row style handler
             rc = @options.rowClass # row class handler
             cellHeight = @options.cellHeight
@@ -449,6 +454,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor.onClick(element.val(), element.is(':checked')) if editor.onClick?
 
             @bodyTable.delegate 'td div.mini-button', 'click', (event) =>
+                act = @options.actionsColumnToolbar
                 console.log 'click in a row button'
                 element = $(event.target).closest('.mini-button')
                 console.log element.html()
@@ -459,6 +465,15 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 x = parseInt(match[2])
                 y = parseInt(match[3])
                 console.log 'calling ' + elementName + ' x: ' + x + ' y: ' + y
+                proceedFlg = true
+                console.log act + ' ' + act[elementName]
+                if act[elementName].beforeClick?
+                    proceedFlg = act[elementName].beforeClick(y)
+                if proceedFlg and act[elementName].onClick?
+                    proceedFlg = act[elementName].onClick(y)
+                if proceedFlg and act[elementName].afterClick?
+                    proceedFlg = act[elementName].afterClick(y)
+
 
         ###
         # Returns TableGrid id.
@@ -913,6 +928,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # When a cell is edited
         ###
         _editCellElement : (element, editRowMode = false) ->
+            return if element.is(':has(.mini-button)') # is an action column
             @keys._isInputFocusedFlg = true # TODO use encapsulation here
             id = @_mtgId
             cm = @_columnModel
@@ -983,6 +999,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         _blurCellElement : (element, editRowMode = false) ->
             return if !editRowMode and !@keys._isInputFocusedFlg
             return if editRowMode and !@editRowFlg
+            return if element.is(':has(.mini-button)')
             id = @_mtgId
             keys = @keys
             cm = @_columnModel

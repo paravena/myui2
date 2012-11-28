@@ -49,15 +49,19 @@
 				iconClass : 'edit-button',
 				text : 'Edit',
 				beforeClick : null,
-				onClick : null,
+				onClick : function(y) {
+                    tableGrid.editRow(y);
+                },
 				afterClick : null
 			},
 			{
 				iconClass : 'save-button',
 				text : 'Save',
 				beforeClick : null,
-				onClick : null,
-				afterClick : null
+                onClick : function(y) {
+                    tableGrid.saveRow(y);
+                },
+                afterClick : null
 			},
 			{
 				iconClass : 'delete-button',
