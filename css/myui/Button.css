@@ -28,6 +28,7 @@ a.toolbar-button span.icon {
     height: 16px;
     margin: 0;
     background-image: url(images/glyphicons-halflings.png);
+    background-repeat: no-repeat;
 }
 
 div.toolbar-separator  {
@@ -73,18 +74,19 @@ div.mini-button span.icon {
     height: 16px;
     margin: 0;
     background-image: url(images/glyphicons-halflings.png);
+    background-repeat:  no-repeat;
 }
 
 span.add-button {
-    background-position: 62px -96px;
+    background-position: -406px -96px;
 }
 
 span.delete-button {
-    background-position: 14px 1px;
+    background-position: -455px 1px;
 }
 
 span.save-button {
-    background-position: 375px -24px;
+    background-position: -94px -24px;
 }
 
 span.setting-button {
