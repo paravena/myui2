@@ -60,6 +60,7 @@ div.mini-button {
     -moz-border-radius: 4px;
     border-radius: 4px;
     background: url('images/bg-btn.gif') repeat-x scroll 0 0 #ddd;
+    margin-right: 3px;
 }
 
 div.mini-button:hover {

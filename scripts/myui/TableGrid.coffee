@@ -53,11 +53,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @newRowsAdded = []
             @deletedRows = []
             @editRowFlg = false
+            @editRowIdx = -1
             @options.addLazyRenderingBehavior = false if @options.addNewRowsToEndBehaviour
 
             if @options.actionsColumnToolbar?
                 @_columnModel.push {'id' : 'actions' + @_mtgId, 'title' : i18n.getMessage('label.actions')}
-                action.name = action.iconClass for action in @options.actionsColumnToolbar when action.name is undefined
+                for action in @options.actionsColumnToolbar
+                    action.name = action.iconClass if action.name is undefined
+                    action.visible = true unless action.hasOwnProperty('visible')
 
             # Header builder
             @hb = new HeaderBuilder(@_mtgId, @_columnModel)
@@ -328,7 +331,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;text-align:{align}" class="tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
             checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x} my-checkbox {isSelectable}" checked="{checked}">'
             radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x} my-radio">'
-            actionBtnTmpl = '<div id="{name}{id}_c{x}r{y}" class="mini-button"><span class="icon {iconClass}">&nbsp;</span></div>'
+            actionBtnTmpl = '<div id="{name}{id}_c{x}r{y}" class="mini-button" style="display:{display}"><span class="icon {iconClass}">&nbsp;</span></div>'
             rs = @options.rowStyle # row style handler
             rc = @options.rowClass # row class handler
             cellHeight = @options.cellHeight
@@ -407,7 +410,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         action['id'] = id
                         action['x'] = j
                         action['y'] = rowIdx
-                        html[idx++] = template(actionBtnTmpl, action) + '&nbsp;'
+                        action['display'] = if action.visible then '' else 'none'
+                        html[idx++] = template(actionBtnTmpl, action)
 
                 html[idx++] = '</div>'
                 html[idx++] = '</td>'
@@ -436,11 +440,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _applyCellCallbacks : ->
             cm = @_columnModel
+            id = @_mtgId
             @bodyTable.delegate 'td input.my-checkbox', 'click', (event) =>
                 element = $(event.target)
                 elementId = element.attr('id')
                 coords = elementId.match(/_c(\d+?)r(\-?\d+?)/)
-                console.log 'coords: ' + coords
                 x = parseInt(coords[1])
                 y = parseInt(coords[2])
                 unless element.is('.selectable')
@@ -455,24 +459,27 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             @bodyTable.delegate 'td div.mini-button', 'click', (event) =>
                 act = @options.actionsColumnToolbar
-                console.log 'click in a row button'
                 element = $(event.target).closest('.mini-button')
-                console.log element.html()
                 elementId = element.attr('id')
-                console.log 'elementId: ' + elementId
                 match = elementId.match(/([A-Za-z\-_]*?)\d+?_c(\d+?)r(\-?\d+?)/)
                 elementName = match[1]
                 x = parseInt(match[2])
                 y = parseInt(match[3])
-                console.log 'calling ' + elementName + ' x: ' + x + ' y: ' + y
                 proceedFlg = true
-                console.log act + ' ' + act[elementName]
+                for action of act
+                    do (action) ->
+                        act[action].hide = ->
+                            $('#'+action+id+'_c'+x+'r'+y).hide()
+                        act[action].show = ->
+                            $('#'+action+id+'_c'+x+'r'+y).show()
                 if act[elementName].beforeClick?
-                    proceedFlg = act[elementName].beforeClick(y)
+                    proceedFlg = act[elementName].beforeClick(y, act)
+                proceedFlg = true if proceedFlg is undefined
                 if proceedFlg and act[elementName].onClick?
-                    proceedFlg = act[elementName].onClick(y)
+                    proceedFlg = act[elementName].onClick(y, act)
+                proceedFlg = true if proceedFlg is undefined
                 if proceedFlg and act[elementName].afterClick?
-                    proceedFlg = act[elementName].afterClick(y)
+                    proceedFlg = act[elementName].afterClick(y, act)
 
 
         ###
@@ -966,8 +973,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor.setTableGrid(this)
                 editor.render(input, true)
                 editor.validate() if editor.validate
-                input.focus()
-                input.select()
+                unless editRowMode
+                    input.focus()
+                    input.select()
             else if editor instanceof TableGrid.CellCheckbox and !@editRowFlg
                 input = $('#mtgInput' + id + '_c' + x + 'r' + y)
                 isChecked = !input.is(':checked')
@@ -1722,11 +1730,22 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 toDiv.html(to)
             @_syncScroll()
 
+        ###
+        # Edit a selected row
+        ###
         editRow : (idx) ->
+            @saveRow(@editRowIdx) if @editRowFlg
             @editRowFlg = true
+            @editRowIdx = idx
             id = @_mtgId
             @_editCellElement($(cell), true) for cell in $('td', '#mtgRow'+id+'_r'+idx)
+            firstElement = $('input[type=text]', '#mtgRow'+id+'_r'+idx).first()
+            firstElement.focus()
+            firstElement.select()
 
+        ###
+        # Saves a selected row
+        ###
         saveRow : (idx) ->
             id = @_mtgId
             @_blurCellElement($(cell), true) for cell in $('td', '#mtgRow'+id+'_r'+idx)

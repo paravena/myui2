@@ -49,10 +49,13 @@
 				iconClass : 'edit-button',
 				text : 'Edit',
 				beforeClick : null,
-				onClick : function(y) {
+				onClick : function(y, act) {
                     tableGrid.editRow(y);
                 },
-				afterClick : null
+				afterClick : function(y, act) {
+					act['edit-button'].hide();
+					act['save-button'].show();
+				}
 			},
 			{
 				iconClass : 'save-button',
@@ -61,7 +64,11 @@
                 onClick : function(y) {
                     tableGrid.saveRow(y);
                 },
-                afterClick : null
+                afterClick : function(y, act) {
+	                act['save-button'].hide();
+	                act['edit-button'].show();
+                },
+				visible : false
 			},
 			{
 				iconClass : 'delete-button',
