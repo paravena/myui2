@@ -118,7 +118,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @scrollTop = 0
             @targetColumnId = null
             @alreadyLoadedFlg = false
-          
+            @_actionsColumnToolbar = {}
+
             @bodyDiv.bind 'dom:dataLoaded', =>
                 @_showLoaderSpinner()
                 @bodyTable = $('#mtgBT' + id)
@@ -158,10 +159,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                                 b.onClick(btn) if b.onClick?
                                 b.afterClick(btn) if b.afterClick?
 
-            temp = {}
             if @options.actionsColumnToolbar?
-               temp[action.name] = action for action in @options.actionsColumnToolbar
-               @options.actionsColumnToolbar = temp
+                @_actionsColumnToolbar[action.name] = action for action in @options.actionsColumnToolbar
 
             # Adding scrolling handler
             @bodyDiv.bind 'scroll', => @_syncScroll()
@@ -458,10 +457,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor.onClick(element.val(), element.is(':checked')) if editor.onClick?
 
             @bodyTable.delegate 'td div.mini-button', 'click', (event) =>
-                act = @options.actionsColumnToolbar
+                act = @_actionsColumnToolbar
                 element = $(event.target).closest('.mini-button')
                 elementId = element.attr('id')
-                match = elementId.match(/([A-Za-z\-_]*?)\d+?_c(\d+?)r(\-?\d+?)/)
+                match = elementId.match(/([A-Za-z\-_]*?)\d+?_c(\d+.?)r(\-?\d+.?)/)
                 elementName = match[1]
                 x = parseInt(match[2])
                 y = parseInt(match[3])
@@ -1673,8 +1672,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             cm = @_columnModel
             index = @newRowsAdded.length
             renderedRows = @renderedRows
-
-            if newRow == undefined
+            if newRow is undefined
                 newRow = {}
                 newRow[cm[j].id] = '' for j in [0...cm.length]
 
@@ -1690,9 +1688,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 numberOfRows = renderedRows + @newRowsAdded.length
                 @keys.setNumberOfRows(numberOfRows)
                 @_scrollToRow(numberOfRows)
-
-            @_applyCellCallbackToRow(-index)
-
 
         ###
         # Deletes selected rows.
