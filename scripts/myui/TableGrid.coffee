@@ -31,7 +31,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 addSettingBehavior : true,
                 addDraggingBehavior : true,
                 addLazyRenderingBehavior : true,
-                addNewRowsToEndBehaviour : false
+                addNewRowsToEndBehaviour : false,
+                beforeEditRow : null,
+                afterEditRow : null,
+                beforeSaveRow : null,
+                afterSaveRow : null
             }, tableModel.options or {})
 
             @pagerHeight = 24
@@ -467,6 +471,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 proceedFlg = true
                 for action of act
                     do (action) ->
+                        if act[action].hide? and act[action].show?
+                            act[action].previousRow = {}
+                            act[action].previousRow.hide = act[action].hide
+                            act[action].previousRow.show = act[action].show
                         act[action].hide = ->
                             $('#'+action+id+'_c'+x+'r'+y).hide()
                         act[action].show = ->
@@ -979,14 +987,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 input = $('#mtgInput' + id + '_c' + x + 'r' + y)
                 isChecked = !input.is(':checked')
                 if isChecked then input.attr('checked', 'checked') else input.removeAttr('checked')
-                if editor.selectable == undefined or !editor.selectable
+                if editor.selectable is undefined or !editor.selectable
                     value = editor.getValueOf(isChecked) if editor.hasOwnProperty('getValueOf')
                     @setValueAt(value, x, y, false)
                     @modifiedRows.push(y) if y >= 0 and y < @rows.length and @modifiedRows.indexOf(y) == -1 # if doesn't exist in the array the row is registered
                 editor.onClick(value, isChecked) if editor instanceof TableGrid.CellCheckbox and editor.onClick?
                 @keys._isInputFocusedFlg = false
                 @editedCellId = null
-                innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
+                innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable is undefined or !editor.selectable)
             else if editor instanceof TableGrid.CellRadioButton and !@editRowFlg
                 input = $('#mtgInput' + id + '_c' + x + 'r' + y)
                 isChecked = !input.is(':checked')
@@ -997,7 +1005,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor.onClick(value, isChecked) if editor instanceof TableGrid.CellRadioButton and editor.onClick?
                 @keys._isInputFocusedFlg = false
                 @editedCellId = null
-                innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable == undefined or !editor.selectable)
+                innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable is undefined or !editor.selectable)
             # end if
 
         ###
@@ -1464,7 +1472,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             rows = @rows
             newRowsAdded = @newRowsAdded
 
-            if refreshValueFlg == undefined or refreshValueFlg
+            if refreshValueFlg is undefined or refreshValueFlg
                 if editor != null and (editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
                     input = $('#mtgInput'+id+'_c'+x+'r'+y)
                     if editor.hasOwnProperty('getValueOf')
@@ -1729,6 +1737,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Edit a selected row
         ###
         editRow : (idx) ->
+            @options.beforeEditRow(idx) if @options.beforeEditRow?
             @saveRow(@editRowIdx) if @editRowFlg
             @editRowFlg = true
             @editRowIdx = idx
@@ -1737,14 +1746,23 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             firstElement = $('input[type=text]', '#mtgRow'+id+'_r'+idx).first()
             firstElement.focus()
             firstElement.select()
+            @options.afterEditRow(idx) if @options.afterEditRow?
 
         ###
         # Saves a selected row
         ###
         saveRow : (idx) ->
+            @options.beforeSaveRow(idx) if @options.beforeSaveRow?
             id = @_mtgId
             @_blurCellElement($(cell), true) for cell in $('td', '#mtgRow'+id+'_r'+idx)
             @editRowFlg = false
+            @options.afterSaveRow(idx) if @options.afterSaveRow?
+
+        ###
+        # Returns actions column toolbar
+        ###
+        getActionsColumnToolbar : ->
+            return  @_actionsColumnToolbar
 
         ###
         # Refresh data displayed in TableGrid.

@@ -89,16 +89,14 @@
                     from: 1,
                     to: 100
                 },
-                rowClass : function(rowIdx) {
-                    var className = '';
-                    if (rowIdx % 2 == 0) {
-                        className = 'hightlight';
-                    }
-                    return className;
-                },
                 addNewRowsToEndBehaviour : true,
                 toolbar : defaultToolbar,
-	            actionsColumnToolbar : actionsColumnToolbar
+	            actionsColumnToolbar : actionsColumnToolbar,
+                beforeEditRow : function(idx) {
+                    var act = tableGrid.getActionsColumnToolbar();
+                    act['save-button'].previousRow.hide();
+                    act['edit-button'].previousRow.show();
+                }
             },
             columnModel : [
                 {
