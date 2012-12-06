@@ -671,7 +671,17 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             $('.mtgC' + id + '_c' + index).attr('width', newWidth)
             $('.mtgC' + id + '_c' + index).css('width', newWidth + 'px')
-            $('.mtgIC' + id + '_c' + index).css('width', (newWidth - 6) + 'px')
+            unless @editRowFlg
+                $('.mtgIC' + id + '_c' + index).css('width', (newWidth - 6) + 'px')
+            else
+                $('.mtgIC' + id + '_c' + index).not('#mtgIC' + id + '_c' + index + 'r' + @editRowIdx).css('width', (newWidth - 6) + 'px')
+                $('#mtgIC' + id + '_c' + index + 'r' + @editRowIdx).css('width', newWidth + 'px')
+                input = $('input[type=text]', '#mtgIC' + id + '_c' + index + 'r' + @editRowIdx)
+                inputWidth = input.width() + (newWidth - oldWidth)
+                input.css('width', inputWidth+'px')
+                div = input.closest('div')
+                divWidth = div.width() + (newWidth - oldWidth)
+                div.css('width', divWidth+'px')
 
             @headerWidth = @headerWidth - (oldWidth - newWidth)
 
@@ -1737,7 +1747,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Edit a selected row
         ###
         editRow : (idx) ->
-            @options.beforeEditRow(idx) if @options.beforeEditRow?
+            proceedFlg = true
+            proceedFlg = @options.beforeEditRow(idx) if @options.beforeEditRow?
+            return if proceedFlg is false
             @saveRow(@editRowIdx) if @editRowFlg
             @editRowFlg = true
             @editRowIdx = idx
@@ -1752,7 +1764,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Saves a selected row
         ###
         saveRow : (idx) ->
-            @options.beforeSaveRow(idx) if @options.beforeSaveRow?
+            proceedFlg = true
+            proceedFlg = @options.beforeSaveRow(idx) if @options.beforeSaveRow?
+            return if proceedFlg is false
             id = @_mtgId
             @_blurCellElement($(cell), true) for cell in $('td', '#mtgRow'+id+'_r'+idx)
             @editRowFlg = false

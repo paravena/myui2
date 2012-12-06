@@ -94,8 +94,10 @@
 	            actionsColumnToolbar : actionsColumnToolbar,
                 beforeEditRow : function(idx) {
                     var act = tableGrid.getActionsColumnToolbar();
-                    act['save-button'].previousRow.hide();
-                    act['edit-button'].previousRow.show();
+                    if (act['save-button'].previousRow) {
+                        act['save-button'].previousRow.hide();
+                        act['edit-button'].previousRow.show();
+                    }
                 }
             },
             columnModel : [
