@@ -47,7 +47,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
 
             unless @options.onShow
                 @options.onShow = (element, update) =>
-                    $(update).css('position', 'absolute')
+                    $(update).addClass('arrow-up')
                     p = $(element).offset()
                     vh = $(window).height() #view port height
                     vst = $(window).scrollTop() # view port scrolling top
@@ -55,14 +55,15 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                     uh = (@entryCount * 22) + 6
                     offsetTop = p.top
                     offsetLeft = p.left
-                    topPos = $(element).outerHeight() + offsetTop
+                    topPos = $(element).outerHeight() + offsetTop + 2
+                    elementWidth = $(element).closest('div').width()
                     leftPos = offsetLeft
                     if (rh >= (p.top - vst))  # down
                         if (uh > rh) then uh = rh - 10
                         update.css({
                             top : topPos + 'px',
                             left : leftPos + 'px',
-                            width : (@elementWidth - 2) + 'px',
+                            width : (elementWidth - 2) + 'px',
                             height: uh + 'px'
                         })
                     else  # above
@@ -74,7 +75,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                         update.css({
                             top : topPos + 'px',
                             left : leftPos + 'px',
-                            width : (@elementWidth - 2) + 'px',
+                            width : (elementWidth - 2) + 'px',
                             height: uh + 'px'
                         })
                     $(update).show()
@@ -147,7 +148,6 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             @element = $(input)
             @id = @element.attr('id')
             @oldElementValue = @element.val()
-            @elementWidth = @element.width()
             @options.paramName ?= @element.name;
             @element.attr('autocomplete', 'off');
             @options.decorate();
@@ -181,7 +181,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         getUpdatedChoices : ->
             unless @update
-                $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list shadow"></div>')
+                $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list all-round-corners shadow"></div>')
                 @update = $('#' + @id + '_update')
 
             if @options.url
@@ -227,7 +227,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             height = $(element).height()
             $(element).css({width: (width - 8) + 'px'})
             $(element).wrap('<div></div>') # auto complete container
-            container = $(element).parent()
+            container = $(element).closest('div') # parent
             container.addClass('my-autocompleter')
             container.attr('id', @id + '_container')
             container.css({'width' : width + 'px', 'height': height + 'px'})

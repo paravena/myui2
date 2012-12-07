@@ -31,7 +31,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/Autocompleter'], ($, Util, Autocomple
         showAll : ->
             if !@active
                 unless @update
-                    @update = $('<div id="'+@id+'_update" class="my-autocompleter-list shadow">&nbsp;</div>')
+                    @update = $('<div id="'+@id+'_update" class="my-autocompleter-list all-round-corners shadow"></div>')
                     $(document.body).append(@update)
 
                 @element.focus()

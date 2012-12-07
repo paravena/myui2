@@ -151,6 +151,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             left_px = left + 'px';
             top_px = if above then (top - calendarHeight - 10) else (top + height + 10) + 'px'
 
+            @_calendarDiv.addClass(if above then 'arrow-down' else 'arrow-up')
             @_calendarDiv.css('left', left_px)
             @_calendarDiv.css('top', top_px)
             @_calendarDiv.css('visibility', '')
