@@ -26,17 +26,22 @@
     border: 1px solid #609;
     margin: 0;
     padding: 0;
-    overflow-y: auto;
-    z-index: 10000;
+    z-index: 999;
 }
 
-.my-autocompleter-list ul {
+.my-inner-list-container {
+    position: relative;
+    overflow-y: auto;
+}
+
+.my-inner-list-container ul {
+    position: relative;
     list-style-type: none;
     margin: 0;
     padding: 3px;
 }
 
-.my-autocompleter-list ul li {
+.my-inner-list-container ul li {
     list-style-type: none;
     display: block;
     margin: 0;
@@ -48,7 +53,7 @@
 
 }
 
-.my-autocompleter-list ul li.selected {
+.my-inner-list-container ul li.selected {
     background-color: #609;
     border : 1px solid #609;
     color : white;

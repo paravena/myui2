@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+		"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Autocompleter sample</title>
+	<link type="text/css" href="../../css/myui/myui.min.css" rel="stylesheet">
+	<script type="text/javascript" src="../../scripts/myui.min.js"></script>
+</head>
+<script type="text/javascript">
+	var comboBox = null;
+	$(window).load(function() {
+		comboBox = new MY.ComboBox({
+			input : '#manufacturerDesc',
+			url : 'get_manufacturers_list.php',
+			initialText : 'Select a manufacturer',
+			parameters : {},
+			getParameters: function() {
+				var params = {test : 'hello'};
+				return params;
+			}
+		});
+	});
+</script>
+<body>
+<h1>Autocompleter Sample</h1>
+<br>
+<label for="manufacturerDesc">Choose a manufacturer:</label>&nbsp;<input type="text" id="manufacturerDesc">
+</body>
+</html>

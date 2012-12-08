@@ -47,7 +47,6 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
 
             unless @options.onShow
                 @options.onShow = (element, update) =>
-                    $(update).addClass('arrow-up')
                     p = $(element).offset()
                     vh = $(window).height() #view port height
                     vst = $(window).scrollTop() # view port scrolling top
@@ -56,16 +55,16 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                     offsetTop = p.top
                     offsetLeft = p.left
                     topPos = $(element).outerHeight() + offsetTop + 2
-                    elementWidth = $(element).closest('div').width()
+                    elementWidth = $(element).closest('div').width() - 2
                     leftPos = offsetLeft
                     if (rh >= (p.top - vst))  # down
                         if (uh > rh) then uh = rh - 10
                         update.css({
                             top : topPos + 'px',
                             left : leftPos + 'px',
-                            width : (elementWidth - 2) + 'px',
+                            width : elementWidth + 'px',
                             height: uh + 'px'
-                        })
+                        }).addClass('arrow-up')
                     else  # above
                         if (uh > (p.top - vst))
                             uh = p.top - vst - 10;
@@ -75,9 +74,11 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                         update.css({
                             top : topPos + 'px',
                             left : leftPos + 'px',
-                            width : (elementWidth - 2) + 'px',
+                            width : elementWidth + 'px',
                             height: uh + 'px'
-                        })
+                        }).addClass('arrow-down')
+                    $('.my-inner-list-container', update).css('height', uh + 'px')
+                    $('.my-inner-list-container', update).css('width', elementWidth + 'px')
                     $(update).show()
 
             unless @options.onHide
@@ -152,10 +153,8 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             @element.attr('autocomplete', 'off');
             @options.decorate();
             @container = $('#' + @id + '_container');
-            @onBlurHandler = (event) => @onBlur(event)
-            $(document).on 'click', @onBlurHandler
-            @onKeyPressHandler = (event) => @_onKeyPress(event)
-            @element.on 'keydown', @onKeyPressHandler
+            $(document).on 'click', (event) => @_onBlur(event)
+            @element.on 'keydown', (event) => @_onKeyPress(event)
 
         ###
         # Displays autocompleter control.
@@ -181,8 +180,10 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         getUpdatedChoices : ->
             unless @update
-                $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list all-round-corners shadow"></div>')
+                $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list all-round-corners shadow"><div class="my-inner-list-container"></div></div>')
                 @update = $('#' + @id + '_update')
+                @_innerListContainer = $('.my-inner-list-container', @update)
+                console.log 'my-inner-list-container' + @_innerListContainer.size()
 
             if @options.url
                 parameters = @options.parameters;
@@ -208,7 +209,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         # On blur handler.
         ###
-        onBlur : (event) ->
+        _onBlur : (event) ->
             return unless @active
             target = $(event.target)
             ancestor = @container;
@@ -325,7 +326,6 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         # Displays choice list.
         ###
         _renderList : ->
-            if @index is undefined then @index = 0
             if @entryCount > 0
                 for i in [0...@entryCount]
                     if @index is i
@@ -370,15 +370,15 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         _syncScroll : (entry, bottomFlg) ->
             return unless entry?
-            updateHeight = @update.height()
-            scrollTop = @update.scrollTop()
+            updateHeight = @_innerListContainer.height()
+            scrollTop = @_innerListContainer.scrollTop()
             topPos = $(entry).position().top
             if topPos > scrollTop and topPos < (scrollTop + updateHeight - 10)
                 return
             unless bottomFlg
-                @update.scrollTop(topPos)
+                @_innerListContainer.scrollTop(topPos)
             else
-                @update.scrollTop(topPos - (updateHeight - $(entry).height() - 5))
+                @_innerListContainer.scrollTop(topPos - (updateHeight - $(entry).height() - 5))
 
         ###
         # Returns selected item choice.
@@ -433,7 +433,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         updateChoices : (choices) ->
             if !@changed && @hasFocus
-                @update.html(choices)
+                $('.my-inner-list-container', @update).html(choices)
                 i = 0
                 entries = $('LI', @update)
                 @entryCount = entries.length
