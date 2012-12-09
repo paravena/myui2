@@ -183,7 +183,6 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list all-round-corners shadow"><div class="my-inner-list-container"></div></div>')
                 @update = $('#' + @id + '_update')
                 @_innerListContainer = $('.my-inner-list-container', @update)
-                console.log 'my-inner-list-container' + @_innerListContainer.size()
 
             if @options.url
                 parameters = @options.parameters;
@@ -271,7 +270,6 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                         event.stopPropagation()
                         return true
                     when eventUtil.KEY_LEFT, eventUtil.KEY_RIGHT
-                        console.log 'right or left?'
                         return true
                     when eventUtil.KEY_UP
                         @markPrevious()

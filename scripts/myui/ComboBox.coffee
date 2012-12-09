@@ -88,7 +88,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/Autocompleter'], ($, Util, Autocomple
                     text = item
                     value = item
                 i++
-                if currentValue is text then @index = i
+                if currentValue is text then @index = i - 1
                 result.push('<li id="' + value + '">' + text + '</li>')
 
             return '<ul>' + result.join('') + '</ul>'
