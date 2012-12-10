@@ -149,7 +149,6 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         ###
         _onKeyPress : (event) ->
             return false if @_blockKeyCaptureFlg
-            console.log 'processing key tableGrid? ' + @_tableGrid?
             # If a modifier key is pressed (except shift), ignore the event
             return false if event.metaKey or event.altKey or event.ctrlKey
             x = @_xCurrentPos
