@@ -1,17 +1,15 @@
 .my-tooltip {
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 11px;
     position: absolute;
-    padding: 2px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
+    padding: 3px;
     z-index: 10000;
 }
 
 .my-tooltip-error {
     color: #000;
-    background: url('images/cancel.png') no-repeat 3px 3px #ccc;
-    border: #f00 solid 1px;
+    background: url('images/cancel.png') no-repeat 3px 3px #ddd;
+    border: #609 solid 1px;
 }
 
 .my-tooltip-info {
@@ -22,4 +20,26 @@
 
 .my-tooltip-inner {
     padding: 1px 1px 1px 25px;
+}
+
+.my-tooltip:before {
+    content: '';
+    display: inline-block;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid #609;
+    position: absolute;
+    top: -7px;
+    left: 6px;
+}
+
+.my-tooltip:after {
+    content: '';
+    display: inline-block;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #ddd;
+    position: absolute;
+    top: -6px;
+    left: 7px;
 }

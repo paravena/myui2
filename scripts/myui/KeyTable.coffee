@@ -35,7 +35,7 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             @_nOldFocus = null
             @_topLimit = 0
             # Table grid key navigation handling flags
-            @_blockKeyCaptureFlg = false
+            @_blockKeyCaptureFlg = true
             @_isInputFocusedFlg = false
             @_xCurrentPos = 0
             @_yCurrentPos = 0
@@ -66,7 +66,6 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                 blurFlg = false if element.closest('my-autocompleter, my-autocompleter-list, my-datepicker-container').length > 0
                 if blurFlg
                     @removeFocus(@_nCurrentFocus, true)
-                    @releaseKeys()
                     @_nOldFocus = null
 
             $(document).on 'click', @_onClickHandler
@@ -149,7 +148,8 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # @param event key event
         ###
         _onKeyPress : (event) ->
-            return false unless @_blockKeyCaptureFlg
+            return false if @_blockKeyCaptureFlg
+            console.log 'processing key tableGrid? ' + @_tableGrid?
             # If a modifier key is pressed (except shift), ignore the event
             return false if event.metaKey or event.altKey or event.ctrlKey
             x = @_xCurrentPos
@@ -163,9 +163,6 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
                         @_eventFire 'action', @_nCurrentFocus
                         return false
                     when eventUtil.KEY_ESC # esc
-                        if !@_eventFire 'esc', @_nCurrentFocus
-                            # Only lose focus if there isn't an escape handler on the cell
-                            @blur()
                         return false
                     when -1, eventUtil.KEY_LEFT # left arrow
                         return false if @_isInputFocusedFlg
@@ -303,18 +300,6 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
             return false
 
         ###
-        # Blur focus from the whole table
-        ###
-        blur : ->
-            #return unless @_nCurrentFocus
-            #@removeFocus(@_nCurrentFocus, onlyCellFlg)
-            #@xCurrentPos = null
-            #@yCurrentPos = null
-            #@_nCurrentFocus = null
-            #@releaseKeys()
-            return
-
-        ###
         # Removes focus from a cell and fire any blur events which are attached
         # @param element cell of interest
         ###
@@ -356,13 +341,13 @@ define ['jquery', 'cs!myui/Util'], ($, Util) ->
         # Start capturing key events for this table
         ###
         captureKeys : ->
-            @_blockKeyCaptureFlg = true
+            @_blockKeyCaptureFlg = false
 
         ###
         # Stop capturing key events for this table
         ###
         releaseKeys : ->
-            @_blockKeyCaptureFlg = false
+            @_blockKeyCaptureFlg = true
 
         ###
         # Sets the top limit of the grid

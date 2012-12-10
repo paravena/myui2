@@ -57,6 +57,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                     topPos = $(element).outerHeight() + offsetTop + 2
                     elementWidth = $(element).closest('div').width() - 2
                     leftPos = offsetLeft
+                    pointerCssClass = 'my-arrow-up-pointer'
                     if (rh >= (p.top - vst))  # down
                         if (uh > rh) then uh = rh - 10
                         update.css({
@@ -64,19 +65,23 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                             left : leftPos + 'px',
                             width : elementWidth + 'px',
                             height: uh + 'px'
-                        }).addClass('arrow-up')
+                        }).addClass(pointerCssClass)
                     else  # above
                         if (uh > (p.top - vst))
+                            console.log 'step 1'
                             uh = p.top - vst - 10;
                             topPos = p.top - (uh + 4)
+                            pointerCssClass = 'my-arrow-down-pointer'
                         else if (uh > rh)
                             topPos = p.top - (uh + 4)
+                            pointerCssClass = 'my-arrow-down-pointer'
+
                         update.css({
                             top : topPos + 'px',
                             left : leftPos + 'px',
                             width : elementWidth + 'px',
                             height: uh + 'px'
-                        }).addClass('arrow-down')
+                        }).addClass(pointerCssClass)
                     $('.my-inner-list-container', update).css('height', uh + 'px')
                     $('.my-inner-list-container', update).css('width', elementWidth + 'px')
                     $(update).show()
@@ -91,7 +96,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 @options.selector = =>
                     result = [] # Beginning matches
                     partial = [] # Inside matches
-                    entry = @getToken()
+                    entry = @_getToken()
                     items = @options.items
                     listTextPropertyName = @options.listTextPropertyName
                     listValuePropertyName = @options.listValuePropertyName
@@ -180,13 +185,13 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         getUpdatedChoices : ->
             unless @update
-                $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list all-round-corners shadow"><div class="my-inner-list-container"></div></div>')
+                $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list my-all-round-corners my-drop-shadow"><div class="my-inner-list-container"></div></div>')
                 @update = $('#' + @id + '_update')
                 @_innerListContainer = $('.my-inner-list-container', @update)
 
             if @options.url
                 parameters = @options.parameters;
-                parameters[@options.finderParamName] = @getToken()
+                parameters[@options.finderParamName] = @_getToken()
                 if @options.getParameters
                     moreParams = @options.getParameters()
                     for p of moreParams
@@ -196,7 +201,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 $.ajax(@options.url, {
                     complete: (response) =>
                         @options.items = $.parseJSON(response.responseText)
-                        @stopIndicator()
+                        @_stopIndicator()
                         @updateChoices @options.selector()
                     ,
                     dataType : 'json',
@@ -236,7 +241,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         # Hide choice list.
         ###
         hide : ->
-            @stopIndicator()
+            @_stopIndicator()
             if @update
                 @update.remove()
                 @active = false
@@ -252,7 +257,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         # Hides spinner indicator.
         ###
-        stopIndicator : ->
+        _stopIndicator : ->
             $(@options.indicator).hide() if @options.indicator?
 
         ###
@@ -262,7 +267,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             if @active
                 switch event.keyCode
                     when eventUtil.KEY_TAB, eventUtil.KEY_RETURN
-                        @selectEntry()
+                        @_selectEntry()
                         event.stopPropagation()
                     when eventUtil.KEY_ESC
                         @hide()
@@ -272,12 +277,12 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                     when eventUtil.KEY_LEFT, eventUtil.KEY_RIGHT
                         return true
                     when eventUtil.KEY_UP
-                        @markPrevious()
+                        @_markPrevious()
                         @_renderList()
                         event.stopPropagation()
                         return true
                     when eventUtil.KEY_DOWN
-                        @markNext()
+                        @_markNext()
                         @_renderList()
                         event.stopPropagation()
                         return true
@@ -317,7 +322,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         onClick : (event) ->
             element = $(event.target).closest('LI')[0]
             @index = $(element).data('autocompleteIndex')
-            @selectEntry()
+            @_selectEntry()
             @hide()
 
         ###
@@ -346,7 +351,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         # Highlight previous item choice.
         ###
-        markPrevious : ->
+        _markPrevious : ->
             if @index > 0
                 @index--;
             else
@@ -356,7 +361,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         # Highlight next item choice.
         ###
-        markNext : ->
+        _markNext : ->
             if @index < @entryCount - 1
                 @index++
             else
@@ -387,8 +392,8 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         # Highlight selected item choice.
         ###
-        selectEntry : ->
-            @updateElement(@getCurrentEntry())
+        _selectEntry : ->
+            @_updateElement(@getCurrentEntry())
 
         ###
         # Returns value.
@@ -399,7 +404,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         # Updates element.
         ###
-        updateElement : (selectedElement) ->
+        _updateElement : (selectedElement) ->
             # if an updateElement method is provided
             if @options.updateElement
                 @options.updateElement(selectedElement)
@@ -407,7 +412,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
 
             value = $(selectedElement).not('informal').text()
 
-            bounds = @getTokenBounds()
+            bounds = @_getTokenBounds()
 
             if bounds[0] isnt -1
                 newValue = @element.val().substr(0, bounds[0])
@@ -437,11 +442,11 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 @entryCount = entries.length
                 @addObservers(entries)
 
-                @stopIndicator()
+                @_stopIndicator()
                 if @index is undefined then @index = 0
 
                 if @entryCount is 1 and @options.autoSelect
-                    @selectEntry()
+                    @_selectEntry()
                     @hide()
                 else
                     @_renderList()
@@ -461,7 +466,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         onObserverEvent : ->
             @changed = false
             @tokenBounds = null
-            if @getToken().length >= @options.minChars
+            if @_getToken().length >= @options.minChars
                 @getUpdatedChoices()
             else
                 @active = false
@@ -472,15 +477,15 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         # Returns token.
         ###
-        getToken : ->
-            bounds = @getTokenBounds()
+        _getToken : ->
+            bounds = @_getTokenBounds()
             return $.trim(@element.val().substring(bounds[0], bounds[1]))
 
         ###
         # Returns am array containing the indexes
         # that delimits the entered text.
         ###
-        getTokenBounds : ->
+        _getTokenBounds : ->
             return @tokenBounds if @tokenBounds
             value = @element.val()
             if $.trim(value) is '' then return [-1, 0]

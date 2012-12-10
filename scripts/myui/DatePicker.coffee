@@ -10,6 +10,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_mdpId = $('.my-datepicker-container').length + $('.my-datepicker').length + 1
             @_targetElement = $(options.input) # make sure it's an element, not a string
             @visibleFlg = false
+            @_tableGrid = null
             # initialize the date control
 
             @options = $.extend({
@@ -87,6 +88,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 $(document).click @_closeIfClickedOutHandler
             @_callback('afterShow')
             @visibleFlg = true
+            @_tableGrid.keys.releaseKeys() if @_tableGrid?
 
         ###
         # Returns unique id.
@@ -110,7 +112,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
             style += 'width: 220px;' if @options.numberOfMonths is 1
 
-            html[idx++] = '<div id="my-datepicker-div'+@_mdpId+'" class="my-datepicker shadow all-round-corners" style="'+style+'">'
+            html[idx++] = '<div id="my-datepicker-div'+@_mdpId+'" class="my-datepicker my-drop-shadow my-all-round-corners" style="'+style+'">'
             html[idx++] = '    <div class="my-datepicker-top" style="clear:left"></div>'
             html[idx++] = '    <div class="my-datepicker-header all-round-corners" style="clear:left"></div>'
             html[idx++] = '    <div class="my-datepicker-body" style="clear:left"></div>'
@@ -151,7 +153,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             left_px = left + 'px';
             top_px = if above then (top - calendarHeight - 10) else (top + height + 10) + 'px'
 
-            @_calendarDiv.addClass(if above then 'arrow-down' else 'arrow-up')
+            @_calendarDiv.addClass(if above then 'my-arrow-down-pointer' else 'my-arrow-up-pointer')
             @_calendarDiv.css('left', left_px)
             @_calendarDiv.css('top', top_px)
             @_calendarDiv.css('visibility', '')
@@ -683,6 +685,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             @_keys.stop()
             @_keys = null
             @visibleFlg = false
+            @_tableGrid.keys.captureKeys() if @_tableGrid?
             @_callback('afterClose')
 
         ###

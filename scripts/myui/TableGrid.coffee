@@ -990,6 +990,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor.setTableGrid(this)
                 editor.render(input, true)
                 editor.validate() if editor.validate
+                editor._tableGrid = @ if editor instanceof DatePicker
                 unless editRowMode
                     input.focus()
                     input.select()
@@ -1046,7 +1047,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             isInputFlg = !(editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
             if isInputFlg
                 editor.hide() if editor.hide? # this only happen when editor is a Combobox
-                return false if editor instanceof DatePicker and editor.visibleFlg
                 editor.reset() if editor.reset?
                 element.css('height', cellHeight + 'px')
                 innerElement.css({
