@@ -801,8 +801,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
           
             $('#mtgHB' + id).css('visibility', 'hidden') # in case the cell menu button is visible
             @_blurCellElement(keys._nCurrentFocus) # in case there is a cell in editing mode
-            keys.blur() # remove the focus of the selected cell
-          
+
             removedHeaderCell = null
             targetHeaderCell = null
             removedCells = null
@@ -1237,7 +1236,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             id = @_mtgId
             cm = @_columnModel
             @_blurCellElement(@keys._nCurrentFocus) # in case there is a cell in editing mode
-            @keys.blur() #remove the focus of the selected cell
             headerRowTable = $('#mtgHRT' + id)
             bodyTable = $('#mtgBT' + id)
             index = -1
