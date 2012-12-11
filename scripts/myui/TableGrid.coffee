@@ -305,7 +305,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 renderedRowsAllowed = @renderedRowsAllowed = rows.length if !@options.addLazyRenderingBehavior
 
             if firstRenderingFlg
-                @innerBodyDiv.css('height',  (rows.length * cellHeight) + 'px')
                 html[idx++] = '<table id="mtgBT'+id+'" border="0" cellspacing="0" cellpadding="0" width="'+headerWidth+'" class="tablegrid-body-table">'
                 html[idx++] = '<tbody>'
 
@@ -1437,6 +1436,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 'width' : @tableWidth + 'px',
                 'height' : @bodyHeight + 'px'
             })
+
+            @innerBodyDiv.css('width', (@tableWidth - @scrollBarWidth) + 'px')
 
             if @options.pager
                 topPos = @bodyHeight + @headerHeight +  5
