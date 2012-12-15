@@ -348,7 +348,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 cellWidth = parseInt(cm[j].width) # consider border at both sides
                 iCellWidth = cellWidth - 6 # consider padding at both sides
                 editor = cm[j].editor or null
-                normalEditorFlg = !(editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton or editor instanceof ComboBox or columnId is 'actions'+id)
+                normalEditorFlg = !(editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton or editor instanceof Autocompleter or columnId is 'actions'+id)
                 alignment = 'left'
                 display = '\'\''
                 if !cm[j].hasOwnProperty('renderer')
@@ -390,7 +390,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     html[idx++] = temp
                 else if editor instanceof TableGrid.CellRadioButton
                     html[idx++] = template(radioTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId]})
-                else if editor instanceof ComboBox
+                else if editor instanceof Autocompleter
                     if !cm[j].hasOwnProperty('renderer')
                         listTextPropertyName = cm[j].editor.options.listTextPropertyName
                         listValuePropertyName = cm[j].editor.options.listValuePropertyName

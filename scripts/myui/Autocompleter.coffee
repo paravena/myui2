@@ -181,6 +181,12 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             return @options.items
 
         ###
+        # Reset autocomplete list.
+        ###
+        reset : ->
+            @options.items = null
+
+        ###
         # Retrieves updated choice list.
         ###
         getUpdatedChoices : ->
