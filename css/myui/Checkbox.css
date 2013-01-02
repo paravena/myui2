@@ -7,7 +7,7 @@
 }
 
 .my-checkbox input {
-   /* visibility: hidden; */
+   visibility: hidden;
 }
 
 .my-checkbox-checked {

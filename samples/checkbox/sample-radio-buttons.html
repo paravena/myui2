@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+		"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>Sample Radios</title>
+		<link type="text/css" href="../../css/myui/myui.min.css" rel="stylesheet">
+		<script type="text/javascript" src="../../scripts/myui.min.js"></script>
+	</head>
+	<script type="text/javascript">
+		$(window).load(function() {
+			$("input[type=radio]").myRadioButton();
+		});
+	</script>
+	<body>
+		<label>
+			<input id="trueRadio" type="radio" name="interest" value="Movies" checked="checked">True
+		</label>
+		<br>
+		<label>
+			<input id="falseRadio" type="radio" name="interest" value="Reading">False
+		</label>
+	</body>
+</html>
