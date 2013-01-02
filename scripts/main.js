@@ -12,15 +12,18 @@ require([
     'cs!myui/Autocompleter',
     'cs!myui/ComboBox',
     'cs!myui/DatePicker',
+    'cs!myui/Checkbox',
     'cs!myui/TableGrid'], function(TextField,
                                    Autocompleter,
                                    ComboBox,
                                    DatePicker,
+                                   Checkbox,
                                    TableGrid) {
         window.MY = {};
         MY.TextField = TextField;
         MY.Autocompleter = Autocompleter;
         MY.ComboBox = ComboBox;
         MY.DatePicker = DatePicker;
+        MY.Checkbox = Checkbox;
         MY.TableGrid = TableGrid;
 });

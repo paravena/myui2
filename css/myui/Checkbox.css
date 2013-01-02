@@ -3,10 +3,25 @@
     height: 25px;
     padding: 0 5px 0 0;
     background: url(images/checkbox.png) no-repeat;
-    display: block;
-    clear: left;
-    float: left;
+    display: inline-block;
 }
+
+.my-checkbox input {
+   /* visibility: hidden; */
+}
+
+.my-checkbox-checked {
+    background-position: 0 -50px;
+}
+
 .my-radio {
     background: url(images/radio.png) no-repeat;
+}
+
+.my-radio input {
+    visibility: hidden;
+}
+
+.my-radio-checked {
+    background-position: 0 -50px;
 }

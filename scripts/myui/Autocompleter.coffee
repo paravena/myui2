@@ -13,12 +13,12 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         baseInitialize : (options) ->
             super(options)
-            @element = $(options.input);
-            @hasFocus = false;
-            @changed = false;
-            @active = false;
-            @index = 0;
-            @entryCount = 0;
+            @element = $(options.input)
+            @hasFocus = false
+            @changed = false
+            @active = false
+            @index = 0
+            @entryCount = 0
 
             @options = $.extend({
                 items: null,
