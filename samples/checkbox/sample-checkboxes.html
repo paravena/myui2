@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+		"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>Sample Checkboxs</title>
+		<!--
+		<link type="text/css" href="../../css/myui/Checkbox.css" rel="stylesheet">
+		<script type="text/javascript" src="../../scripts/libs/jquery.js"></script>
+		-->
+		<link type="text/css" href="../../css/myui/myui.min.css" rel="stylesheet">
+		<script type="text/javascript" src="../../scripts/myui.min.js"></script>
+	</head>
+	<script type="text/javascript">
+		$(window).load(function() {
+			$("input[type=checkbox]").myCheckbox();
+		});
+		/*
+		$(document).ready(function() {
+			var checkboxes = $("input[type=checkbox]");
+			checkboxes.wrap('<span class="my-checkbox"></span>').css('visibility', 'hidden');
+			checkboxes.each(function() {
+				var checkbox = $(this);
+				var span = $(this).parent('span');
+				if (checkbox.is(':checked')) {
+					span.addClass('my-checkbox-checked');
+				}
+				span.on('mousedown', function() {
+					if (checkbox.is(':checked')) {
+						span.removeClass('my-checkbox-checked');
+					} else {
+						span.addClass('my-checkbox-checked');
+					}
+				});
+			});
+		});
+		*/
+	</script>
+	<body>
+		<label>
+			<input id="moviesCheck" type="checkbox" name="interest" value="Movies" checked="checked">Movies
+		</label>
+		<br>
+		<label>
+			<input id="readingCheck" type="checkbox" name="interest" value="Reading">Reading
+		</label>
+		<br>
+		<label>
+			<input id="sportCheck" type="checkbox" name="interest" value="Sport">Sport
+		</label>
+		<br>
+		<label>
+			<input id="dancingCheck" type="checkbox" name="interest" value="Dancing" checked="checked">Dancing
+		</label>
+	</body>
+</html>
