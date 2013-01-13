@@ -2,31 +2,27 @@ define ['jquery'], ($) ->
     class RadioButton
         constructor : (options) ->
             @elements = $(options.input)
-
             @options = $.extend({
                 onClick : null,
                 getValueOf : null,
-                tableGrid : null
             }, options or {})
-
             @onClick = options.onClick
             @getValueOf = options.getValueOf
+            @_decorate()
+            @_addBehavior()
 
-            unless @options.tableGrid?
-                @decorate()
-                @addBehavior()
-
-        decorate : ->
+        _decorate : ->
             @elements.wrap('<span class="my-radio"></span>')
             $(element).parent('span').addClass('my-radio-checked') for element in @elements when $(element).is(':checked')
 
-        addBehavior : ->
+        _addBehavior : ->
             span = @elements.parent('span')
             span.on 'mousedown', (event) =>
                 element = $(event.target)
                 isChecked = $('input', element).is(':checked')
+                name = $('input', element).attr('name')
                 unless isChecked
-                    $(':checked', @elements).parent('span').removeClass('my-radio-checked')
+                    $('input[name='+name+']').parent('span').removeClass('my-radio-checked')
                     element.addClass('my-radio-checked')
                 @options.onClick(!isChecked, $(element)) if @options.onClick?
 

@@ -184,7 +184,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         # Reset autocomplete list.
         ###
         reset : ->
-            @options.items = null
+            # @options.items = null TODO check why is causing a problem when rendering the grid control
 
         ###
         # Retrieves updated choice list.

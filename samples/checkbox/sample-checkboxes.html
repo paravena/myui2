@@ -3,10 +3,6 @@
 <html>
 	<head>
 		<title>Sample Checkboxs</title>
-		<!--
-		<link type="text/css" href="../../css/myui/Checkbox.css" rel="stylesheet">
-		<script type="text/javascript" src="../../scripts/libs/jquery.js"></script>
-		-->
 		<link type="text/css" href="../../css/myui/myui.min.css" rel="stylesheet">
 		<script type="text/javascript" src="../../scripts/myui.min.js"></script>
 	</head>
@@ -14,26 +10,6 @@
 		$(window).load(function() {
 			$("input[type=checkbox]").myCheckbox();
 		});
-		/*
-		$(document).ready(function() {
-			var checkboxes = $("input[type=checkbox]");
-			checkboxes.wrap('<span class="my-checkbox"></span>').css('visibility', 'hidden');
-			checkboxes.each(function() {
-				var checkbox = $(this);
-				var span = $(this).parent('span');
-				if (checkbox.is(':checked')) {
-					span.addClass('my-checkbox-checked');
-				}
-				span.on('mousedown', function() {
-					if (checkbox.is(':checked')) {
-						span.removeClass('my-checkbox-checked');
-					} else {
-						span.addClass('my-checkbox-checked');
-					}
-				});
-			});
-		});
-		*/
 	</script>
 	<body>
 		<label>

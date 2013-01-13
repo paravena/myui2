@@ -1,4 +1,4 @@
-define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myui/TextField', 'cs!myui/BrowseInput', 'cs!myui/Autocompleter', 'cs!myui/ComboBox', 'cs!myui/DatePicker', 'myui/i18n'], ($, jquerypp, Util, KeyTable, TextField, BrowseInput, Autocompleter, ComboBox, DatePicker, i18n) ->
+define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myui/TextField', 'cs!myui/Checkbox', 'cs!myui/RadioButton', 'cs!myui/BrowseInput', 'cs!myui/Autocompleter', 'cs!myui/ComboBox', 'cs!myui/DatePicker', 'myui/i18n'], ($, jquerypp, Util, KeyTable, TextField, Checkbox, RadioButton, BrowseInput, Autocompleter, ComboBox, DatePicker, i18n) ->
     eventUtil = $.util.event
     template = $.util.template
     arrayUtil = $.util.array
@@ -331,8 +331,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             id = @_mtgId
             tdTmpl = '<td id="mtgC{id}_c{x}r{y}" height="{height}" width="{width}" style="width:{width}px;height:{height}px;display:{display}" class="tablegrid-cell mtgC{id} mtgC{id}_c{x} mtgR{id}_r{y}">'
             icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;text-align:{align}" class="tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
-            checkboxTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x} my-checkbox {isSelectable}" checked="{checked}">'
-            radioTmpl = '<input id="mtgInput{id}_c{x}r{y}" name="mtgInput{id}_c{x}" type="radio" value="{value}" class="mtgInput{id}_c{x} my-radio">'
+            checkboxTmpl = '<label><span id="my-checkbox{id}_c{x}r{y}" class="my-checkbox {isSelectable}"><input name="my-checkbox{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x}" checked="{checked}"></span></label>'
+            radioTmpl = '<label><span id="my-radio{id}_c{x}r{y}" class="my-radio"><input name="my-radio{id}_c{x}" type="radio" value="{value}" class="my-radio{id}_c{x}"></span></label>'
             actionBtnTmpl = '<div id="{name}{id}_c{x}r{y}" class="mini-button" style="display:{display}"><span class="icon {iconClass}">&nbsp;</span></div>'
             rs = @options.rowStyle # row style handler
             rc = @options.rowClass # row class handler
@@ -365,7 +365,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     if !cm[j].hasOwnProperty('renderer')
                         html[idx++] = row[columnId]
                     else
-                        html[idx++] = cm[j].renderer(row[columnId], @getRow(rowIdx))
+                        html[idx++] = cm[j].renderer(row[columnId], row)
                 else if editor instanceof TableGrid.CellCheckbox
                     selectable = if editor.selectable then 'selectable' else ''
                     temp = template(checkboxTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId], 'isSelectable' : selectable})
@@ -391,22 +391,22 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 else if editor instanceof TableGrid.CellRadioButton
                     html[idx++] = template(radioTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId]})
                 else if editor instanceof Autocompleter
-                    if !cm[j].hasOwnProperty('renderer')
+                    unless cm[j].hasOwnProperty('renderer')
                         listTextPropertyName = cm[j].editor.options.listTextPropertyName
                         listValuePropertyName = cm[j].editor.options.listValuePropertyName
                         cm[j].renderer = (value, list) ->
                             result = value
-                            for i in [0...list.length]
-                                if list[i] instanceof Object
-                                    if list[i][listValuePropertyName] is value
-                                        result = list[i][listTextPropertyName]
+                            for item in list
+                                if item instanceof Object
+                                    if item[listValuePropertyName] is value
+                                        result = item[listTextPropertyName]
                                         break
                                 else
                                     break # this happen when list is an array of strings
                             # end for
                             return result
                         # end renderer
-                    html[idx++] = cm[j].renderer(row[columnId], editor.getItems(), @getRow(rowIdx))
+                    html[idx++] = cm[j].renderer(row[columnId], editor.getItems(), row)
                 else if columnId is 'actions' + id
                     for action in @options.actionsColumnToolbar
                         action['id'] = id
@@ -443,21 +443,26 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         _applyCellCallbacks : ->
             cm = @_columnModel
             id = @_mtgId
-            @bodyTable.delegate 'td input.my-checkbox', 'click', (event) =>
-                element = $(event.target)
-                elementId = element.attr('id')
+            @bodyTable.delegate 'td span.my-checkbox', 'mousedown', (event) =>
+                span = $(event.target)
+                elementId = span.attr('id')
                 coords = elementId.match(/_c(\d+?)r(\-?\d+?)/)
                 x = parseInt(coords[1])
                 y = parseInt(coords[2])
-                unless element.is('.selectable')
-                    value = element.is(':checked')
-                    value = editor.getValueOf(element.is(':checked')) if editor.getValueOf?
+                isChecked = $('input', span).is(':checked')
+                unless isChecked
+                    span.addClass('my-checkbox-checked')
+                else
+                    span.removeClass('my-checkbox-checked')
+                unless span.is('.selectable')
+                    value = isChecked
+                    value = editor.getValueOf(isChecked) if editor.getValueOf?
                     @setValueAt(value, x, y, false)
                     # if doesn't exist in the array the row is registered
-                    @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1
-                    element.parent('div').addClass('modified-cell')
+                    @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1 # TODO a bug here
+                    span.parent('div').addClass('modified-cell')
                 editor = cm[x].editor
-                editor.onClick(element.val(), element.is(':checked')) if editor.onClick?
+                editor.onClick(span.val(), span.is(':checked')) if editor.onClick?
 
             @bodyTable.delegate 'td div.mini-button', 'click', (event) =>
                 act = @_actionsColumnToolbar
@@ -993,14 +998,20 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     input.focus()
                     input.select()
             else if editor instanceof TableGrid.CellCheckbox and !@editRowFlg
-                input = $('#mtgInput' + id + '_c' + x + 'r' + y)
+                span = $('#my-checkbox' + id + '_c' + x + 'r' + y)
+                input = $('input', '#my-checkbox' + id + '_c' + x + 'r' + y)
                 isChecked = !input.is(':checked')
-                if isChecked then input.attr('checked', 'checked') else input.removeAttr('checked')
+                if isChecked
+                    input.attr('checked', 'checked')
+                    span.addClass('my-checkbox-checked')
+                else
+                    input.removeAttr('checked')
+                    span.removeClass('my-checkbox-checked')
                 if editor.selectable is undefined or !editor.selectable
                     value = editor.getValueOf(isChecked) if editor.hasOwnProperty('getValueOf')
                     @setValueAt(value, x, y, false)
                     @modifiedRows.push(y) if y >= 0 and y < @rows.length and @modifiedRows.indexOf(y) == -1 # if doesn't exist in the array the row is registered
-                editor.onClick(value, isChecked) if editor instanceof TableGrid.CellCheckbox and editor.onClick?
+                editor.onClick(value, isChecked) if editor.onClick?
                 @keys._isInputFocusedFlg = false
                 @editedCellId = null
                 innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable is undefined or !editor.selectable)
@@ -1011,7 +1022,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 value = editor.getValueOf(isChecked) if editor.hasOwnProperty('getValueOf')
                 @setValueAt(value, x, y, false)
                 @modifiedRows.push(y) if y >= 0 and y < @rows.length and @modifiedRows.indexOf(y) == -1 #if doesn't exist in the array the row is registered
-                editor.onClick(value, isChecked) if editor instanceof TableGrid.CellRadioButton and editor.onClick?
+                editor.onClick(value, isChecked) if editor.onClick?
                 @keys._isInputFocusedFlg = false
                 @editedCellId = null
                 innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable is undefined or !editor.selectable)
@@ -1041,7 +1052,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             type = cm[x].type or 'string'
             columnId = cm[x].id
             alignment = if type == 'number' then 'right' else 'left'
-          
+            alignment = cm[x].align if cm[x].align?
             isInputFlg = !(editor instanceof TableGrid.CellCheckbox or editor instanceof TableGrid.CellRadioButton)
             if isInputFlg
                 editor.hide() if editor.hide? # this only happen when editor is a Combobox
@@ -1610,7 +1621,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         break
             else
                 selectAllFlg = cm[idx].selectAllFlg
-
             if idx >= 0
                 j = 0
                 y = 0
@@ -1618,17 +1628,18 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     if !addNewRowsToEndBehaviorFlg
                         for j in [0...newRowsAdded.length]
                             y = -(j + 1)
-                            result.push(y) if $('#mtgInput'+id+'_c'+idx+'r'+y).is(':checked')
+                            result.push(y) if $('#my-checkbox'+id+'_c'+idx+'r'+y).is('.my-checkbox-checked')
                     else
                         for j in [0...newRowsAdded.length]
                             y = j + renderedRows
-                            result.push(y) if $('#mtgInput'+id+'_c'+idx+'r'+y).is(':checked')
+                            result.push(y) if $('#my-checkbox'+id+'_c'+idx+'r'+y).is('.my-checkbox-checked')
 
                 for j in [0...renderedRows]
                     y = j
-                    result.push(y) if @deletedRows.indexOf(@getRow(y)) == -1 and $('#mtgInput'+id+'_c'+idx+'r'+y).size() > 0 and $('#mtgInput'+id+'_c'+idx+'r'+y).is(':checked')
+                    # TODO this is weird
+                    result.push(y) if @deletedRows.indexOf(@getRow(y)) == -1 and $('#my-checkbox'+id+'_c'+idx+'r'+y).size() > 0 and $('#my-checkbox'+id+'_c'+idx+'r'+y).is('.my-checkbox-checked')
 
-
+                #TODO check this maybe there is a bug
                 if selectAllFlg and renderedRows < @rows.length
                     result.push(j) for j in [renderedRows...@rows.length]
 
@@ -1811,7 +1822,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             return result
     #end TableGrid
 
-    class TableGrid.CellCheckbox
+    class TableGrid.CellCheckbox extends Checkbox
         constructor : (options) ->
             options = $.extend({
                 onClick : null,
@@ -1822,7 +1833,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @getValueOf = options.getValueOf
             @selectable = options.selectable
 
-    class TableGrid.CellRadioButton
+    class TableGrid.CellRadioButton extends RadioButton
         constructor : (options) ->
             options = $.extend({
                 onClick : null,

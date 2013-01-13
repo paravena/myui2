@@ -2,27 +2,22 @@ define ['jquery'], ($) ->
     class Checkbox
         constructor : (options) ->
             @elements = $(options.input)
-
             @options = $.extend({
                 onClick : null,
                 getValueOf : null,
                 selectable : null
-                tableGrid : null
             }, options or {})
-
             @onClick = options.onClick
             @getValueOf = options.getValueOf
             @selectable = options.selectable
+            @_decorate()
+            @_addBehavior()
 
-            unless @options.tableGrid?
-                @decorate()
-                @addBehavior()
-
-        decorate : ->
+        _decorate : ->
             @elements.wrap('<span class="my-checkbox"></span>')
             $(element).parent('span').addClass('my-checkbox-checked') for element in @elements when $(element).is(':checked')
 
-        addBehavior : ->
+        _addBehavior : ->
             span = @elements.parent('span')
             span.on 'mousedown', (event) =>
                 element = $(event.target)
