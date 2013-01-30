@@ -133,6 +133,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     @_makeAllColumnsResizable()
                     @_makeAllColumnDraggable() if @options.addDraggingBehavior
                     @_applySettingMenuBehavior() if @options.addSettingBehavior
+                @keys.stop() if @keys?
                 @keys = new KeyTable(@)
                 @_addKeyBehavior()
                 @_addPagerBehavior() if @pager
@@ -446,9 +447,13 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @bodyTable.delegate 'td span.my-checkbox', 'mousedown', (event) =>
                 span = $(event.target)
                 elementId = span.attr('id')
-                coords = elementId.match(/_c(\d+?)r(\-?\d+?)/)
+                coords = elementId.match(/_c(\d+.?)r(\-?\d+.?)/)
                 x = parseInt(coords[1])
                 y = parseInt(coords[2])
+                editor = cm[x].editor
+                if typeof(cm[x].editable) is 'function' and !cm[x].editable(x, y)
+                    event.preventDefault()
+                    return false
                 isChecked = $('input', span).is(':checked')
                 unless isChecked
                     span.addClass('my-checkbox-checked')
@@ -460,9 +465,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     @setValueAt(value, x, y, false)
                     # if doesn't exist in the array the row is registered
                     @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1 # TODO a bug here
-                    span.parent('div').addClass('modified-cell')
+                    span.parent('div').addClass('modified-cell') unless y < 0 || y >= @rows.length
                 editor = cm[x].editor
                 editor.onClick(span.val(), span.is(':checked')) if editor.onClick?
+                return true
 
             @bodyTable.delegate 'td div.mini-button', 'click', (event) =>
                 act = @_actionsColumnToolbar
@@ -924,6 +930,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     if c.editable
                         f_action = (cell) =>
                             return if @editRowFlg
+                            if typeof(c.editable) is 'function'
+                                [x, y] = @getCurrentPosition()
+                                return unless c.editable(x, y)
                             if @editedCellId == null or @editedCellId != cell.attr('id')
                                 @editedCellId = cell.attr('id')
                                 @_editCellElement(cell)
@@ -939,9 +948,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         f_blur = (cell) =>
                             return if @editRowFlg
                             @editedCellId = null if @_blurCellElement(cell)
-                            coords = @getCurrentPosition()
-                            row = @getRow(coords[1])
-                            @options.onCellBlur(cell,coords[0], coords[1], row, c.id) if @options.onCellBlur?
+                            [x, y] = @getCurrentPosition()
+                            row = @getRow(y)
+                            @options.onCellBlur(cell, x, y, row, c.id) if @options.onCellBlur?
                         keys.events.blur(c, f_blur)
 
                     f_focus = (cell) =>
@@ -1014,7 +1023,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor.onClick(value, isChecked) if editor.onClick?
                 @keys._isInputFocusedFlg = false
                 @editedCellId = null
-                innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable is undefined or !editor.selectable)
+                innerElement.addClass('modified-cell') if (y >= 0 and y < @rows.length) and !editor.selectable
             else if editor instanceof TableGrid.CellRadioButton and !@editRowFlg
                 input = $('#mtgInput' + id + '_c' + x + 'r' + y)
                 isChecked = !input.is(':checked')
@@ -1199,7 +1208,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             if @url
                 @request[@options.sortColumnParameter] = cm[idx].id;
                 @request[@options.ascDescFlagParameter] = ascDescFlg;
-                @_retrieveDataFromUrl(1)
+                @_retrieveDataFromUrl(1, true)
             else if @rows and @rows.length > 0
                 columnValues = @getColumnValues(cm[idx].id, false)
                 hashIndex = {}
@@ -1795,17 +1804,22 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @modifiedRows = []
             @deletedRows = []
             @newRowsAdded = []
-            @_retrieveDataFromUrl(1, false)
+            @_retrieveDataFromUrl(1, true)
 
         ###
         # Empty data displayed in TableGrid.
         ###
         empty : ->
-            bodyTable = @bodyTable
-            bodyTable.find('tbody').html('')
+            @modifiedRows = []
+            @deletedRows = []
+            @newRowsAdded = []
             @rows = []
             @pager.total = 0
-            @pagerDiv.html(@_updatePagerInfo())
+            @renderedRows = 0
+            @innerBodyDiv.html @_createTableBody(@rows)
+            @bodyTable = $('#mtgBT' + @_mtgId)
+            @pagerDiv.innerHTML = @_updatePagerInfo()
+            @bodyDiv.trigger('dom:dataLoaded')
 
         ###
         # Turns an array row into an object row

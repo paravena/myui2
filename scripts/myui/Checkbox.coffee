@@ -14,7 +14,7 @@ define ['jquery'], ($) ->
             @_addBehavior()
 
         _decorate : ->
-            @elements.wrap('<span class="my-checkbox"></span>')
+            @elements.wrap('<label><span class="my-checkbox"></span></label>')
             $(element).parent('span').addClass('my-checkbox-checked') for element in @elements when $(element).is(':checked')
 
         _addBehavior : ->

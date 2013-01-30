@@ -69,7 +69,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                     else  # above
                         if (uh > (p.top - vst))
                             console.log 'step 1'
-                            uh = p.top - vst - 10;
+                            uh = p.top - vst - 10
                             topPos = p.top - (uh + 4)
                             pointerCssClass = 'my-arrow-down-pointer'
                         else if (uh > rh)
@@ -133,7 +133,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                         i++
                     #end while
                     if partial.length
-                        result = result.concat(partial.slice(0, @options.choices - result.length));
+                        result = result.concat(partial.slice(0, @options.choices - result.length))
                     return "<ul>" + result.join('') + "</ul>"
 
             if typeof(@options.tokens) is 'string'
@@ -154,10 +154,10 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             @element = $(input)
             @id = @element.attr('id')
             @oldElementValue = @element.val()
-            @options.paramName ?= @element.name;
-            @element.attr('autocomplete', 'off');
-            @options.decorate();
-            @container = $('#' + @id + '_container');
+            @options.paramName ?= @element.name
+            @element.attr('autocomplete', 'off')
+            @options.decorate()
+            @container = $('#' + @id + '_container')
             $(document).on 'click', (event) => @_onBlur(event)
             @element.on 'keydown', (event) => @_onKeyPress(event)
 
@@ -196,14 +196,14 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 @_innerListContainer = $('.my-inner-list-container', @update)
 
             if @options.url
-                parameters = @options.parameters;
+                parameters = @options.parameters
                 parameters[@options.finderParamName] = @_getToken()
                 if @options.getParameters
                     moreParams = @options.getParameters()
                     for p of moreParams
                         parameters[p] = moreParams[p]
 
-                @startIndicator();
+                @startIndicator()
                 $.ajax(@options.url, {
                     complete: (response) =>
                         @options.items = $.parseJSON(response.responseText)
@@ -222,8 +222,8 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         _onBlur : (event) ->
             return unless @active
             target = $(event.target)
-            ancestor = @container;
-            blurFlg = true;
+            ancestor = @container
+            blurFlg = true
             blurFlg = false if target.closest(ancestor).size() > 0 # is descendant of ?
             if blurFlg
                 @hide()
@@ -359,9 +359,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         _markPrevious : ->
             if @index > 0
-                @index--;
+                @index--
             else
-                @index = @entryCount - 1;
+                @index = @entryCount - 1
             @_syncScroll(@_getEntry(@index), false)
 
         ###
@@ -441,7 +441,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         # Updates choice list.
         ###
         updateChoices : (choices) ->
-            if !@changed && @hasFocus
+            if !@changed and @hasFocus
                 $('.my-inner-list-container', @update).html(choices)
                 i = 0
                 entries = $('LI', @update)
@@ -505,7 +505,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                 tp = value.lastIndexOf(@options.tokens[index], diff + offset - 1)
                 if tp > prevTokenPos then prevTokenPos = tp
                 tp = value.indexOf(@options.tokens[index], diff + offset)
-                if -1 != tp && tp < nextTokenPos then nextTokenPos = tp
+                if -1 != tp and tp < nextTokenPos then nextTokenPos = tp
                 ++index
             return (@tokenBounds = [prevTokenPos + 1, nextTokenPos])
 

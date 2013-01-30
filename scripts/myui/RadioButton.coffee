@@ -12,7 +12,7 @@ define ['jquery'], ($) ->
             @_addBehavior()
 
         _decorate : ->
-            @elements.wrap('<span class="my-radio"></span>')
+            @elements.wrap('<label><span class="my-radio"></span></label>')
             $(element).parent('span').addClass('my-radio-checked') for element in @elements when $(element).is(':checked')
 
         _addBehavior : ->
