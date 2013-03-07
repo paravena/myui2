@@ -129,7 +129,11 @@
                     id : 'subject',
                     title : 'Subject',
                     width : 205,
-                    editable: true
+                    editable: true,
+	                renderer : function(value, row) {
+		                console.log(row['from_name']);
+		                return value;
+	                }
                 },
                 {
                     id : 'received_date',
