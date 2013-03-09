@@ -195,7 +195,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 html[idx++] = '</div>'
                 @topPos += @titleHeight + 1
 
-
             if @options.toolbar? # adding toolbar
                 buttons = @options.toolbar or []
                 html[idx++] = '<div id="mtgHeaderToolbar'+id+'" class="tablegrid-toolbar" style="position:absolute;top:'+@topPos+'px;left:'+@leftPos+'px;width:'+(@tableWidth - 4)+'px;height:'+(@toolbarHeight - 2)+'px;padding:1px 2px;z-index:10">'
@@ -254,18 +253,18 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html[idx++] = '<div id="mtgHB'+id+'" class="tablegrid-header-button" style="width:14px;height:'+@headerHeight+'px">'
             html[idx++] = '</div>'
             # Adding Header Button Menu
-            html[idx++] = '<div id="mtgHBM'+id+'" class="tablegrid-menu shadow">'
+            html[idx++] = '<div id="mtgHBM'+id+'" class="my-tablegrid-menu shadow">'
             html[idx++] = '<ul>'
             html[idx++] = '<li id="mtgSortAsc'+id+'">'
-            html[idx++] = '<span class="menu-item-icon sort-ascending-icon">&nbsp;</span>'
+            html[idx++] = '<span class="my-menu-item-icon sort-ascending-icon">&nbsp;</span>'
             html[idx++] = i18n.getMessage('label.sortAsc')
             html[idx++] = '</li>'
             html[idx++] = '<li id="mtgSortDesc'+id+'">'
-            html[idx++] = '<span class="menu-item-icon sort-descending-icon">&nbsp;</span>'
+            html[idx++] = '<span class="my-menu-item-icon sort-descending-icon">&nbsp;</span>'
             html[idx++] = i18n.getMessage('label.sortDesc')
             html[idx++] = '</li>'
             html[idx++] = '<li class="mtgSelectAll">'
-            html[idx++] = '<span class="menu-item-checkbox"><input type="checkbox" id="mtgSelectAll'+id+'"></span>'
+            html[idx++] = '<label><span class="my-checkbox my-menu-item-checkbox"><input type="checkbox" id="mtgSelectAll'+id+'"></span></label>'
             html[idx++] = i18n.getMessage('label.selectAll')
             html[idx++] = '</li>'
             html[idx++] = '</ul>'
@@ -332,7 +331,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             id = @_mtgId
             tdTmpl = '<td id="mtgC{id}_c{x}r{y}" height="{height}" width="{width}" style="width:{width}px;height:{height}px;display:{display}" class="tablegrid-cell mtgC{id} mtgC{id}_c{x} mtgR{id}_r{y}">'
             icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;text-align:{align}" class="tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
-            checkboxTmpl = '<label><span id="my-checkbox{id}_c{x}r{y}" class="my-checkbox {isSelectable}"><input name="my-checkbox{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x}" checked="{checked}"></span></label>'
+            checkboxTmpl = '<label><span id="my-checkbox{id}_c{x}r{y}" class="my-checkbox {isSelectable} {checkedClass}"><input name="my-checkbox{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x}" checked="{checked}"></span></label>'
             radioTmpl = '<label><span id="my-radio{id}_c{x}r{y}" class="my-radio"><input name="{groupName}" type="radio" value="{value}" class="my-radio{id}_c{x}"></span></label>'
             actionBtnTmpl = '<div id="{name}{id}_c{x}r{y}" class="mini-button" style="display:{display}"><span class="icon {iconClass}">&nbsp;</span></div>'
             rs = @options.rowStyle # row style handler
@@ -372,22 +371,25 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     temp = template(checkboxTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId], 'isSelectable' : selectable})
                     if editor.selectable is undefined or !editor.selectable
                         selectAllFlg = cm[j].selectAllFlg
+                        checkedFlg = false
+                        trueVal = null
                         if editor.getValueOf?
                             trueVal = editor.getValueOf(true)
-                            if row[columnId] == trueVal or selectAllFlg
-                                temp = temp.replace(/\{checked\}/, 'checked')
-                            else
-                                temp = temp.replace(/checked=.*?>/, '>')
                         else
-                            if eval(row[columnId]) or selectAllFlg  #must be true or false
-                                temp = temp.replace(/\{checked\}/, 'checked')
-                            else
-                                temp = temp.replace(/checked=.*?>/, '>')
+                            trueVal = eval(row[columnId])
+                        if row[columnId] == trueVal or selectAllFlg
+                            temp = temp.replace(/\{checked\}/, 'checked')
+                            temp = temp.replace(/\{checkedClass\}/, 'my-checkbox-checked')
+                        else
+                            temp = temp.replace(/checked=.*?>/, '>')
+                            temp = temp.replace(/\{checkedClass\}/, '')
                     else # When is selectable
                         if cm[j].selectAllFlg
                             temp = temp.replace(/\{checked\}/, 'checked')
+                            temp = temp.replace(/\{checkedClass\}/, 'my-checkbox-checked')
                         else
                             temp = temp.replace(/checked=.*?>/, '>')
+                            temp = temp.replace(/\{checkedClass\}/, '')
                     html[idx++] = temp
                 else if editor instanceof TableGrid.CellRadioButton
                     groupName = if editor.groupName? then editor.groupName else 'my-radio'+id+'_c'+j
@@ -445,7 +447,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         _applyCellCallbacks : ->
             cm = @_columnModel
             id = @_mtgId
-            @bodyTable.delegate 'td span.my-checkbox', 'mousedown', (event) =>
+            @bodyTable.delegate 'td span.my-checkbox', 'mousedown', (event, data = {fromKeyboard: false}) =>
                 span = $(event.target)
                 elementId = span.attr('id')
                 coords = elementId.match(/_c(\d+.?)r(\-?\d+.?)/)
@@ -455,11 +457,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 if typeof(cm[x].editable) is 'function' and !cm[x].editable(x, y)
                     event.preventDefault()
                     return false
-                isChecked = $('input', span).is(':checked')
+                input = $('input', span)
+                isChecked = input.is(':checked')
                 unless isChecked
                     span.addClass('my-checkbox-checked')
+                    input.attr('checked', 'checked') if data.fromKeyboard
                 else
                     span.removeClass('my-checkbox-checked')
+                    input.removeAttr('checked') if data.fromKeyboard
                 unless span.is('.selectable')
                     value = isChecked
                     value = editor.getValueOf(isChecked) if editor.getValueOf?
@@ -470,15 +475,16 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor.onClick(span.val(), span.is(':checked')) if editor.onClick?
                 return true
 
-            @bodyTable.delegate 'td span.my-radio', 'mousedown', (event) =>
+            @bodyTable.delegate 'td span.my-radio', 'mousedown', (event, data = {fromKeyboard: false}) =>
                 span = $(event.target)
                 groupName = $('input', span).attr('name')
                 $('input[name='+groupName+']', @bodyTable).parent('span').removeClass('my-radio-checked')
                 span.addClass('my-radio-checked')
+                $('input', span).attr('checked', 'checked') if data.fromKeyboard
                 elementId = span.attr('id')
                 coords = elementId.match(/_c(\d+.?)r(\-?\d+.?)/)
                 x = parseInt(coords[1])
-                y = parseInt(coords[2]) # TODO tomorrow sigo too tired now :-(
+                y = parseInt(coords[2]) # TODO tomorrow sigo too tired now :-( need to think what to do here
 
             @bodyTable.delegate 'td div.mini-button', 'click', (event) =>
                 act = @_actionsColumnToolbar
@@ -549,16 +555,16 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html = []
             idx = 0;
             if height > 0
-                html[idx++] = '<div id="mtgSM'+id+'" class="tablegrid-menu shadow" style="height:'+height+'px">'
+                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu shadow" style="height:'+height+'px">'
             else
-                html[idx++] = '<div id="mtgSM'+id+'" class="tablegrid-menu shadow">'
+                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu shadow">'
             html[idx++] = '<ul>'
             for c in cm
                 html[idx++] = '<li>'
                 if c.visible
-                    html[idx++] = '<span class="menu-item-checkbox"><input id="'+c.id+'" type="checkbox" checked="checked"></span>'
+                    html[idx++] = '<label><span class="my-checkbox my-checkbox-checked my-menu-item-checkbox"><input id="'+c.id+'" type="checkbox" checked="checked"></span></label>'
                 else
-                    html[idx++] = '<span class="menu-item-checkbox"><input id="'+c.id+'" type="checkbox"></span>'
+                    html[idx++] = '<label><span class="my-checkbox my-menu-item-checkbox"><input id="'+c.id+'" type="checkbox"></span></label>'
                 html[idx++] = '&nbsp;'+ c.title
                 html[idx++] = '</li>'
 
@@ -599,6 +605,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             $('#mtgSM'+ id + ' :checkbox').on 'click', (event) =>
                 checkbox = $(event.target)
+                checkbox.parent('span').toggleClass('my-checkbox-checked')
                 @_toggleColumnVisibility(checkbox.attr('id'))
 
         ###
@@ -1016,25 +1023,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 unless editRowMode
                     input.focus()
                     input.select()
-            else if editor instanceof TableGrid.CellCheckbox and !@editRowFlg
-                span = $('#my-checkbox' + id + '_c' + x + 'r' + y)
-                span.click()
-                @editedCellId = null
-                @keys._isInputFocusedFlg = false # TODO I would like to remove these lines
-            else if editor instanceof TableGrid.CellRadioButton and !@editRowFlg
-                span = $('#my-radio' + id + '_c' + x + 'r' + y)
-                span.click()
+            else if !@editRowFlg
+                span = $('.my-checkbox, .my-radio', innerElement)
+                span.trigger('mousedown', {fromKeyboard : true})
                 @editedCellId = null
                 @keys._isInputFocusedFlg = false
-                ###
-                value = editor.getValueOf(isChecked) if editor.getValueOf?
-                @setValueAt(value, x, y, false)
-                @modifiedRows.push(y) if y >= 0 and y < @rows.length and @modifiedRows.indexOf(y) == -1 #if doesn't exist in the array the row is registered
-                editor.onClick(value, isChecked) if editor.onClick?
-                @keys._isInputFocusedFlg = false
-                @editedCellId = null
-                innerElement.addClass('modified-cell') if y >= 0 and (editor.selectable is undefined or !editor.selectable)
-                ###
             # end if
 
         ###
@@ -1094,6 +1087,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Applies header buttons
         ###
         _applyHeaderButtons : ->
+            console.log 'apply header buttons called'
             id = @_mtgId
             cm = @_columnModel
             headerHeight = @headerHeight
@@ -1109,7 +1103,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             topPos += @titleHeight if @options.title?
             topPos += @toolbarHeight if @options.toolbar?
 
-            $('.mtgIHC' + id).on 'mousemove', (event) =>
+            $('.mtgIHC' + id).on 'mouseenter', (event) =>
                 element = $(event.target)
                 return unless element.attr('id')
                 elementId = element.attr('id')
@@ -1133,15 +1127,18 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     sortDescMenuItem.on 'click', => @_sortData(columnIndex, 'DESC')
 
             # Sorting when click on header column
-            $('.mtgIHC' + id).on 'click', (event) =>
+            $('.mtgIHC' + id).on 'mousedown', (event) =>
                 element = $(event.target)
                 return unless element.attr('id')
                 elementId = element.attr('id')
                 columnIndex = parseInt(elementId.match(/_c(\d*)/)[1]) # extract column number from id
                 @_toggleSortData(columnIndex)
 
-            headerButton.on 'click', =>
+            headerButton.on 'mousedown', =>
+                return if columnIndex < 0
                 cm = @_columnModel
+                editor = cm[columnIndex].editor
+                selectableFlg = false
                 if headerButtonMenu.css('visibility') == 'hidden'
                     if cm[columnIndex].sortable
                         $('#mtgSortDesc' + id).show()
@@ -1150,29 +1147,30 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         $('#mtgSortDesc' + id).hide()
                         $('#mtgSortAsc' + id).hide()
 
+                    selectableFlg = editor instanceof TableGrid.CellCheckbox and editor.selectable
+                    console.log 'is selectable column ' + selectableFlg
                     selectAllItem = $('#mtgHBM' + id + ' .mtgSelectAll:first')
-                    if @renderedRows > 0 and cm[columnIndex].editor instanceof TableGrid.CellCheckbox
-                        selectAllItem.find('input').attr('checked', cm[columnIndex].selectAllFlg)
+                    if !selectableFlg
+                        selectAllItem.hide()
+                    else
                         selectAllItem.show()
-                        selectAllItem.on 'click', => # onclick handler
-                            flag = cm[columnIndex].selectAllFlg = $('#mtgSelectAll' + id).is(':checked')
-                            selectableFlg = false
-                            selectableFlg = true if cm[columnIndex].editor instanceof TableGrid.CellCheckbox and cm[columnIndex].editor.selectable
+                        if cm[columnIndex].selectAllFlg
+                            $('input', selectAllItem).attr('checked', 'checked')
+                            $('.my-checkbox', selectAllItem).addClass('my-checkbox-checked')
+
+                        selectAllItem.one 'click', => # onclick handler
+                            console.log 'select all handler'
+                            $('.my-checkbox', selectAllItem).toggleClass('my-checkbox-checked')
+                            isChecked = cm[columnIndex].selectAllFlg = $('#mtgSelectAll' + id).is(':checked')
+                            console.log 'isChecked: ' + isChecked
                             renderedRows = @renderedRows
                             beginAtRow = 0
                             beginAtRow = -@newRowsAdded.length if @newRowsAdded.length > 0
                             x = columnIndex
                             for y in [beginAtRow...renderedRows]
-                                element = $('#mtgInput' + id + '_c' + x + 'r' + y)
-                                element.attr('checked', flag)
-                                value = flag
-                                if !selectableFlg
-                                    value = cm[x].editor.getValueOf(element.is(':checked')) if cm[x].editor.getValueOf?
-                                    @setValueAt(value, x, y, false)
-                                    # if doesn't exist in the array the row is registered
-                                    @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1
-                    else
-                        selectAllItem.hide()
+                                span = $('#my-checkbox' + id + '_c' + x + 'r' + y)
+                                span.trigger('mousedown', {fromKeyboard : true})
+                            headerButtonMenu.css('visibility', 'hidden')
 
                     leftPos = parseInt(headerButton.css('left'))
                     headerButtonMenu.css({

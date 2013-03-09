@@ -131,7 +131,7 @@
                     width : 205,
                     editable: true,
 	                renderer : function(value, row) {
-		                console.log(row['from_name']);
+		                //console.log(row['from_name']);
 		                return value;
 	                }
                 },
@@ -156,7 +156,8 @@
 		            id: 'read',
 		            title : 'Already Read',
 		            editable : function(x, y) {
-			            return !(y >= 0 && y < tableGrid.rows.length)
+			            //return !(y >= 0 && y < tableGrid.rows.length)
+			            return true;
 		            },
 		            editor : new MY.TableGrid.CellCheckbox({
 			            selectable : false,

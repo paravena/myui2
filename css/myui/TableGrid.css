@@ -227,7 +227,7 @@ div.tablegrid-browse-button {
 
 }
 
-div.tablegrid-menu {
+div.my-tablegrid-menu {
     position: absolute;
     width: 130px;
     overflow: auto;
@@ -240,12 +240,12 @@ div.tablegrid-menu {
     border-radius: 3px;
 }
 
-div.tablegrid-menu ul {
+div.my-tablegrid-menu ul {
     margin: 3px;
     padding: 0;
 }
 
-div.tablegrid-menu ul li {
+div.my-tablegrid-menu ul li {
     position: relative;
     list-style-type: none;
     padding: 0 0 0 28px;
@@ -256,7 +256,7 @@ div.tablegrid-menu ul li {
     line-height: 20px;
 }
 
-div.tablegrid-menu ul li:hover {
+div.my-tablegrid-menu ul li:hover {
     background-color: #90c;
     color: white;
     -webkit-border-radius: 3px;
@@ -264,13 +264,13 @@ div.tablegrid-menu ul li:hover {
     border-radius: 3px;
 }
 
-span.menu-item-icon {
+span.my-menu-item-icon {
     position : absolute;
     left : 0;
     padding: 2px;
 }
 
-span.menu-item-checkbox {
+span.my-menu-item-checkbox {
     position : absolute;
     left : 0;
 }
