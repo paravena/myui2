@@ -91,7 +91,7 @@ span.save-button {
 }
 
 span.setting-button {
-    background-position: -430px 1px;
+    background-position: -431px 1px;
 }
 
 span.edit-button {
@@ -107,11 +107,11 @@ span.first-page-disabled {
 }
 
 span.previous-page {
-    background-position: -430px -72px;
+    background-position: -431px -72px;
 }
 
 span.previous-page-disabled {
-    background-position: -430px -72px;
+    background-position: -431px -72px;
 }
 
 span.next-page {
