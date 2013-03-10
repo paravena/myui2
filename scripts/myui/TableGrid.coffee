@@ -255,16 +255,16 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             # Adding Header Button Menu
             html[idx++] = '<div id="mtgHBM'+id+'" class="my-tablegrid-menu shadow">'
             html[idx++] = '<ul>'
-            html[idx++] = '<li id="mtgSortAsc'+id+'">'
+            html[idx++] = '<li id="sort-asc'+id+'">'
             html[idx++] = '<span class="my-menu-item-icon sort-ascending-icon">&nbsp;</span>'
             html[idx++] = i18n.getMessage('label.sortAsc')
             html[idx++] = '</li>'
-            html[idx++] = '<li id="mtgSortDesc'+id+'">'
+            html[idx++] = '<li id="sort-desc'+id+'">'
             html[idx++] = '<span class="my-menu-item-icon sort-descending-icon">&nbsp;</span>'
             html[idx++] = i18n.getMessage('label.sortDesc')
             html[idx++] = '</li>'
-            html[idx++] = '<li class="mtgSelectAll">'
-            html[idx++] = '<label><span class="my-checkbox my-menu-item-checkbox"><input type="checkbox" id="mtgSelectAll'+id+'"></span></label>'
+            html[idx++] = '<li class="select-all">'
+            html[idx++] = '<label><span class="my-checkbox my-menu-item-checkbox"><input type="checkbox" id="select-all'+id+'"></span></label>'
             html[idx++] = i18n.getMessage('label.selectAll')
             html[idx++] = '</li>'
             html[idx++] = '</ul>'
@@ -1092,8 +1092,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             headerHeight = @headerHeight
             headerButton = $('#mtgHB' + id)
             headerButtonMenu = $('#mtgHBM' + id)
-            sortAscMenuItem = $('#mtgSortAsc'+id)
-            sortDescMenuItem = $('#mtgSortDesc'+id)
+            sortAscMenuItem = $('#sort-asc'+id)
+            sortDescMenuItem = $('#sort-desc'+id)
             columnIndex = -1
             editor = null
             sortable = true
@@ -1140,14 +1140,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 selectableFlg = false
                 if headerButtonMenu.css('visibility') == 'hidden'
                     if cm[columnIndex].sortable
-                        $('#mtgSortDesc' + id).show()
-                        $('#mtgSortAsc' + id).show()
+                        $('#sort-desc' + id).show()
+                        $('#sort-asc' + id).show()
                     else
-                        $('#mtgSortDesc' + id).hide()
-                        $('#mtgSortAsc' + id).hide()
+                        $('#sort-desc' + id).hide()
+                        $('#sort-asc' + id).hide()
 
                     selectableFlg = editor instanceof TableGrid.CellCheckbox and editor.selectable
-                    selectAllItem = $('#mtgHBM' + id + ' .mtgSelectAll:first')
+                    selectAllItem = $('#mtgHBM' + id + ' .select-all:first')
                     if !selectableFlg
                         selectAllItem.hide()
                     else
@@ -1158,7 +1158,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
                         selectAllItem.one 'click', => # onclick handler
                             $('.my-checkbox', selectAllItem).toggleClass('my-checkbox-checked')
-                            isChecked = cm[columnIndex].selectAllFlg = $('#mtgSelectAll' + id).is(':checked')
+                            isChecked = cm[columnIndex].selectAllFlg = $('#select-all' + id).is(':checked')
                             renderedRows = @renderedRows
                             beginAtRow = 0
                             beginAtRow = -@newRowsAdded.length if @newRowsAdded.length > 0
@@ -1350,13 +1350,13 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     html[idx++] = '<tr>'
                     html[idx++] = '<td><div id="mtgLoader'+id+'" class="mtgLoader">&nbsp;</div></td>'
                     html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
-                    html[idx++] = '<td><a id="mtgFirst'+id+'" class="tablegrid-pager-control"><div class="first-page">&nbsp;</div></a></td>'
-                    html[idx++] = '<td><a id="mtgPrev'+id+'" class="tablegrid-pager-control"><div class="previous-page">&nbsp;</div></a></td>'
+                    html[idx++] = '<td><a id="mtgFirst'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span style="padding:3px">First</span></div></a></td>'
+                    html[idx++] = '<td><a id="mtgPrev'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span class="icon previous-page">&nbsp;</span></div></a></td>'
                     html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
                     html[idx++] = temp
                     html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
-                    html[idx++] = '<td><a id="mtgNext'+id+'" class="tablegrid-pager-control"><div class="next-page">&nbsp;</div></a></td>'
-                    html[idx++] = '<td><a id="mtgLast'+id+'" class="tablegrid-pager-control"><div class="last-page">&nbsp;</div></a></td>'
+                    html[idx++] = '<td><a id="mtgNext'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span class="icon next-page">&nbsp;</span></div></a></td>'
+                    html[idx++] = '<td><a id="mtgLast'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span style="padding:3px">Last</span></div></a></td>'
                     html[idx++] = '</tr>'
                     html[idx++] = '</tbody>'
                     html[idx++] = '</table>'
@@ -1384,28 +1384,28 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             total = @pager.total
             if total > 0
                 if currentPage > 1
-                    $('#mtgFirst'+id).find('div').attr('class', 'first-page')
+                    $('#mtgFirst'+id).find('span').attr('class', 'first-page')
                     $('#mtgFirst'+id).on 'click', => @_retrieveDataFromUrl(1)
                 else
-                    $('#mtgFirst'+id).find('div').attr('class', 'first-page-disabled')
+                    $('#mtgFirst'+id).find('span').attr('class', 'first-page-disabled')
 
                 if currentPage > 0 and currentPage < pages
-                    $('#mtgNext'+id).find('div').attr('class', 'next-page')
+                    $('#mtgNext'+id).find('span').attr('class', 'next-page')
                     $('#mtgNext'+id).on 'click', => @_retrieveDataFromUrl(parseInt(currentPage) + 1)
                 else
-                    $('#mtgNext'+id).find('div').attr('class', 'next-page-disabled')
+                    $('#mtgNext'+id).find('span').attr('class', 'next-page-disabled')
 
                 if currentPage > 1 and currentPage <= pages
-                    $('#mtgPrev'+id).find('div').attr('class', 'previous-page')
+                    $('#mtgPrev'+id).find('span').attr('class', 'previous-page')
                     $('#mtgPrev'+id).on 'click', => @_retrieveDataFromUrl(parseInt(currentPage) - 1)
                 else
-                    $('#mtgPrev'+id).find('div').attr('class', 'previous-page-disabled')
+                    $('#mtgPrev'+id).find('span').attr('class', 'previous-page-disabled')
 
                 if currentPage < pages
-                    $('#mtgLast'+id).find('div').attr('class', 'last-page')
+                    $('#mtgLast'+id).find('span').attr('class', 'last-page')
                     $('#mtgLast'+id).on 'click', => @_retrieveDataFromUrl(@pager.pages)
                 else
-                    $('#mtgLast'+id).find('div').attr('class', 'last-page-disabled')
+                    $('#mtgLast'+id).find('span').attr('class', 'last-page-disabled')
 
                 $('#mtgPageInput'+id).on 'keydown', (event) =>
                     if event.which == eventUtil.KEY_RETURN

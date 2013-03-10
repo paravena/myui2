@@ -98,3 +98,34 @@ span.edit-button {
     background-position: 1px -72px;
 }
 
+span.first-page {
+    background-image: url(images/first.gif);
+}
+
+span.first-page-disabled {
+    background-image: url(images/first-disabled.gif);
+}
+
+span.previous-page {
+    background-position: -430px -72px;
+}
+
+span.previous-page-disabled {
+    background-position: -430px -72px;
+}
+
+span.next-page {
+    background-position: -455px -72px;
+}
+
+span.next-page-disabled {
+    background-position: -455px -72px;
+}
+
+span.last-page {
+    background-image: url(images/last.gif);
+}
+
+span.last-page-disabled {
+    background-image: url(images/last-disabled.gif);
+}

@@ -339,54 +339,6 @@ div.tablegrid-pager-loader {
     height: 16px;
 }
 
-div.first-page {
-    background: url(images/first.gif) center no-repeat transparent;
-    width: 16px;
-    height: 16px;
-}
-
-div.first-page-disabled {
-    background: url(images/first-disabled.gif) center no-repeat transparent;
-    width: 16px;
-    height: 16px;
-}
-
-div.previous-page {
-    background: url(images/prev.gif) center no-repeat transparent;
-    width: 16px;
-    height: 16px;
-}
-
-div.previous-page-disabled {
-    background: url(images/prev-disabled.gif) center no-repeat transparent;
-    width: 16px;
-    height: 16px;
-}
-
-div.next-page {
-    background: url(images/next.gif) center no-repeat transparent;
-    width: 16px;
-    height: 16px;
-}
-
-div.next-page-disabled {
-    background: url(images/next-disabled.gif) center no-repeat transparent;
-    width: 16px;
-    height: 16px;
-}
-
-div.last-page {
-    background: url(images/last.gif) center no-repeat transparent;
-    width: 16px;
-    height: 16px;
-}
-
-div.last-page-disabled {
-    background: url(images/last-disabled.gif) center no-repeat transparent;
-    width: 16px;
-    height: 16px;
-}
-
 div.tablegrid-pager-separator {
     background: url(images/y-sep.png) center no-repeat transparent;
     width: 2px;
