@@ -136,6 +136,13 @@ td div.tablegrid-inner-cell {
     padding: 3px;
 }
 
+.tablegrid-inner-cell label {
+    display: block;
+    margin : -2px 0 0 0;
+    padding: 0;
+    text-align: center;
+}
+
 tr.hightlight {
     background-color: #eee;
 }
@@ -195,14 +202,6 @@ div.drop-yes {
 /***********************************************
  * Cell Input Definition
  ***********************************************/
-input.mtgInputCheckbox {
-    height: 12px;
-}
-
-input.mtgInputRadio {
-    height: 12px;
-}
-
 input.tablegrid-textfield {
     position: relative;
     font-size: 11px;
@@ -229,7 +228,7 @@ div.tablegrid-browse-button {
 
 div.my-tablegrid-menu {
     position: absolute;
-    width: 130px;
+    width: 150px;
     overflow: auto;
     background: #ddd url(images/menu.gif) repeat-y;
     z-index: 100;
@@ -254,6 +253,15 @@ div.my-tablegrid-menu ul li {
     cursor: default;
     font-weight: bold;
     line-height: 20px;
+}
+
+div.my-tablegrid-menu label {
+/*    display: inline-block;
+    margin-top: -1px;*/
+}
+
+div.my-tablegrid-menu ul li label span {
+    height: 22px; /* TODO check this is little ugly*/
 }
 
 div.my-tablegrid-menu ul li:hover {

@@ -1087,7 +1087,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Applies header buttons
         ###
         _applyHeaderButtons : ->
-            console.log 'apply header buttons called'
             id = @_mtgId
             cm = @_columnModel
             headerHeight = @headerHeight
@@ -1148,7 +1147,6 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         $('#mtgSortAsc' + id).hide()
 
                     selectableFlg = editor instanceof TableGrid.CellCheckbox and editor.selectable
-                    console.log 'is selectable column ' + selectableFlg
                     selectAllItem = $('#mtgHBM' + id + ' .mtgSelectAll:first')
                     if !selectableFlg
                         selectAllItem.hide()
@@ -1159,10 +1157,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                             $('.my-checkbox', selectAllItem).addClass('my-checkbox-checked')
 
                         selectAllItem.one 'click', => # onclick handler
-                            console.log 'select all handler'
                             $('.my-checkbox', selectAllItem).toggleClass('my-checkbox-checked')
                             isChecked = cm[columnIndex].selectAllFlg = $('#mtgSelectAll' + id).is(':checked')
-                            console.log 'isChecked: ' + isChecked
                             renderedRows = @renderedRows
                             beginAtRow = 0
                             beginAtRow = -@newRowsAdded.length if @newRowsAdded.length > 0
