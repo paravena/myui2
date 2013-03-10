@@ -99,11 +99,11 @@ span.edit-button {
 }
 
 span.first-page {
-    background-image: url(images/first.gif);
+
 }
 
 span.first-page-disabled {
-    background-image: url(images/first-disabled.gif);
+
 }
 
 span.previous-page {
@@ -123,9 +123,9 @@ span.next-page-disabled {
 }
 
 span.last-page {
-    background-image: url(images/last.gif);
+
 }
 
 span.last-page-disabled {
-    background-image: url(images/last-disabled.gif);
+
 }
