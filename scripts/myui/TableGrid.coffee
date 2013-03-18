@@ -1384,28 +1384,23 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             total = @pager.total
             if total > 0
                 if currentPage > 1
-                    $('#mtgFirst'+id).find('span').attr('class', 'first-page')
                     $('#mtgFirst'+id).on 'click', => @_retrieveDataFromUrl(1)
-                else
-                    $('#mtgFirst'+id).find('span').attr('class', 'first-page-disabled')
 
                 if currentPage > 0 and currentPage < pages
-                    $('#mtgNext'+id).find('span').attr('class', 'next-page')
+                    $('span', '#mtgNext'+id).css('opacity', '1');
                     $('#mtgNext'+id).on 'click', => @_retrieveDataFromUrl(parseInt(currentPage) + 1)
                 else
-                    $('#mtgNext'+id).find('span').attr('class', 'next-page-disabled')
+                    $('span', '#mtgNext'+id).css('opacity', '0.5');
 
                 if currentPage > 1 and currentPage <= pages
-                    $('#mtgPrev'+id).find('span').attr('class', 'previous-page')
+                    $('span', '#mtgPrev'+id).css('opacity', '1')
                     $('#mtgPrev'+id).on 'click', => @_retrieveDataFromUrl(parseInt(currentPage) - 1)
                 else
-                    $('#mtgPrev'+id).find('span').attr('class', 'previous-page-disabled')
+                    $('span', '#mtgPrev'+id).css('opacity', '0.5')
 
                 if currentPage < pages
-                    $('#mtgLast'+id).find('span').attr('class', 'last-page')
                     $('#mtgLast'+id).on 'click', => @_retrieveDataFromUrl(@pager.pages)
                 else
-                    $('#mtgLast'+id).find('span').attr('class', 'last-page-disabled')
 
                 $('#mtgPageInput'+id).on 'keydown', (event) =>
                     if event.which == eventUtil.KEY_RETURN
