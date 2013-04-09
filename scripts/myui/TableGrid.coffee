@@ -147,7 +147,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 @pagerDiv.html @_updatePagerInfo() if @pager
                 @bodyDiv.trigger 'dom:dataLoaded'
             else
-                @_retrieveDataFromUrl(1, true)
+                @_retrieveDataFromUrl(1)
 
             if @options.toolbar?
                 buttons = @options.toolbar or []
@@ -1104,7 +1104,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             $('.mtgIHC' + id).on 'mouseenter', (event) =>
                 element = $(event.target)
-                return unless element.attr('id')
+                return unless element.attr('id') # this happen when over a parent nested column
                 elementId = element.attr('id')
                 columnIndex = parseInt(elementId.match(/_c(\d*)/)[1]) # extract column number from id
                 editor = cm[columnIndex].editor
@@ -1201,7 +1201,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             if @url
                 @request[@options.sortColumnParameter] = cm[idx].id;
                 @request[@options.ascDescFlagParameter] = ascDescFlg;
-                @_retrieveDataFromUrl(1, true)
+                @_retrieveDataFromUrl(1)
             else if @rows and @rows.length > 0
                 columnValues = @getColumnValues(cm[idx].id, false)
                 hashIndex = {}
@@ -1288,9 +1288,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Retrieves data from url using an AJAX call, expected result must
         # in JSON format otherwise it will call onFailure callback.
         ###
-        _retrieveDataFromUrl : (pageNumber, firstTimeFlg) ->
-            if !firstTimeFlg and @options.onPageChange?
-                return unless @options.onPageChange()
+        _retrieveDataFromUrl : (pageNumber) ->
+            return if @options.onPageChange? and !@options.onPageChange()
             pageParameter = 'page'
             pageParameter = @pager.pageParameter if @pager != null and @pager.pageParameter
             @request[pageParameter] = pageNumber
@@ -1321,12 +1320,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     finally
                         @_toggleLoadingOverlay()
                         @bodyDiv.scrollTop(@scrollTop = 0)
-                        @bodyDiv.trigger('dom:dataLoaded') if firstTimeFlg
+                        @bodyDiv.trigger('dom:dataLoaded')
                 fail : (response) ->
                     @options.onFailure(response) if @options.onFailure?
                     @_toggleLoadingOverlay()
                     @bodyDiv.scrollTop(@scrollTop = 0)
-                    @bodyDiv.trigger('dom:dataLoaded') if firstTimeFlg
+                    @bodyDiv.trigger('dom:dataLoaded')
             })
 
         ###
@@ -1792,7 +1791,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             @modifiedRows = []
             @deletedRows = []
             @newRowsAdded = []
-            @_retrieveDataFromUrl(1, true)
+            @_retrieveDataFromUrl(1)
 
         ###
         # Empty data displayed in TableGrid.
@@ -1940,7 +1939,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         temp = thTmpl.replace(/\{id\}/g, id)
                         temp = temp.replace(/\{colspan\}/g, colspan)
                         temp = temp.replace(/\{rowspan\}/g, rowspan)
-                        temp = temp.replace(/id="mtgHC.*?_\{x\}"/g,'')
+                        temp = temp.replace(/id="mtgHC.*?_c\{x\}"/g,'')
                         temp = temp.replace(/width="\{width\}"/g,'')
                         temp = temp.replace(/width:\{width\}px;/g,'')
                         temp = temp.replace(/height="\{height\}"/g,'')
@@ -1949,7 +1948,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         temp = temp.replace(/\{display\}/g, display)
                         html[idx++] = temp
                         temp = ihcTmpl.replace(/\{id\}/g, id)
-                        temp = temp.replace(/id="mtgIHC.*?_\{x\}"/g,'')
+                        temp = temp.replace(/id="mtgIHC.*?_c\{x\}"/g,'')
                         temp = temp.replace(/width:\{width\}px;/g,'')
                         temp = temp.replace(/height:\{height\}px;/g,'')
                         html[idx++] = temp
