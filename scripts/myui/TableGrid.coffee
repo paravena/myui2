@@ -253,7 +253,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html[idx++] = '<div id="mtgHB'+id+'" class="tablegrid-header-button" style="width:14px;height:'+@headerHeight+'px">'
             html[idx++] = '</div>'
             # Adding Header Button Menu
-            html[idx++] = '<div id="mtgHBM'+id+'" class="my-tablegrid-menu shadow">'
+            html[idx++] = '<div id="mtgHBM'+id+'" class="my-tablegrid-menu .my-drop-shadow">'
             html[idx++] = '<ul>'
             html[idx++] = '<li id="sort-asc'+id+'">'
             html[idx++] = '<span class="my-menu-item-icon sort-ascending-icon">&nbsp;</span>'
@@ -555,9 +555,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html = []
             idx = 0;
             if height > 0
-                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu shadow" style="height:'+height+'px">'
+                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu .my-drop-shadow" style="height:'+height+'px">'
             else
-                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu shadow">'
+                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu .my-drop-shadow">'
             html[idx++] = '<ul>'
             for c in cm
                 html[idx++] = '<li>'
@@ -1343,22 +1343,32 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 html[idx++] = '<span class="tablegrid-pager-message">'+temp+'</span>'
                 if pager.pages?
                     input = '<input type="text" name="mtgPageInput'+id+'" id="mtgPageInput'+id+'" value="'+pager.currentPage+'" class="tablegrid-page-input" size="3" maxlength="3">'
-                    temp = i18n.getMessage('message.pagePrompt', {'pages' : pager.pages, 'input' : input})
+                    temp = i18n.getMessage('message.pagePrompt', {'id' : id, 'pages' : pager.pages, 'input' : input})
                     html[idx++] = '<table class="tablegrid-pager-table" border="0" cellpadding="0" cellspacing="0">'
                     html[idx++] = '<tbody>'
                     html[idx++] = '<tr>'
                     html[idx++] = '<td><div id="mtgLoader'+id+'" class="mtgLoader">&nbsp;</div></td>'
-                    html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
-                    html[idx++] = '<td><a id="mtgFirst'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span style="padding:3px">First</span></div></a></td>'
-                    html[idx++] = '<td><a id="mtgPrev'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span class="icon previous-page">&nbsp;</span></div></a></td>'
+                    #html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
+                    #html[idx++] = '<td><a id="mtgFirst'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span style="padding:3px">First</span></div></a></td>'
+                    #html[idx++] = '<td><a id="mtgLast'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span style="padding:3px">Last</span></div></a></td>'
                     html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
                     html[idx++] = temp
                     html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
+                    html[idx++] = '<td><a id="mtgPrev'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span class="icon previous-page">&nbsp;</span></div></a></td>'
                     html[idx++] = '<td><a id="mtgNext'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span class="icon next-page">&nbsp;</span></div></a></td>'
-                    html[idx++] = '<td><a id="mtgLast'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span style="padding:3px">Last</span></div></a></td>'
                     html[idx++] = '</tr>'
                     html[idx++] = '</tbody>'
                     html[idx++] = '</table>'
+                    html[idx++] = '<div id="my-first-last-menu'+id+'" class="my-tablegrid-menu my-drop-shadow">'
+                    html[idx++] = '<ul>'
+                    html[idx++] = '<li id="mtgFirst'+id+'">'
+                    html[idx++] = i18n.getMessage('label.first')
+                    html[idx++] = '</li>'
+                    html[idx++] = '<li id="mtgLast'+id+'">'
+                    html[idx++] = i18n.getMessage('label.last')
+                    html[idx++] = '</li>'
+                    html[idx++] = '</ul>'
+                    html[idx++] = '</div>'
                 else
                     html[idx++] = '<table class="tablegrid-pager-table" border="0" cellpadding="0" cellspacing="0">'
                     html[idx++] = '<tbody>'
@@ -1381,33 +1391,41 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             currentPage = @pager.currentPage
             pages = @pager.pages
             total = @pager.total
-            if total > 0
-                if currentPage > 1
-                    $('#mtgFirst'+id).on 'click', => @_retrieveDataFromUrl(1)
+            return if total <= 0
 
-                if currentPage > 0 and currentPage < pages
-                    $('span', '#mtgNext'+id).css('opacity', '1');
-                    $('#mtgNext'+id).on 'click', => @_retrieveDataFromUrl(parseInt(currentPage) + 1)
-                else
-                    $('span', '#mtgNext'+id).css('opacity', '0.5');
+            if pages > 0
+                $("#my-page-label#{id}").append $("#my-first-last-menu#{id}")
+                $("#my-first-last-menu#{id}").css("margin-top", "3px")
+                $("#my-page-label#{id}").hover(
+                    -> $("#my-first-last-menu#{id}").css("visibility", "visible"),
+                    -> $("#my-first-last-menu#{id}").css("visibility", "hidden"))
 
-                if currentPage > 1 and currentPage <= pages
-                    $('span', '#mtgPrev'+id).css('opacity', '1')
-                    $('#mtgPrev'+id).on 'click', => @_retrieveDataFromUrl(parseInt(currentPage) - 1)
-                else
-                    $('span', '#mtgPrev'+id).css('opacity', '0.5')
+            if currentPage > 1
+                $('#mtgFirst'+id).on 'click', => @_retrieveDataFromUrl(1)
 
-                if currentPage < pages
-                    $('#mtgLast'+id).on 'click', => @_retrieveDataFromUrl(@pager.pages)
-                else
+            if currentPage > 0 and currentPage < pages
+                $('span', '#mtgNext'+id).css('opacity', '1');
+                $('#mtgNext'+id).on 'click', => @_retrieveDataFromUrl(parseInt(currentPage) + 1)
+            else
+                $('span', '#mtgNext'+id).css('opacity', '0.5');
 
-                $('#mtgPageInput'+id).on 'keydown', (event) =>
-                    if event.which == eventUtil.KEY_RETURN
-                        pageNumber = $('#mtgPageInput'+id).val()
-                        pageNumber = pages if pageNumber > pages
-                        pageNumber = '1' if pageNumber < 1
-                        $('#mtgPageInput'+id).val(pageNumber)
-                        @_retrieveDataFromUrl(pageNumber)
+            if currentPage > 1 and currentPage <= pages
+                $('span', '#mtgPrev'+id).css('opacity', '1')
+                $('#mtgPrev'+id).on 'click', => @_retrieveDataFromUrl(parseInt(currentPage) - 1)
+            else
+                $('span', '#mtgPrev'+id).css('opacity', '0.5')
+
+            if currentPage < pages
+                $('#mtgLast'+id).on 'click', => @_retrieveDataFromUrl(@pager.pages)
+            else
+
+            $('#mtgPageInput'+id).on 'keydown', (event) =>
+                if event.which == eventUtil.KEY_RETURN
+                    pageNumber = $('#mtgPageInput'+id).val()
+                    pageNumber = pages if pageNumber > pages
+                    pageNumber = '1' if pageNumber < 1
+                    $('#mtgPageInput'+id).val(pageNumber)
+                    @_retrieveDataFromUrl(pageNumber)
         ###
         # Resize handler.
         ###

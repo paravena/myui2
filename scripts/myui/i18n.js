@@ -14,6 +14,8 @@ define(function() {
     i18n['EN']['label.selectAll'] = 'Select all';
     i18n['EN']['label.loading'] = 'Loading ...';
     i18n['EN']['label.actions'] = 'Actions';
+    i18n['EN']['label.first'] = 'First';
+    i18n['EN']['label.last'] = 'Last';
     i18n['EN']['message.totalDisplay'] = '<strong><span id="mtgTotal">#{total}</span></strong> records found';
     i18n['EN']['message.rowsDisplay'] = ', displaying <strong><span id="mtgFrom">#{from}</span></strong>&nbsp;to&nbsp;<strong><span id="mtgTo">#{to}</span></strong>';
     i18n['EN']['message.pagePrompt'] = '<td><strong>Page:</strong></td><td>#{input}</td><td>of&nbsp;<strong>#{pages}</strong></td>';
@@ -46,9 +48,11 @@ define(function() {
     i18n['ES']['label.selectAll'] = 'Seleccionar todo';
     i18n['ES']['label.loading'] = 'Espere ...';
     i18n['ES']['label.actions'] = 'Acciones';
+    i18n['ES']['label.first'] = 'Primera';
+    i18n['ES']['label.last'] = 'Ultima';
     i18n['ES']['message.totalDisplay'] = '<strong><span id="mtgTotal">#{total}</span></strong> filas encontradas';
     i18n['ES']['message.rowsDisplay'] = ', mostrando <strong><span id="mtgFrom">#{from}</span></strong>&nbsp;a&nbsp;<strong><span id="mtgTo">#{to}</span></strong>';
-    i18n['ES']['message.pagePrompt'] = '<td><strong>P&aacute;gina:</strong></td><td>#{input}</td><td>de&nbsp;<strong>#{pages}</strong></td>';
+    i18n['ES']['message.pagePrompt'] = '<td id="my-page-label#{id}"><strong>P&aacute;gina:</strong></td><td>#{input}</td><td>de&nbsp;<strong>#{pages}</strong></td>';
     i18n['ES']['message.noRecordFound'] = '<strong>No hay filas</strong>';
     i18n['ES']['error.required.field'] = '#{field} debe ser ingresado';
     i18n['ES']['error.invalid.creditCard'] = 'valor #{value} no es un numero de targeta valido';
@@ -78,6 +82,8 @@ define(function() {
     i18n['PT']['label.selectAll'] = 'Selecionar tudo';
     i18n['PT']['label.loading'] = 'Aguarde ...';
     i18n['PT']['label.actions'] = 'A&ccedil;&otilde;es';
+    i18n['PT']['label.first'] = 'Primeiro';
+    i18n['PT']['label.last'] = 'Passado';
     i18n['PT']['message.totalDisplay'] = '<strong><span id="mtgTotal">#{total}</span></strong> registros encontrados';
     i18n['PT']['message.rowsDisplay'] = ', mostrando <strong><span id="mtgFrom">#{from}</span></strong>&nbsp;at&eacute;&nbsp;<strong><span id="mtgTo">#{to}</span></strong>';
     i18n['PT']['message.pagePrompt'] = '<td><strong>P&aacute;gina:</strong></td><td>#{input}</td><td>de&nbsp;<strong>#{pages}</strong></td>';
