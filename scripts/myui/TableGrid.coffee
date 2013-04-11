@@ -1359,7 +1359,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     html[idx++] = '</tr>'
                     html[idx++] = '</tbody>'
                     html[idx++] = '</table>'
-                    html[idx++] = '<div id="my-first-last-menu'+id+'" class="my-tablegrid-menu my-drop-shadow">'
+                    html[idx++] = '<div id="my-first-last-menu'+id+'" class="my-tablegrid-pager-menu my-drop-shadow">'
                     html[idx++] = '<ul>'
                     html[idx++] = '<li id="mtgFirst'+id+'">'
                     html[idx++] = i18n.getMessage('label.first')
