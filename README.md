@@ -19,6 +19,7 @@ Steps to build the project
 <code>
 npm install -g coffee-script
 </code>
+<br>
 <code>
 npm install -g node-sass
 </code>
