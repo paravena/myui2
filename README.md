@@ -14,7 +14,14 @@ Soon I will finish the migration from old Prototype to CoffeeScript and JQuery. 
 Steps to build the project
 --------------------------------------
 
-* Download node 
+* Download <a href="http://nodejs.org">node</a>, then install some plugins, like coffee-script and sass.
+
+<code>
+npm install -g coffee-script
+</code>
+<code>
+npm install -g node-sass
+</code>
 * execute the following commands:
 <br>
 <br>
