@@ -1,0 +1,347 @@
+.tablegrid {
+  @include font_family;
+  .tablegrid-header-title {
+    border-top: solid 1px #ccc;
+    border-left: solid 1px #ccc;
+    border-right: solid 1px #ccc;
+    background-color: #eee;
+    font-weight: bold;
+    color: #333;
+    text-shadow: 1px 1px 0 white;
+  }
+  .tablegrid-toolbar {
+    border-top: solid 1px #ccc;
+    border-left: solid 1px #ccc;
+    border-right: solid 1px #ccc;
+    background-color: #eee;
+  }
+  .tablegrid-header-row  {
+    background: #ccc url(images/hrow.gif) repeat-x;
+    border-top: solid 1px #ccc;
+    border-left: solid 1px #ccc;
+    border-right: solid 1px #ccc;
+    cursor: default;
+    table {
+      &.tablegrid-header-row-table {
+        padding: 0;
+        color: black;
+        text-align: left;
+        th {
+          &.tablegrid-header-cell {
+            border: 1px solid transparent;
+            border-right-color: #ddd;
+            border-bottom-color: #ddd;
+            text-shadow: 1px 1px 0 #ddd;
+            margin: 0;
+            padding: 0;
+            .header-separator {
+              float: right;
+              width: 1px;
+              z-index: 30;
+            }
+            .sort-icon {
+              width: 8px;
+              height: 4px;
+              visibility: hidden;
+            }
+          }
+          div {
+            &.tablegrid-inner-header-cell {
+              position: relative;
+              white-space: nowrap;
+              font-size: 11px;
+              height: 18px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              padding: 4px 3px;
+              float: left;
+              text-align: left;
+              span {
+                &.tablegrid-sort-asc-icon {
+                  background: url(images/sort-arrow-asc.png) center no-repeat transparent;
+                }
+                &.tablegrid-sort-desc-icon {
+                  background: url(images/sort-arrow-desc.png) center no-repeat transparent;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .tablegrid-header-button {
+    position: absolute;
+    background: url(images/ddn.png) center no-repeat;
+    border-left: solid #ddd 1px;
+    visibility: hidden;
+    z-index: 50;
+  }
+  .tablegrid-column-move-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    width: 9px;
+    height: 9px;
+    background: url(images/col-move-top.gif) center no-repeat transparent;
+    visibility: hidden
+  }
+  .tablegrid-column-move-bottom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    width:  9px;
+    height: 9px;
+    background: url(images/col-move-bottom.gif) center no-repeat transparent;
+    visibility: hidden
+  }
+  .tablegrid-resize-marker {
+    cursor: col-resize !important;
+    cursor: w-resize;
+    position: absolute;
+    width: 2px;
+    background-color: transparent;
+    z-index : 300;
+  }
+  .dragColumn {
+    position: absolute;
+    background: url(images/hrow.gif) repeat-x;
+    padding: 3px;
+    z-index: 0;
+    border: solid 1px #ccc;
+    visibility: hidden;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: default;
+    .drop-no {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 16px;
+      height: 16px;
+      background: url(images/no.gif) no-repeat center;
+    }
+    .drop-yes {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 16px;
+      height: 16px;
+      background: url(images/yes.gif) no-repeat center;
+    }
+  }
+}
+
+/* Body definition */
+div.tablegrid-body {
+  border: solid 1px #ccc;
+  border-top: solid 1px #eee;
+  .tablegrid-body-table {
+    table-layout: fixed;
+    position: relative;
+    z-index: 0;
+    tr {
+      &.hightlight {
+        background-color: #eee;
+      }
+      &.focus {
+        background-color: #e6d7f5;
+      }
+      td {
+        &.tablegrid-cell {
+          border-left: 1px solid transparent;
+          border-right: 1px solid #ddd;
+          border-bottom: solid 1px #ddd;
+          padding: 0;
+          margin: 0;
+          div {
+            &.tablegrid-inner-cell {
+              position: relative;
+              white-space: nowrap;
+              font-size: 11px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              padding: 3px;
+              label {
+                display: block;
+                margin : -2px 0 0 0;
+                padding: 0;
+                text-align: center;
+              }
+            }
+            &.modified-cell {
+              background : url(images/m.png) no-repeat 0 0;
+            }
+            input {
+              &.tablegrid-textfield {
+                position: relative;
+                font-size: 11px;
+                vertical-align: top;
+                height: 16px;
+                background-color: white;
+                outline: none;
+                padding: 2px 3px;
+                border: 1px solid #0081c2;
+              }
+            }
+          }
+        }
+        &.focus {
+          /*border-left: solid 1px #90c;*/
+          div {
+            &.tablegrid-inner-cell {
+              background-color: #0081c2;
+              color: white;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+div.my-tablegrid-menu {
+  position: absolute;
+  width: 150px;
+  overflow: auto;
+  background: #ddd url(images/menu.gif) repeat-y;
+  z-index: 100;
+  visibility : hidden;
+  border: 1px solid #ccc;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  ul {
+    margin: 3px;
+    padding: 0;
+    li {
+      position: relative;
+      list-style-type: none;
+      padding: 0 0 0 28px;
+      display: block;
+      color: black;
+      cursor: default;
+      font-weight: bold;
+      line-height: 20px;
+      label {
+        span {
+          height: 22px; /* TODO check this is little ugly*/
+          &.my-menu-item-checkbox {
+            position : absolute;
+            left : 0;
+          }
+        }
+      }
+      &:hover {
+        background-color: #0081c2;
+        color: white;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+      }
+      span {
+        &.my-menu-item-icon {
+          position : absolute;
+          left : 0;
+          padding: 2px;
+        }
+        &.sort-ascending-icon {
+          background: url(images/sort_ascending.png) no-repeat transparent center;
+          width: 16px;
+          height: 16px;
+        }
+        &.sort-descending-icon {
+          background: url(images/sort_descending.png) no-repeat transparent center;
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+  }
+}
+
+div.my-tablegrid-pager-menu {
+  position: absolute;
+  width: 100px;
+  overflow: auto;
+  background: #eee;
+  z-index: 100;
+  visibility : hidden;
+  border: 1px solid #ccc;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  ul {
+    margin: 3px;
+    padding: 0;
+    li {
+      position: relative;
+      list-style-type: none;
+      padding: 0 0 0 3px;
+      display: block;
+      color: black;
+      cursor: default;
+      font-weight: bold;
+      line-height: 20px;
+      &:hover {
+        background-color: #0081c2;
+        color: white;
+        text-shadow: 1px 1px 0 #039;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+      }
+    }
+  }
+}
+
+/* Pager Definition */
+div.tablegrid-pager {
+  background-color: #eee;
+  border-left: solid 1px #ccc;
+  border-right: solid 1px #ccc;
+  border-bottom: solid 1px #ccc;
+  cursor: default;
+  padding: 2px;
+  text-shadow: 1px 1px 0 white;
+  .tablegrid-pager-message {
+    float: left;
+    padding: 2px;
+  }
+  table {
+    &.tablegrid-pager-table {
+      float: right;
+      font-size: 11px;
+      margin: 0;
+      td {
+        padding-left: 2px;
+        padding-right: 2px;
+      }
+    }
+  }
+  .tablegrid-pager-separator {
+    background: url(images/y-sep.png) center no-repeat transparent;
+    width: 2px;
+    height: 13px;
+  }
+  input {
+    &.tablegrid-page-input {
+      font-size: 11px;
+      width: 25px;
+      margin: 0;
+    }
+  }
+  a {
+    &.tablegrid-pager-control {
+      cursor: pointer;
+      text-decoration: none;
+    }
+  }
+  .tablegrid-pager-loader {
+    background: url(images/mtg-loader.gif) center no-repeat transparent;
+    width: 16px;
+    height: 16px;
+  }
+}

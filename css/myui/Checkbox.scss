@@ -1,0 +1,25 @@
+.my-checkbox {
+  display: inline-block;
+  width: 19px;
+  height: 25px;
+  padding: 0;
+  background: url(images/checkbox.png) no-repeat;
+  input {
+    visibility: hidden;
+  }
+}
+
+.my-checkbox-checked {
+  @extend .my-checkbox;
+  background-position: 0 -50px;
+}
+
+.my-radio {
+  @extend .my-checkbox;
+  background: url(images/radio.png) no-repeat;
+}
+
+.my-radio-checked {
+  @extend .my-radio;
+  background-position: 0 -50px;
+}

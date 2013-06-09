@@ -116,7 +116,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
             html[idx++] = '    <div class="my-datepicker-top" style="clear:left"></div>'
             html[idx++] = '    <div class="my-datepicker-header all-round-corners" style="clear:left"></div>'
             html[idx++] = '    <div class="my-datepicker-body" style="clear:left"></div>'
-            html[idx++] = '    <div class="my-datepicker-footer all-round-corners" style="clear:left"></div>' unless @options.embedded
+            #html[idx++] = '    <div class="my-datepicker-footer all-round-corners" style="clear:left"></div>' unless @options.embedded
             html[idx++] = '</div>'
 
             $(parent).append(html.join(''))
@@ -282,14 +282,14 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
                 html[idx++] = '<option value="'+min[1]+'">'+min[0]+'</option>' for min in timeItems
                 html[idx++] = '</select>'
                 html[idx++] = '</span>'
-
+            ###
             if !@options.embedded
                 html[idx++] = '<span class="button-controls">'
                 html[idx++] = '<a href="#" class="toolbar-button close-button"><span class="text">'+i18n.getMessage('label.ok')+'</span></a>'
                 if @options.clearButton
                     html[idx++] = '<a href="#" class="toolbar-button clear-button"><span class="text">'+i18n.getMessage('label.clear')+'</span></a>'
                 html[idx++] = '</span>';
-
+            ###
             footerDiv.append html.join('')
 
         ###

@@ -1,0 +1,73 @@
+/*
+ * CSS definitions of Autocompleter control
+ */
+
+div.my-autocompleter {
+  display: inline-block;
+  position: relative;
+  padding: 0;
+  margin: 0;
+  input {
+    border: 1px solid $input_border_color;
+    outline: none;
+    padding: 3px;
+  }
+}
+
+div.my-autocompleter-list {
+  @include font_family;
+  position: absolute;
+  display: block;
+  background-color: white;
+  border: 1px solid #ccc;
+  margin: 0;
+  padding: 0;
+  z-index: 999;
+}
+
+.my-inner-list-container {
+  position: relative;
+  overflow-y: auto;
+  ul {
+    position: relative;
+    list-style-type: none;
+    margin: 0;
+    padding: 3px;
+    li {
+      list-style-type: none;
+      display: block;
+      margin: 0;
+      padding: 3px;
+      cursor: pointer;
+      vertical-align: middle;
+      border: 1px solid white;
+      font-weight: bold;
+      &.selected {
+        background-color: #0081c2;
+        border: 1px solid #0081c2;
+        color: white;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+      }
+    }
+  }
+}
+
+.my-autocompleter-indicator {
+  background: url(images/search-indicator.gif) no-repeat;
+  padding: 0 12px;
+  margin: 0 0 0 2px;
+}
+
+.my-combobox-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #bbb url(images/cbb.png) no-repeat 0 1px;
+  width: 16px;
+  height: 22px;
+  margin: 0;
+  border: solid #0081c2 1px;
+  border-left-style: none;
+}

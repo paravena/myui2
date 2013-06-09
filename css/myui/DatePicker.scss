@@ -1,0 +1,158 @@
+.my-datepicker {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #fff;
+  background-color: #fff;
+  border: #ccc 1px solid;
+  display: block;
+  padding: 3px;
+  z-index: 1000;
+  .my-datepicker-header {
+    position: relative;
+    padding: 3px 0;
+    background-color: #ddd;
+    height: 27px;
+    select {
+      font-size: 12px;
+      &.month {
+        width: 90px;
+      }
+      &.year {
+        width: 55px;
+      }
+    }
+    a {
+      &.prev {
+        position: absolute;
+        left: 3px;
+        span {
+          background: url(images/glyphicons-halflings.png) no-repeat -239px -96px;
+        }
+      }
+      &.next {
+        position: absolute;
+        right: 3px;
+        span {
+          background: url(images/glyphicons-halflings.png) no-repeat -263px -96px;
+        }
+      }
+    }
+    .month-year {
+      display: inline-block;
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 5px 0;
+      text-shadow: 1px 1px 0 white;
+      color: #333;
+    }
+  }
+  .my-datepicker-body {
+    th {
+      font-weight: bold;
+      font-size: 11px;
+      color: #000;
+      background-color: #fff;
+      border-bottom: 1px #ddd solid;
+      padding: 4px;
+      &.new-month-separator {
+        border-left: solid #ddd 1px;
+      }
+    }
+    td {
+      font-size: 11px;
+      color: black;
+      background-color: white;
+      text-align: center;
+      vertical-align: middle;
+      div {
+        padding: 4px;
+      }
+      &.week-number {
+        padding: 2px;
+      }
+      &.week-number {
+        div {
+          background-color: #ddd;
+          -webkit-border-radius: 2px;
+          -moz-border-radius: 2px;
+          border-radius: 2px;
+          color: #fff;
+        }
+      }
+      &.other {
+        div {
+          color: #aaa;
+        }
+      }
+      &.weekend {
+        background-color: white;
+      }
+      &.selected {
+        background-color: white;
+        div {
+          color: red;
+        }
+      }
+      &.today {
+        border: 1px dashed red;
+      }
+      &.focus {
+        color: #fff;
+        div {
+          background-color: #0081c2;
+          color : #fff;
+          -webkit-border-radius: 2px;
+          -moz-border-radius: 2px;
+          border-radius: 2px;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+  .my-datepicker-footer {
+    position: relative;
+    padding: 3px;
+    background-color: #ddd;
+    height: 27px;
+    select {
+      font-size: 12px;
+    }
+    a {
+      color: black;
+      font-size: 9px;
+      vertical-align: middle;
+    }
+    .button-controls {
+      float: right;
+    }
+    .separator {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 5px 0;
+      text-shadow: 1px 1px 0 white;
+      color: #333;
+    }
+  }
+}
+
+.my-datepicker-container {
+  display: inline-block;
+  position: relative;
+  input {
+    border: 1px solid #0081c2;
+    outline: none;
+    padding: 3px;
+    margin: 0;
+  }
+  .my-datepicker-select-button {
+    position: absolute;
+    top: 0;
+    right : 0;
+    background: #ddd url(images/glyphicons-halflings.png) no-repeat -188px -116px;
+    width: 21px;
+    height: 22px;
+    margin: 0;
+    border: solid #039 1px;
+    border-left-style: none;
+  }
+}

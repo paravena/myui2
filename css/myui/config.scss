@@ -1,0 +1,7 @@
+$input_border_color : #0081c2;
+
+@mixin font_family($size : 11px,  $color : black) {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: $size;
+  color: $color;
+}
