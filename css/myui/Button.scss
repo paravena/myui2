@@ -1,20 +1,16 @@
 // sass file
 a.toolbar-button {
+  @include box_shadow_button;
+  @include border_radius;
   display: inline-block;
+  border: 1px solid #bbb;
+  border-bottom-color: #999;
+  cursor : pointer;
+  background: url('images/bg-btn.gif') repeat-x scroll 0 0 #ddd;
   padding:  4px;
   height: 16px;
   float: left;
   text-decoration: none;
-  border: 1px solid #bbb;
-  border-bottom-color: #999;
-  cursor : pointer;
-  border-radius: 4px;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  background: url('images/bg-btn.gif') repeat-x scroll 0 0 #ddd;
-  box-shadow: 0 1px 0 #f8f8f8;
-  -wekbit-box-shadow: 0 1px 0 #f8f8f8;
-  -moz-box-shadow: 0 1px 0 #f8f8f8;
   &:hover {
     background-position: 0 -6px;
     border: 1px solid #999;
@@ -67,7 +63,6 @@ a.toolbar-button {
   }
 }
 
-
 div.toolbar-separator  {
   float: left;
   width: 0;
@@ -77,59 +72,9 @@ div.toolbar-separator  {
   margin: 0 3px;
 }
 
-
-/* Mini button */
+// TODO check if this could be redifined following same signature as toolbar-button
 div.mini-button {
-  display: inline-block;
+  @extend a.toolbar-button;
   padding: 1px;
-  border: 1px solid #bbb;
-  border-bottom-color: #999;
-  cursor : pointer;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-  background: url('images/bg-btn.gif') repeat-x scroll 0 0 #ddd;
   margin-right: 3px;
-  &:hover {
-    background-position: 0 -6px;
-    border: 1px solid #999;
-    border-bottom-color: #666;
-  }
-  span {
-    &.icon {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      margin: 0;
-      background-image: url(images/glyphicons-halflings.png);
-      background-repeat:  no-repeat;
-    }
-    &.add-button {
-      background-position: -406px -96px;
-    }
-    &.delete-button {
-      background-position: -455px 1px;
-    }
-    &.save-button {
-      background-position: -94px -24px;
-    }
-    &.setting-button {
-      background-position: -431px 1px;
-    }
-    &.edit-button {
-      background-position: 1px -72px;
-    }
-    &.previous-page {
-      background-position: -431px -72px;
-    }
-    &.previous-page-disabled {
-      background-position: -431px -72px;
-    }
-    &.next-page {
-      background-position: -455px -72px;
-    }
-    &.next-page-disabled {
-      background-position: -455px -72px;
-    }
-  }
 }

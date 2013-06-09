@@ -1,8 +1,24 @@
 // sass file
-$input_border_color : #0081c2;
+$border_color_input : #0081c2;
+$border_color_cell_focus : #0081c2;
+$border_color_table : #ccc;
+$background_color_table : #eee;
 
-@mixin font_family($size : 11px,  $color : black) {
+@mixin font_family($size : 11px,  $color : black, $font_weight: normal) {
   font-family: Arial, Helvetica, sans-serif;
   font-size: $size;
+  font-weight: $font_weight;
   color: $color;
+}
+
+@mixin box_shadow_button($h_shadow : 0, $v_shadow : 1px, $blur : 0, $color : #f8f8f8)  {
+  box-shadow: $h_shadow $v_shadow $blur $color;
+  -wekbit-box-shadow: $h_shadow $v_shadow $blur $color;
+  -moz-box-shadow: $h_shadow $v_shadow $blur $color;
+}
+
+@mixin border_radius($border : 4px){
+  border-radius: $border;
+  -webkit-border-radius: $border;
+  -moz-border-radius: $border;
 }

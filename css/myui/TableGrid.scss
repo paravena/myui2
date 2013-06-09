@@ -2,19 +2,19 @@
 .tablegrid {
   @include font_family;
   .tablegrid-header-title {
-    border-top: solid 1px #ccc;
-    border-left: solid 1px #ccc;
-    border-right: solid 1px #ccc;
-    background-color: #eee;
+    border-top: solid 1px $border_color_table;
+    border-left: solid 1px $border_color_table;
+    border-right: solid 1px $border_color_table;
+    background-color: $background_color_table;
     font-weight: bold;
     color: #333;
     text-shadow: 1px 1px 0 white;
   }
   .tablegrid-toolbar {
-    border-top: solid 1px #ccc;
-    border-left: solid 1px #ccc;
-    border-right: solid 1px #ccc;
-    background-color: #eee;
+    border-top: solid 1px $border_color_table;
+    border-left: solid 1px $border_color_table;
+    border-right: solid 1px $border_color_table;
+    background-color: $background_color_table;
   }
   .tablegrid-header-row  {
     background: #ccc url(images/hrow.gif) repeat-x;
@@ -148,7 +148,7 @@ div.tablegrid-body {
         background-color: #eee;
       }
       &.focus {
-        background-color: #e6d7f5;
+        background-color: lighten(#0081c2, 55%); //#e6d7f5;
       }
       td {
         &.tablegrid-cell {
