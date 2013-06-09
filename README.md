@@ -7,14 +7,22 @@ Road Map
 Soon I will finish the migration from old Prototype to CoffeeScript and JQuery. Following tasks are:
 
 * Optimize and improve event handling
-* Replace CSS files with CSS <a href="http://lesscss.org">Less</a>
-* Include CSS Less files in RequireJS optimize process
+* Replace CSS files with CSS <a href="http://sass-lang.org">Sass</a>
+* Include CSS Sass files in RequireJS optimize process
 * Make look & feel closer to <a href="http://twitter.github.com/bootstrap/">bootstrap</a>
 
 Steps to build the project
 --------------------------------------
 
-* Download node 
+* Download <a href="http://nodejs.org">node</a>, then install some plugins, like coffee-script and sass.
+
+<code>
+npm install -g coffee-script
+</code>
+<br>
+<code>
+npm install -g node-sass
+</code>
 * execute the following commands:
 <br>
 <br>
