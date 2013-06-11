@@ -22,3 +22,10 @@ $background_color_table : #eee;
   -webkit-border-radius: $border;
   -moz-border-radius: $border;
 }
+
+@mixin border($style : solid, $width : 1px, $color: black, $top : true, $right: true, $bottom: true, $left: true) {
+  @if $top { border-top : $style $width $color }
+  @if $right { border-right : $style $width $color }
+  @if $bottom { border-bottom: $style $width $color }
+  @if $left { border-left : $style $width $color }
+}

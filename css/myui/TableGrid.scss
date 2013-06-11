@@ -1,26 +1,20 @@
 // sass file
 .tablegrid {
-  @include font_family;
+  @include font_family($font_weight : bold, $color : #333);
   .tablegrid-header-title {
     border-top: solid 1px $border_color_table;
     border-left: solid 1px $border_color_table;
     border-right: solid 1px $border_color_table;
     background-color: $background_color_table;
-    font-weight: bold;
-    color: #333;
     text-shadow: 1px 1px 0 white;
   }
   .tablegrid-toolbar {
-    border-top: solid 1px $border_color_table;
-    border-left: solid 1px $border_color_table;
-    border-right: solid 1px $border_color_table;
+    @include border($color : $border_color_table, $bottom : false);
     background-color: $background_color_table;
   }
   .tablegrid-header-row  {
     background: #ccc url(images/hrow.gif) repeat-x;
-    border-top: solid 1px #ccc;
-    border-left: solid 1px #ccc;
-    border-right: solid 1px #ccc;
+    @include border($color : $border_color_table, $bottom : false);
     cursor: default;
     table {
       &.tablegrid-header-row-table {
@@ -50,7 +44,6 @@
             &.tablegrid-inner-header-cell {
               position: relative;
               white-space: nowrap;
-              font-size: 11px;
               height: 18px;
               overflow: hidden;
               text-overflow: ellipsis;
@@ -99,8 +92,8 @@
     visibility: hidden
   }
   .tablegrid-resize-marker {
-    cursor: col-resize !important;
-    cursor: w-resize;
+    cursor: col-resize;
+    //cursor: w-resize;
     position: absolute;
     width: 2px;
     background-color: transparent;
@@ -113,7 +106,6 @@
     z-index: 0;
     border: solid 1px #ccc;
     visibility: hidden;
-    font-size: 11px;
     font-weight: bold;
     cursor: default;
     .drop-no {
@@ -139,6 +131,7 @@
 div.tablegrid-body {
   border: solid 1px #ccc;
   border-top: solid 1px #eee;
+  font-weight: normal;
   .tablegrid-body-table {
     table-layout: fixed;
     position: relative;
