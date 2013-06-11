@@ -2,9 +2,7 @@
 .tablegrid {
   @include font_family($font_weight : bold, $color : #333);
   .tablegrid-header-title {
-    border-top: solid 1px $border_color_table;
-    border-left: solid 1px $border_color_table;
-    border-right: solid 1px $border_color_table;
+    @include border($color : $border_color_table, $bottom : false);
     background-color: $background_color_table;
     text-shadow: 1px 1px 0 white;
   }
@@ -12,20 +10,19 @@
     @include border($color : $border_color_table, $bottom : false);
     background-color: $background_color_table;
   }
-  .tablegrid-header-row  {
+  .header-row  {
     background: #ccc url(images/hrow.gif) repeat-x;
     @include border($color : $border_color_table, $bottom : false);
     cursor: default;
     table {
-      &.tablegrid-header-row-table {
+      &.header-row-table {
         padding: 0;
-        color: black;
         text-align: left;
         th {
-          &.tablegrid-header-cell {
+          &.header-cell {
             border: 1px solid transparent;
-            border-right-color: #ddd;
-            border-bottom-color: #ddd;
+            border-right-color: $border_color_header_cell;
+            border-bottom-color: $border_color_header_cell;
             text-shadow: 1px 1px 0 #ddd;
             margin: 0;
             padding: 0;
@@ -41,7 +38,7 @@
             }
           }
           div {
-            &.tablegrid-inner-header-cell {
+            &.inner-header-cell {
               position: relative;
               white-space: nowrap;
               height: 18px;
@@ -64,14 +61,14 @@
       }
     }
   }
-  .tablegrid-header-button {
+  .header-button {
     position: absolute;
     background: url(images/ddn.png) center no-repeat;
-    border-left: solid #ddd 1px;
+    border-left: solid 1px $border_color_button;
     visibility: hidden;
     z-index: 50;
   }
-  .tablegrid-column-move-top {
+  .column-move-top {
     position: absolute;
     top: 0;
     left: 0;
@@ -81,7 +78,7 @@
     background: url(images/col-move-top.gif) center no-repeat transparent;
     visibility: hidden
   }
-  .tablegrid-column-move-bottom {
+  .column-move-bottom {
     position: absolute;
     top: 0;
     left: 0;
@@ -91,7 +88,7 @@
     background: url(images/col-move-bottom.gif) center no-repeat transparent;
     visibility: hidden
   }
-  .tablegrid-resize-marker {
+  .resize-marker {
     cursor: col-resize;
     //cursor: w-resize;
     position: absolute;
@@ -99,12 +96,12 @@
     background-color: transparent;
     z-index : 300;
   }
-  .dragColumn {
+  .drag-column {
     position: absolute;
     background: url(images/hrow.gif) repeat-x;
     padding: 3px;
     z-index: 0;
-    border: solid 1px #ccc;
+    border: solid 1px $border_color_cell;
     visibility: hidden;
     font-weight: bold;
     cursor: default;
@@ -129,8 +126,8 @@
 
 /* Body definition */
 div.tablegrid-body {
-  border: solid 1px #ccc;
-  border-top: solid 1px #eee;
+  border: solid 1px $border_color_table;
+  border-top: solid 1px lighten($border_color_table, 20%); //#eee
   font-weight: normal;
   .tablegrid-body-table {
     table-layout: fixed;
@@ -141,13 +138,13 @@ div.tablegrid-body {
         background-color: #eee;
       }
       &.focus {
-        background-color: lighten(#0081c2, 55%); //#e6d7f5;
+        background-color: lighten($background_color_cell_focus, 55%); //#e6d7f5;
       }
       td {
         &.tablegrid-cell {
           border-left: 1px solid transparent;
-          border-right: 1px solid #ddd;
-          border-bottom: solid 1px #ddd;
+          border-right: 1px solid $border_color_cell;
+          border-bottom: solid 1px $border_color_cell;
           padding: 0;
           margin: 0;
           div {
@@ -177,7 +174,7 @@ div.tablegrid-body {
                 background-color: white;
                 outline: none;
                 padding: 2px 3px;
-                border: 1px solid #0081c2;
+                border: 1px solid $border_color_input;
               }
             }
           }
@@ -186,7 +183,7 @@ div.tablegrid-body {
           /*border-left: solid 1px #90c;*/
           div {
             &.tablegrid-inner-cell {
-              background-color: #0081c2;
+              background-color: $background_color_cell_focus;
               color: white;
             }
           }
@@ -197,6 +194,7 @@ div.tablegrid-body {
 }
 
 div.my-tablegrid-menu {
+  @include border_radius($radius : 3px);
   position: absolute;
   width: 150px;
   overflow: auto;
@@ -204,9 +202,6 @@ div.my-tablegrid-menu {
   z-index: 100;
   visibility : hidden;
   border: 1px solid #ccc;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
   ul {
     margin: 3px;
     padding: 0;
@@ -229,11 +224,9 @@ div.my-tablegrid-menu {
         }
       }
       &:hover {
-        background-color: #0081c2;
+        @include border_radius($radius : 3px);
+        background-color: $background_color_item_focus;
         color: white;
-        -webkit-border-radius: 3px;
-        -moz-border-radius: 3px;
-        border-radius: 3px;
       }
       span {
         &.my-menu-item-icon {
@@ -257,6 +250,7 @@ div.my-tablegrid-menu {
 }
 
 div.my-tablegrid-pager-menu {
+  @include border_radius($radius : 3px);
   position: absolute;
   width: 100px;
   overflow: auto;
@@ -264,9 +258,6 @@ div.my-tablegrid-pager-menu {
   z-index: 100;
   visibility : hidden;
   border: 1px solid #ccc;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
   ul {
     margin: 3px;
     padding: 0;
@@ -280,12 +271,10 @@ div.my-tablegrid-pager-menu {
       font-weight: bold;
       line-height: 20px;
       &:hover {
-        background-color: #0081c2;
+        @include border_radius($radius : 3px);
+        background-color: $background_color_item_focus;
         color: white;
         text-shadow: 1px 1px 0 #039;
-        -webkit-border-radius: 3px;
-        -moz-border-radius: 3px;
-        border-radius: 3px;
       }
     }
   }
@@ -293,13 +282,12 @@ div.my-tablegrid-pager-menu {
 
 /* Pager Definition */
 div.tablegrid-pager {
-  background-color: #eee;
-  border-left: solid 1px #ccc;
-  border-right: solid 1px #ccc;
-  border-bottom: solid 1px #ccc;
+  @include border($color : $border_color_pager, $top : false);
+  background-color: $background_color_pager;
   cursor: default;
   padding: 2px;
   text-shadow: 1px 1px 0 white;
+  font-weight: normal;
   .tablegrid-pager-message {
     float: left;
     padding: 2px;

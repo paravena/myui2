@@ -211,7 +211,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             overlayTopPos = @topPos
             # Adding Header Row
-            html[idx++] = '<div id="headerRowDiv'+id+'" class="tablegrid-header-row" style="position:absolute;top:'+@topPos+'px;left:'+@leftPos+'px;width:'+@tableWidth+'px;height:'+@headerHeight+'px;padding:0;overflow:hidden;z-index:0">'
+            html[idx++] = '<div id="headerRowDiv'+id+'" class="header-row" style="position:absolute;top:'+@topPos+'px;left:'+@leftPos+'px;width:'+@tableWidth+'px;height:'+@headerHeight+'px;padding:0;overflow:hidden;z-index:0">'
             #header row box useful for drag and drop
 
             html[idx++] = '<div id="mtgHRB'+id+'" style="position:relative;padding:0;margin:0;width:'+(@headerWidth+21)+'px;height:'+@headerHeight+'px;">'
@@ -250,7 +250,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 html[idx++] = @_createSettingMenu()
 
             # Adding Header Button Control
-            html[idx++] = '<div id="mtgHB'+id+'" class="tablegrid-header-button" style="width:14px;height:'+@headerHeight+'px">'
+            html[idx++] = '<div id="mtgHB'+id+'" class="header-button" style="width:14px;height:'+@headerHeight+'px">'
             html[idx++] = '</div>'
             # Adding Header Button Menu
             html[idx++] = '<div id="mtgHBM'+id+'" class="my-tablegrid-menu .my-drop-shadow">'
@@ -271,16 +271,16 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html[idx++] = '</div>'
 
             # Adding resize markers
-            html[idx++] = '<div id="resizeMarkerLeft'+id+'" class="tablegrid-resize-marker">'
+            html[idx++] = '<div id="resizeMarkerLeft'+id+'" class="resize-marker">'
             html[idx++] = '</div>'
-            html[idx++] = '<div id="resizeMarkerRight'+id+'" class="tablegrid-resize-marker">'
+            html[idx++] = '<div id="resizeMarkerRight'+id+'" class="resize-marker">'
             html[idx++] = '</div>'
 
             # Adding Dragging controls
-            html[idx++] = '<div id="mtgColMoveTop'+id+'" class="tablegrid-column-move-top">&nbsp;</div>'
-            html[idx++] = '<div id="mtgColMoveBottom'+id+'" class="tablegrid-column-move-bottom">&nbsp;</div>'
+            html[idx++] = '<div id="mtgColMoveTop'+id+'" class="column-move-top">&nbsp;</div>'
+            html[idx++] = '<div id="mtgColMoveBottom'+id+'" class="column-move-bottom">&nbsp;</div>'
           
-            html[idx++] = '<div id="dragColumn'+id+'" class="dragColumn" style="width:100px;height:18px;">'
+            html[idx++] = '<div id="dragColumn'+id+'" class="drag-column" style="width:100px;height:18px;">'
             html[idx++] = '<span class="columnTitle">&nbsp;</span>'
             html[idx++] = '<div class="drop-no">&nbsp;</div>'
             html[idx++] = '</div>'
@@ -694,7 +694,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             editor = cm[index].editor
             headerColumn.attr('width', newWidth)
             headerColumn.css('width', newWidth + 'px')
-            $('.tablegrid-inner-header-cell', headerColumn).css('width', (newWidth - 8) + 'px')
+            $('.inner-header-cell', headerColumn).css('width', (newWidth - 8) + 'px')
 
             $('.mtgC' + id + '_c' + index).attr('width', newWidth)
             $('.mtgC' + id + '_c' + index).css('width', newWidth + 'px')
@@ -908,7 +908,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 if index < cm.length
                     $(th).attr('id', 'mtgHC'+ id + '_c' + index)
                     try
-                        ihc = $(th).find('div.tablegrid-inner-header-cell')
+                        ihc = $(th).find('div.inner-header-cell')
                         ihc.attr('id', 'mtgIHC' + id + '_c' + index)
                         ihc.find('span').attr('id', 'mtgSortIcon' + id + '_c' + index)
                         hs = $(th).find('div.header-separator')
@@ -1900,10 +1900,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         # Creates header row
         ###
         _createHeaderRow : ->
-            thTmpl = '<th id="mtgHC{id}_c{x}" colspan="{colspan}" rowspan="{rowspan}" width="{width}" height="{height}" style="width:{width}px;height:{height}px;border-bottom-color:{color};display:{display}" class="tablegrid-header-cell mtgHC{id}">'
-            thTmplLast = '<th id="mtgHC{id}_c{x}" colspan="{colspan}" rowspan="{rowspan}" width="{width}" height="{height}" style="width:{width}px;height:{height}px;border-right:none;" class="tablegrid-header-cell mtgHC{id}">'
-            ihcTmpl = '<div id="mtgIHC{id}_c{x}" class="tablegrid-inner-header-cell mtgIHC{id}" style="width:{width}px;height:{height}px;">'
-            ihcTmplLast = '<div class="tablegrid-inner-header-cell" style="width:{width}px;height:{height}px;">'
+            thTmpl = '<th id="mtgHC{id}_c{x}" colspan="{colspan}" rowspan="{rowspan}" width="{width}" height="{height}" style="width:{width}px;height:{height}px;border-bottom-color:{color};display:{display}" class="header-cell mtgHC{id}">'
+            thTmplLast = '<th id="mtgHC{id}_c{x}" colspan="{colspan}" rowspan="{rowspan}" width="{width}" height="{height}" style="width:{width}px;height:{height}px;border-right:none;" class="header-cell mtgHC{id}">'
+            ihcTmpl = '<div id="mtgIHC{id}_c{x}" class="inner-header-cell mtgIHC{id}" style="width:{width}px;height:{height}px;">'
+            ihcTmplLast = '<div class="inner-header-cell" style="width:{width}px;height:{height}px;">'
             hsTmpl = '<div id="mtgHS{id}_c{x}" class="header-separator mtgHS{id}" style="height:{height}px;">'
             siTmpl = '<span id="mtgSortIcon{id}_c{x}" class="sort-icon">&nbsp;&nbsp;&nbsp;</span>'
             cm = @_columnModel
@@ -1914,7 +1914,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             idx = 0
             @filledPositions = []
 
-            html[idx++] = '<table id="mtgHRT'+id+'" width="'+(@headerWidth+21)+'" cellpadding="0" cellspacing="0" border="0" class="tablegrid-header-row-table">'
+            html[idx++] = '<table id="mtgHRT'+id+'" width="'+(@headerWidth+21)+'" cellpadding="0" cellspacing="0" border="0" class="header-row-table">'
             html[idx++] = '<thead>'
 
             temp = null

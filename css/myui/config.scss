@@ -1,8 +1,18 @@
-// sass file
 $border_color_input : #0081c2;
 $border_color_cell_focus : #0081c2;
 $border_color_table : #ccc;
+$border_color_button : #ddd;
+$border_color_cell : #ddd;
+$border_color_header_cell : #ddd;
+$border_color_pager : #ccc;
+$border_color_pager_manu : #ccc;
+
 $background_color_table : #eee;
+$background_color_menu : #ddd;
+$background_color_pager : #eee;
+$background_color_pager_menu : #eee;
+$background_color_cell_focus : #0081c2;
+$background_color_item_focus : #0081c2;
 
 @mixin font_family($size : 11px,  $color : black, $font_weight: normal) {
   font-family: Arial, Helvetica, sans-serif;
@@ -17,10 +27,10 @@ $background_color_table : #eee;
   -moz-box-shadow: $h_shadow $v_shadow $blur $color;
 }
 
-@mixin border_radius($border : 4px){
-  border-radius: $border;
-  -webkit-border-radius: $border;
-  -moz-border-radius: $border;
+@mixin border_radius($radius : 4px){
+  border-radius: $radius;
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
 }
 
 @mixin border($style : solid, $width : 1px, $color: black, $top : true, $right: true, $bottom: true, $left: true) {

@@ -13,6 +13,17 @@ div.my-autocompleter {
     outline: none;
     padding: 3px;
   }
+  .my-combobox-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #bbb url(images/cbb.png) no-repeat 0 1px;
+    width: 16px;
+    height: 22px;
+    margin: 0;
+    border: solid $border_color_input 1px;
+    border-left-style: none;
+  }
 }
 
 div.my-autocompleter-list {
@@ -24,36 +35,32 @@ div.my-autocompleter-list {
   margin: 0;
   padding: 0;
   z-index: 999;
-}
-
-.my-inner-list-container {
-  position: relative;
-  overflow-y: auto;
-  ul {
+  .my-inner-list-container {
     position: relative;
-    list-style-type: none;
-    margin: 0;
-    padding: 3px;
-    li {
-      list-style-type: none;
-      display: block;
+    overflow-y: auto;
+    ul {
+      position: relative;
       margin: 0;
       padding: 3px;
-      cursor: pointer;
-      vertical-align: middle;
-      border: 1px solid white;
-      font-weight: bold;
-      &.selected {
-        background-color: #0081c2;
-        border: 1px solid #0081c2;
-        color: white;
-        -webkit-border-radius: 3px;
-        -moz-border-radius: 3px;
-        border-radius: 3px;
+      li {
+        list-style-type: none;
+        margin: 0;
+        padding: 3px;
+        cursor: pointer;
+        vertical-align: middle;
+        border: 1px solid white;
+        font-weight: bold;
+        &.selected {
+          @include border_radius($radius : 3px);
+          background-color: #0081c2;
+          border: 1px solid #0081c2;
+          color: white;
+        }
       }
     }
   }
 }
+
 
 .my-autocompleter-indicator {
   background: url(images/search-indicator.gif) no-repeat;
@@ -61,14 +68,3 @@ div.my-autocompleter-list {
   margin: 0 0 0 2px;
 }
 
-.my-combobox-button {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: #bbb url(images/cbb.png) no-repeat 0 1px;
-  width: 16px;
-  height: 22px;
-  margin: 0;
-  border: solid #0081c2 1px;
-  border-left-style: none;
-}
