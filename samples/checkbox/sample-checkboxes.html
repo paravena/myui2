@@ -4,11 +4,18 @@
 	<head>
 		<title>Sample Checkboxs</title>
 		<link type="text/css" href="../../css/myui/myui.min.css" rel="stylesheet">
-		<script type="text/javascript" src="../../scripts/myui.min.js"></script>
+		<script type="text/javascript" src="../../scripts/libs/require.js"></script>
 	</head>
 	<script type="text/javascript">
-		$(window).load(function() {
-			$("input[type=checkbox]").myCheckbox();
+        require.config({
+            baseUrl : '../../scripts',
+            paths : {
+                'jquery' : 'libs/jquery',
+                'jquerypp.custom' : 'libs/jquerypp.custom'
+            }
+        });
+        require(['myui.min', 'jquery', 'jquerypp.custom'], function () {
+            $("input[type=checkbox]").myCheckbox();
 		});
 	</script>
 	<body>

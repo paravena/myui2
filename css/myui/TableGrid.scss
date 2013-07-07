@@ -141,14 +141,14 @@ div.tablegrid-body {
         background-color: lighten($background_color_cell_focus, 55%); //#e6d7f5;
       }
       td {
-        &.tablegrid-cell {
+        &.cell {
           border-left: 1px solid transparent;
           border-right: 1px solid $border_color_cell;
           border-bottom: solid 1px $border_color_cell;
           padding: 0;
           margin: 0;
           div {
-            &.tablegrid-inner-cell {
+            &.inner-cell {
               position: relative;
               white-space: nowrap;
               font-size: 11px;
@@ -182,7 +182,7 @@ div.tablegrid-body {
         &.focus {
           /*border-left: solid 1px #90c;*/
           div {
-            &.tablegrid-inner-cell {
+            &.inner-cell {
               background-color: $background_color_cell_focus;
               color: white;
             }
@@ -213,13 +213,14 @@ div.my-tablegrid-menu {
       color: black;
       cursor: default;
       font-weight: bold;
-      line-height: 20px;
+      line-height: 24px;
       label {
         span {
           height: 22px; /* TODO check this is little ugly*/
-          &.my-menu-item-checkbox {
+          &.item-checkbox {
             position : absolute;
             left : 0;
+            top : 2px;
           }
         }
       }
@@ -229,10 +230,10 @@ div.my-tablegrid-menu {
         color: white;
       }
       span {
-        &.my-menu-item-icon {
+        &.item-icon {
           position : absolute;
           left : 0;
-          padding: 2px;
+          padding: 4px 2px;
         }
         &.sort-ascending-icon {
           background: url(images/sort_ascending.png) no-repeat transparent center;
@@ -264,7 +265,8 @@ div.my-tablegrid-pager-menu {
     li {
       position: relative;
       list-style-type: none;
-      padding: 0 0 0 3px;
+      line-height: 24px;
+      padding: 2px 3px;
       display: block;
       color: black;
       cursor: default;
@@ -303,7 +305,7 @@ div.tablegrid-pager {
       }
     }
   }
-  .tablegrid-pager-separator {
+  .separator {
     background: url(images/y-sep.png) center no-repeat transparent;
     width: 2px;
     height: 13px;

@@ -1,6 +1,5 @@
 // sass file
 a.toolbar-button {
-  @include box_shadow_button;
   @include border_radius;
   display: inline-block;
   border: 1px solid #bbb;

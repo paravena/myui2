@@ -256,15 +256,15 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html[idx++] = '<div id="mtgHBM'+id+'" class="my-tablegrid-menu .my-drop-shadow">'
             html[idx++] = '<ul>'
             html[idx++] = '<li id="sort-asc'+id+'">'
-            html[idx++] = '<span class="my-menu-item-icon sort-ascending-icon">&nbsp;</span>'
+            html[idx++] = '<span class="item-icon sort-ascending-icon">&nbsp;</span>'
             html[idx++] = i18n.getMessage('label.sortAsc')
             html[idx++] = '</li>'
             html[idx++] = '<li id="sort-desc'+id+'">'
-            html[idx++] = '<span class="my-menu-item-icon sort-descending-icon">&nbsp;</span>'
+            html[idx++] = '<span class="item-icon sort-descending-icon">&nbsp;</span>'
             html[idx++] = i18n.getMessage('label.sortDesc')
             html[idx++] = '</li>'
             html[idx++] = '<li class="select-all">'
-            html[idx++] = '<label><span class="my-checkbox my-menu-item-checkbox"><input type="checkbox" id="select-all'+id+'"></span></label>'
+            html[idx++] = '<label><span class="my-checkbox item-checkbox"><input type="checkbox" id="select-all'+id+'"></span></label>'
             html[idx++] = i18n.getMessage('label.selectAll')
             html[idx++] = '</li>'
             html[idx++] = '</ul>'
@@ -329,8 +329,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _createRow : (row, rowIdx) ->
             id = @_mtgId
-            tdTmpl = '<td id="mtgC{id}_c{x}r{y}" height="{height}" width="{width}" style="width:{width}px;height:{height}px;display:{display}" class="tablegrid-cell mtgC{id} mtgC{id}_c{x} mtgR{id}_r{y}">'
-            icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;text-align:{align}" class="tablegrid-inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
+            tdTmpl = '<td id="mtgC{id}_c{x}r{y}" height="{height}" width="{width}" style="width:{width}px;height:{height}px;display:{display}" class="cell mtgC{id} mtgC{id}_c{x} mtgR{id}_r{y}">'
+            icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;text-align:{align}" class="inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
             checkboxTmpl = '<label><span id="my-checkbox{id}_c{x}r{y}" class="my-checkbox {isSelectable} {checkedClass}"><input name="my-checkbox{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x}" checked="{checked}"></span></label>'
             radioTmpl = '<label><span id="my-radio{id}_c{x}r{y}" class="my-radio"><input name="{groupName}" type="radio" value="{value}" class="my-radio{id}_c{x}"></span></label>'
             actionBtnTmpl = '<div id="{name}{id}_c{x}r{y}" class="mini-button" style="display:{display}"><span class="icon {iconClass}">&nbsp;</span></div>'
@@ -562,9 +562,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             for c in cm
                 html[idx++] = '<li>'
                 if c.visible
-                    html[idx++] = '<label><span class="my-checkbox my-checkbox-checked my-menu-item-checkbox"><input id="'+c.id+'" type="checkbox" checked="checked"></span></label>'
+                    html[idx++] = '<label><span class="my-checkbox my-checkbox-checked item-checkbox"><input id="'+c.id+'" type="checkbox" checked="checked"></span></label>'
                 else
-                    html[idx++] = '<label><span class="my-checkbox my-menu-item-checkbox"><input id="'+c.id+'" type="checkbox"></span></label>'
+                    html[idx++] = '<label><span class="my-checkbox item-checkbox"><input id="'+c.id+'" type="checkbox"></span></label>'
                 html[idx++] = '&nbsp;'+ c.title
                 html[idx++] = '</li>'
 
@@ -920,12 +920,12 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             for i in [-numberOfRowsAdded...renderedRows]
                 $('.mtgR'+id+'_r'+i).each (index) ->
                     $(this).attr('id', 'mtgC' + id + '_c' + index + 'r' + i)
-                    $(this).attr('class', 'tablegrid-cell mtgC' + id + ' mtgC' + id + '_c' + index + ' mtgR' + id + '_r' + i)
+                    $(this).attr('class', 'cell mtgC' + id + ' mtgC' + id + '_c' + index + ' mtgR' + id + '_r' + i)
 
                 $('.mtgIR'+id+'_r'+i).each (index, div) ->
                     $(div).attr('id', 'mtgIC' + id + '_c' + index + 'r' + i)
                     modifiedCellClass = if $(div).attr('class').match(/modified-cell/) then ' modified-cell' else ''
-                    $(div).attr('class', 'tablegrid-inner-cell mtgIC' + id + ' mtgIC' + id + '_c' + index + ' mtgIR' + id + '_r' + i + modifiedCellClass)
+                    $(div).attr('class', 'inner-cell mtgIC' + id + ' mtgIC' + id + '_c' + index + ' mtgIR' + id + '_r' + i + modifiedCellClass)
                     if $(div).find('input').size() > 0  # when it contains a checkbox or radio button
                         input = $(div).find('input')
                         input.attr('id', 'mtgInput' + id + '_c' + index + 'r' + i)
@@ -1348,12 +1348,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     html[idx++] = '<tbody>'
                     html[idx++] = '<tr>'
                     html[idx++] = '<td><div id="mtgLoader'+id+'" class="mtgLoader">&nbsp;</div></td>'
-                    #html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
-                    #html[idx++] = '<td><a id="mtgFirst'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span style="padding:3px">First</span></div></a></td>'
-                    #html[idx++] = '<td><a id="mtgLast'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span style="padding:3px">Last</span></div></a></td>'
-                    html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
+                    html[idx++] = '<td><div class="separator">&nbsp;</div></td>'
                     html[idx++] = temp
-                    html[idx++] = '<td><div class="tablegrid-pager-separator">&nbsp;</div></td>'
+                    html[idx++] = '<td><div class="separator">&nbsp;</div></td>'
                     html[idx++] = '<td><a id="mtgPrev'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span class="icon previous-page">&nbsp;</span></div></a></td>'
                     html[idx++] = '<td><a id="mtgNext'+id+'" class="tablegrid-pager-control"><div class="mini-button"><span class="icon next-page">&nbsp;</span></div></a></td>'
                     html[idx++] = '</tr>'
@@ -1397,8 +1394,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 $("#my-page-label#{id}").append $("#my-first-last-menu#{id}")
                 $("#my-first-last-menu#{id}").css("margin-top", "3px")
                 $("#my-page-label#{id}").hover(
-                    -> $("#my-first-last-menu#{id}").css("visibility", "visible"),
-                    -> $("#my-first-last-menu#{id}").css("visibility", "hidden"))
+                  ( -> $("#my-first-last-menu#{id}").css("visibility", "visible")),
+                  ( -> $("#my-first-last-menu#{id}").css("visibility", "hidden")))
 
             if currentPage > 1
                 $('#mtgFirst'+id).on 'click', => @_retrieveDataFromUrl(1)

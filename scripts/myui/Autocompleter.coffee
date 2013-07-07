@@ -68,7 +68,6 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                         }).addClass(pointerCssClass)
                     else  # above
                         if (uh > (p.top - vst))
-                            console.log 'step 1'
                             uh = p.top - vst - 10
                             topPos = p.top - (uh + 4)
                             pointerCssClass = 'my-arrow-down-pointer'

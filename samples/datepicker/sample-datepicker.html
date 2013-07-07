@@ -4,11 +4,18 @@
 <head>
 	<title>Test</title>
 	<link type="text/css" href="../../css/myui/myui.min.css" rel="stylesheet">
-	<script type="text/javascript" src="../../scripts/myui.min.js"></script>
+	<script type="text/javascript" src="../../scripts/libs/require.js"></script>
 </head>
 <script type="text/javascript">
 	var datePicker1 = null;
-	$(window).load(function() {
+    require.config({
+        baseUrl : '../../scripts',
+        paths : {
+            'jquery' : 'libs/jquery',
+            'jquerypp.custom' : 'libs/jquerypp.custom'
+        }
+    });
+    require(['myui.min', 'jquery', 'jquerypp.custom'], function () {
 		datePicker1 = new MY.DatePicker({
 			input: '#arrivalDt',
 			format: 'dd-MMM-yyyy',

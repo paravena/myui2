@@ -1,20 +1,30 @@
-/*
-requirejs.config({
-   baseUrl : '../../scripts',
-   paths : {
-       'jquery' : 'libs/jquery',
-       'jquerypp.custom' : 'libs/jquerypp.custom'
-   }
+require.config({
+    shim : {
+        'cs!myui/TableGrid' : [
+            'jquery',
+            'jquerypp.custom',
+            'cs!myui/TextField',
+            'cs!myui/Autocompleter',
+            'cs!myui/ComboBox',
+            'cs!myui/DatePicker',
+            'cs!myui/Checkbox',
+            'cs!myui/RadioButton',
+        ]
+    }
 });
-*/
+
 require([
+    'jquery',
+    'jquerypp.custom',
     'cs!myui/TextField',
     'cs!myui/Autocompleter',
     'cs!myui/ComboBox',
     'cs!myui/DatePicker',
     'cs!myui/Checkbox',
     'cs!myui/RadioButton',
-    'cs!myui/TableGrid'], function(TextField,
+    'cs!myui/TableGrid'], function($,
+                                   jquerypp,
+                                   TextField,
                                    Autocompleter,
                                    ComboBox,
                                    DatePicker,
