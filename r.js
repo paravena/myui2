@@ -2314,7 +2314,7 @@ var requirejs, require, define;
     //like Joyent where it defaults to a server.js as the only executed
     //script. But only do it if this is not an optimization run.
     if (commandOption !== 'o' && (!fileName || !jsSuffixRegExp.test(fileName))) {
-        fileName = 'main.js';
+        fileName = 'myui.js';
     }
 
     /**

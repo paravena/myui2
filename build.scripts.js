@@ -1,7 +1,7 @@
 ({
     baseUrl : 'scripts',
     stubModules: ['cs'],
-    name : 'main',
+    name : 'myui',
     //optimize : 'none'
     out : 'scripts/myui.min.js',
     paths : {
@@ -11,6 +11,6 @@
         'jquery' : 'libs/jquery',
         'jquerypp.custom' : 'libs/jquerypp.custom'
     },
-    exclude : ['jquery', 'jquerypp.custom']
-    //include : ['requireLib']
+    exclude : ['jquery', 'jquerypp.custom'],
+    include : ['requireLib']
 })
