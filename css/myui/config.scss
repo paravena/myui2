@@ -39,3 +39,10 @@ $background_color_item_focus : #0081c2;
   @if $bottom { border-bottom: $style $width $color }
   @if $left { border-left : $style $width $color }
 }
+
+@mixin opacity($color, $opacity) {
+  background-color: $color;
+  filter: alpha(opacity = $opacity * 100);
+  -moz-opacity: $opacity;
+  opacity: $opacity;
+}

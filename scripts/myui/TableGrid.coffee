@@ -526,14 +526,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _showLoaderSpinner : ->
             id = @_mtgId
-            $('#mtgLoader'+id).show()
+            $('#loader-icon'+id).show()
 
         ###
         # Hides loader spinner.
         ###
         _hideLoaderSpinner : ->
             id = @_mtgId
-            $('#mtgLoader'+id).hide()
+            $('#loader-icon'+id).hide()
 
         ###
         # Hides menus.
@@ -1333,7 +1333,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         ###
         _updatePagerInfo : (emptyFlg) ->
             id = @_mtgId
-            return '<span id="mtgLoader'+id+'" class="mtgLoader">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' if emptyFlg
+            return '<span id="loader-icon'+id+'" class="loader-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' if emptyFlg
             html = []
             idx = 0
             pager = @pager
@@ -1347,7 +1347,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     html[idx++] = '<table class="tablegrid-pager-table" border="0" cellpadding="0" cellspacing="0">'
                     html[idx++] = '<tbody>'
                     html[idx++] = '<tr>'
-                    html[idx++] = '<td><div id="mtgLoader'+id+'" class="mtgLoader">&nbsp;</div></td>'
+                    html[idx++] = '<td><div id="loader-icon'+id+'" class="loader-icon">&nbsp;</div></td>'
                     html[idx++] = '<td><div class="separator">&nbsp;</div></td>'
                     html[idx++] = temp
                     html[idx++] = '<td><div class="separator">&nbsp;</div></td>'
@@ -1370,7 +1370,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     html[idx++] = '<table class="tablegrid-pager-table" border="0" cellpadding="0" cellspacing="0">'
                     html[idx++] = '<tbody>'
                     html[idx++] = '<tr>'
-                    html[idx++] = '<td><div id="tablegrid-pager-loader'+id+'" class="mtgLoader">&nbsp;</div></td>'
+                    html[idx++] = '<td><div id="loader-icon'+id+'" class="loader-icon">&nbsp;</div></td>'
                     html[idx++] = '</tr>'
                     html[idx++] = '</tbody>'
                     html[idx++] = '</table>'

@@ -7,10 +7,10 @@
 @import "DatePicker";
 @import "Button";
 @import "TableGrid";
+
 /*
  * General purpose CSS definitions
  */
-
 .my-drop-shadow {
   -moz-box-shadow: 3px 3px 4px #ddd;
   -webkit-box-shadow: 3px 3px 4px #ddd;
@@ -18,27 +18,22 @@
 }
 
 .loading-box {
-  background: #0081c2 url(images/ajax-loader.gif) no-repeat 6px 4px;
+  @include border_radius(5px);
+  background: #eee url(images/ajax-loader.gif) no-repeat 6px 4px;
   width: 80px;
   height: 20px;
-  padding:4px 5px 2px 8px;
-  color: white;
+  padding: 4px 5px 2px 1px;
+  color: black;
   text-align: right;
   font-weight: bold;
   font-size: 12px;
   border: solid 1px dimgray;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
   margin: auto;
 }
 
 .overlay {
+  @include opacity(#999, 0.6);
   position: absolute;
-  background-color: #999;
-  filter:alpha(opacity=60);
-  -moz-opacity: 0.6;
-  opacity: 0.6;
   visibility: hidden;
   z-index: 20;
 }
