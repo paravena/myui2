@@ -112,7 +112,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
             style += 'width: 220px;' if @options.numberOfMonths is 1
 
-            html[idx++] = '<div id="my-datepicker-div'+@_mdpId+'" class="my-datepicker my-drop-shadow my-all-round-corners" style="'+style+'">'
+            html[idx++] = '<div id="my-datepicker-div'+@_mdpId+'" class="my-datepicker" style="'+style+'">'
             html[idx++] = '    <div class="my-datepicker-top" style="clear:left"></div>'
             html[idx++] = '    <div class="my-datepicker-header all-round-corners" style="clear:left"></div>'
             html[idx++] = '    <div class="my-datepicker-body" style="clear:left"></div>'

@@ -190,7 +190,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         getUpdatedChoices : ->
             unless @update
-                $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list my-all-round-corners my-drop-shadow"><div class="my-inner-list-container"></div></div>')
+                $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list"><div class="my-inner-list-container"></div></div>')
                 @update = $('#' + @id + '_update')
                 @_innerListContainer = $('.my-inner-list-container', @update)
 

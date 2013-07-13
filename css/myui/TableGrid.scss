@@ -195,6 +195,7 @@ div.tablegrid-body {
 
 div.my-tablegrid-menu {
   @include border_radius($radius : 3px);
+  @include drop_shadow;
   position: absolute;
   width: 150px;
   overflow: auto;
@@ -252,6 +253,7 @@ div.my-tablegrid-menu {
 
 div.my-tablegrid-pager-menu {
   @include border_radius($radius : 3px);
+  @include drop_shadow;
   position: absolute;
   width: 100px;
   overflow: auto;

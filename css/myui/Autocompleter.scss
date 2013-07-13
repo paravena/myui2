@@ -28,6 +28,8 @@ div.my-autocompleter {
 
 div.my-autocompleter-list {
   @include font_family;
+  @include drop_shadow;
+  @include border_radius(3px);
   position: absolute;
   display: block;
   background-color: white;

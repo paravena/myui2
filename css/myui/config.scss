@@ -21,7 +21,7 @@ $background_color_item_focus : #0081c2;
   color: $color;
 }
 
-@mixin box_shadow_button($h_shadow : 0, $v_shadow : 1px, $blur : 0, $color : #f8f8f8)  {
+@mixin drop_shadow($h_shadow : 3px, $v_shadow : 3px, $blur : 4px, $color : #ddd)  {
   box-shadow: $h_shadow $v_shadow $blur $color;
   -wekbit-box-shadow: $h_shadow $v_shadow $blur $color;
   -moz-box-shadow: $h_shadow $v_shadow $blur $color;

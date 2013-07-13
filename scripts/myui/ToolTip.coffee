@@ -15,7 +15,7 @@ define ['jquery'], ($) ->
             id = @parentElement.attr('id')
             toolTipId = "#{id}_tooltip"
             html = []
-            html.push "<div id=\"#{toolTipId}\" class=\"my-tooltip my-tooltip-#{@type} my-drop-shadow my-all-round-corners\" style=\"display:none\">"
+            html.push "<div id=\"#{toolTipId}\" class=\"my-tooltip my-tooltip-#{@type}\" style=\"display:none\">"
             html.push "<div class=\"my-tooltip-inner\">"
             html.push @message
             html.push "</div>"

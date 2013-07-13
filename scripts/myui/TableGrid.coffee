@@ -253,7 +253,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html[idx++] = '<div id="mtgHB'+id+'" class="header-button" style="width:14px;height:'+@headerHeight+'px">'
             html[idx++] = '</div>'
             # Adding Header Button Menu
-            html[idx++] = '<div id="mtgHBM'+id+'" class="my-tablegrid-menu .my-drop-shadow">'
+            html[idx++] = '<div id="mtgHBM'+id+'" class="my-tablegrid-menu">'
             html[idx++] = '<ul>'
             html[idx++] = '<li id="sort-asc'+id+'">'
             html[idx++] = '<span class="item-icon sort-ascending-icon">&nbsp;</span>'
@@ -555,9 +555,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html = []
             idx = 0;
             if height > 0
-                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu .my-drop-shadow" style="height:'+height+'px">'
+                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu" style="height:'+height+'px">'
             else
-                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu .my-drop-shadow">'
+                html[idx++] = '<div id="mtgSM'+id+'" class="my-tablegrid-menu">'
             html[idx++] = '<ul>'
             for c in cm
                 html[idx++] = '<li>'
@@ -1356,7 +1356,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     html[idx++] = '</tr>'
                     html[idx++] = '</tbody>'
                     html[idx++] = '</table>'
-                    html[idx++] = '<div id="my-first-last-menu'+id+'" class="my-tablegrid-pager-menu my-drop-shadow">'
+                    html[idx++] = '<div id="my-first-last-menu'+id+'" class="my-tablegrid-pager-menu">'
                     html[idx++] = '<ul>'
                     html[idx++] = '<li id="mtgFirst'+id+'">'
                     html[idx++] = i18n.getMessage('label.first')

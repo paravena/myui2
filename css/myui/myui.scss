@@ -11,11 +11,6 @@
 /*
  * General purpose CSS definitions
  */
-.my-drop-shadow {
-  -moz-box-shadow: 3px 3px 4px #ddd;
-  -webkit-box-shadow: 3px 3px 4px #ddd;
-  box-shadow: 3px 3px 4px #ddd;
-}
 
 .loading-box {
   @include border_radius(5px);
@@ -24,9 +19,9 @@
   height: 20px;
   padding: 4px 5px 2px 1px;
   color: black;
-  text-align: right;
   font-weight: bold;
   font-size: 12px;
+  text-align: right;
   border: solid 1px dimgray;
   margin: auto;
 }
@@ -36,12 +31,6 @@
   position: absolute;
   visibility: hidden;
   z-index: 20;
-}
-
-.my-all-round-corners {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
 }
 
 .my-arrow-up-pointer:before {
@@ -55,7 +44,7 @@
   left: 6px;
 }
 
-.my-arrow-up-pointer:after {   /* TODO check this is not working as expected */
+.my-arrow-up-pointer:after {
   content: '';
   display: inline-block;
   border-left: 6px solid transparent;

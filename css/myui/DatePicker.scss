@@ -1,5 +1,7 @@
 // sass file
 .my-datepicker {
+  @include drop_shadow;
+  @include border_radius(3px);
   font-family: Arial, Helvetica, sans-serif;
   color: #fff;
   background-color: #fff;
