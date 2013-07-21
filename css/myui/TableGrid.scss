@@ -1,4 +1,5 @@
-// sass file
+@import "config";
+
 .tablegrid {
   @include font_family($font_weight : bold, $color : #333);
   .tablegrid-header-title {

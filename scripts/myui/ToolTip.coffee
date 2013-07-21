@@ -16,7 +16,7 @@ define ['jquery'], ($) ->
             toolTipId = "#{id}_tooltip"
             html = []
             html.push "<div id=\"#{toolTipId}\" class=\"my-tooltip my-tooltip-#{@type}\" style=\"display:none\">"
-            html.push "<div class=\"my-tooltip-inner\">"
+            html.push "<div class=\"tooltip-inner\">"
             html.push @message
             html.push "</div>"
             html.push "</div>"

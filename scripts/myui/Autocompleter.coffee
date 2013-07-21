@@ -81,8 +81,8 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
                             width : elementWidth + 'px',
                             height: uh + 'px'
                         }).addClass(pointerCssClass)
-                    $('.my-inner-list-container', update).css('height', uh + 'px')
-                    $('.my-inner-list-container', update).css('width', elementWidth + 'px')
+                    $('.inner-list-container', update).css('height', uh + 'px')
+                    $('.inner-list-container', update).css('width', elementWidth + 'px')
                     $(update).show()
 
             unless @options.onHide
@@ -190,9 +190,9 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         getUpdatedChoices : ->
             unless @update
-                $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list"><div class="my-inner-list-container"></div></div>')
+                $(document.body).append('<div id="'+@id+'_update" class="my-autocompleter-list"><div class="inner-list-container"></div></div>')
                 @update = $('#' + @id + '_update')
-                @_innerListContainer = $('.my-inner-list-container', @update)
+                @_innerListContainer = $('.inner-list-container', @update)
 
             if @options.url
                 parameters = @options.parameters
@@ -441,7 +441,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
         ###
         updateChoices : (choices) ->
             if !@changed and @hasFocus
-                $('.my-inner-list-container', @update).html(choices)
+                $('.inner-list-container', @update).html(choices)
                 i = 0
                 entries = $('LI', @update)
                 @entryCount = entries.length

@@ -1,4 +1,5 @@
-// sass file
+@import "config";
+
 a.toolbar-button {
   @include border_radius;
   display: inline-block;

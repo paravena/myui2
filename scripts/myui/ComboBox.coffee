@@ -31,8 +31,8 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/Autocompleter'], ($, Util, Autocomple
         showAll : ->
             if !@active
                 unless @update
-                    @update = $('<div id="'+@id+'_update" class="my-autocompleter-list"><div class="my-inner-list-container"></div></div>')
-                    @_innerListContainer = $('.my-inner-list-container', @update)
+                    @update = $('<div id="'+@id+'_update" class="my-autocompleter-list"><div class="inner-list-container"></div></div>')
+                    @_innerListContainer = $('.inner-list-container', @update)
                     $(document.body).append(@update)
 
                 @element.focus()

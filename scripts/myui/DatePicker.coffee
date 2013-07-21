@@ -114,16 +114,16 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
 
             html[idx++] = '<div id="my-datepicker-div'+@_mdpId+'" class="my-datepicker" style="'+style+'">'
             html[idx++] = '    <div class="my-datepicker-top" style="clear:left"></div>'
-            html[idx++] = '    <div class="my-datepicker-header all-round-corners" style="clear:left"></div>'
-            html[idx++] = '    <div class="my-datepicker-body" style="clear:left"></div>'
-            #html[idx++] = '    <div class="my-datepicker-footer all-round-corners" style="clear:left"></div>' unless @options.embedded
+            html[idx++] = '    <div class="header" style="clear:left"></div>'
+            html[idx++] = '    <div class="body" style="clear:left"></div>'
+            #html[idx++] = '    <div class="footer" style="clear:left"></div>' unless @options.embedded
             html[idx++] = '</div>'
 
             $(parent).append(html.join(''))
             @_calendarDiv = $('#my-datepicker-div'+@_mdpId)
-            @_headerDiv = $('.my-datepicker-header', @_calendarDiv)
-            @_bodyDiv = $('.my-datepicker-body', @_calendarDiv)
-            @_footerDiv = $('.my-datepicker-footer', @_calendarDiv)
+            @_headerDiv = $('.header', @_calendarDiv)
+            @_bodyDiv = $('.body', @_calendarDiv)
+            @_footerDiv = $('.footer', @_calendarDiv)
             @_initHeaderDiv()
             unless @options.embedded
                 @_initButtonsDiv()
