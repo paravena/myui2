@@ -1,0 +1,45 @@
+@import "config";
+
+.my-tooltip {
+  @include font_family;
+  @include drop_shadow;
+  @include border_radius(3px);
+  position: absolute;
+  padding: 3px;
+  z-index: 10000;
+  &:before {
+    content: '';
+    display: inline-block;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid $border_color_tooltip;
+    position: absolute;
+    top: -7px;
+    left: 6px;
+  }
+  &:after {
+    content: '';
+    display: inline-block;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid $background_color_tooltip;
+    position: absolute;
+    top: -6px;
+    left: 7px;
+  }
+  .tooltip-inner {
+    padding: 1px 1px 1px 25px;
+  }
+}
+
+.my-tooltip-error {
+  @extend .my-tooltip;
+  background: url('images/cancel.png') no-repeat 3px 3px $background_color_tooltip;
+  border: $border_color_tooltip solid 1px;
+}
+
+.my-tooltip-info {
+  @extend .my-tooltip;
+  background: url('images/info.png') no-repeat 3px 3px $background_color_tooltip;
+  border: $border_color_tooltip solid 1px;
+}

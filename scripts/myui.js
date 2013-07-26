@@ -2,7 +2,7 @@
 require.config({
     baseUrl : '../../scripts',
     shim : {
-        'jquery' : ['myui']
+        'jquery' : ['myui', 'jquerypp.custom']
     },
     paths : {
         'jquery' : 'libs/jquery',
