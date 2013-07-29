@@ -3,6 +3,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
     mathUtil = $.util.math
     eventUtil = $.util.event
     numberUtil = $.util.number
+    deviceUtil = $.util.device
 
     class DatePicker extends TextField
         constructor : (options) ->
@@ -60,6 +61,7 @@ define ['jquery', 'cs!myui/Util', 'myui/i18n', 'cs!myui/TextField', 'cs!myui/Key
         decorate : (element) ->
             width = $(element).width()
             height = $(element).height()
+            $(element).attr('readonly', 'readonly') if deviceUtil.isMobile()
             $(element).wrap('<div></div>') # date picker container
             $(element).css {width : (width - 30)+'px'}
             @container = $(element).parent()

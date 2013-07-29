@@ -1,5 +1,6 @@
 define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
     eventUtil = $.util.event
+    deviceUtil = $.util.device
 
     class Autocompleter extends TextField
         ###
@@ -237,6 +238,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/TextField'], ($, Util, TextField) ->
             height = $(element).height()
             $(element).css({width: (width - 8) + 'px'})
             $(element).wrap('<div></div>') # auto complete container
+            $(element).attr('readonly', 'readonly') if deviceUtil.isMobile()
             container = $(element).closest('div') # parent
             container.addClass('my-autocompleter')
             container.attr('id', @id + '_container')

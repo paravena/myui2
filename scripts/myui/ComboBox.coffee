@@ -1,5 +1,6 @@
 define ['jquery', 'cs!myui/Util', 'cs!myui/Autocompleter'], ($, Util, Autocompleter) ->
     eventUtil = $.util.event
+    deviceUtil = $.util.device
 
     class ComboBox extends Autocompleter
         ###
@@ -101,6 +102,7 @@ define ['jquery', 'cs!myui/Util', 'cs!myui/Autocompleter'], ($, Util, Autocomple
             height = $(element).height()
             $(element).wrap('<div></div>') # auto complete container
             $(element).css({width : (width - 25)+'px'})
+            $(element).attr('readonly', 'readonly') if deviceUtil.isMobile()
             container = $(element).parent()
             container.addClass('my-autocompleter')
             container.attr('id', @id + '_container')

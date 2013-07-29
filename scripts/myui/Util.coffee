@@ -35,6 +35,21 @@ define ['jquery', 'myui/i18n'], ($, i18n) ->
             output = {}
             output[key] = key for key in array
             value for key, value of output
+
+    device =
+        isAndroid : ->
+            navigator.userAgent.match(/Android/i)
+        isBlackBerry : ->
+            navigator.userAgent.match(/BlackBerry/i)
+        isIOS : ->
+            navigator.userAgent.match(/iPhone|iPad|iPod/i)
+        isOpera : ->
+            navigator.userAgent.match(/Opera Mini/i)
+        isWindows : ->
+            navigator.userAgent.match(/IEMobile/i)
+        isMobile : ->
+            device.isAndroid() || device.isBlackBerry() || device.isIOS() || device.isOpera() || device.isWindows()
+
     ###
     # Date functions
     # These functions are used to parse, format, and manipulate Date objects.
@@ -511,5 +526,6 @@ define ['jquery', 'myui/i18n'], ($, i18n) ->
         number : number
         template : template
         array : array
+        device : device
 
     $.util = util
