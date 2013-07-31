@@ -9,19 +9,17 @@
   input {
     visibility: hidden;
   }
+  &.active {
+    background-position: 0 -50px;
+  }
 }
 
-.my-checkbox-checked {
-  @extend .my-checkbox;
-  background-position: 0 -50px;
-}
 
 .my-radio {
   @extend .my-checkbox;
   background: url(images/radio.png) no-repeat;
+  &.active {
+    background-position: 0 -50px;
+  }
 }
 
-.my-radio-checked {
-  @extend .my-radio;
-  background-position: 0 -50px;
-}

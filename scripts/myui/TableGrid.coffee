@@ -264,7 +264,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             html[idx++] = i18n.getMessage('label.sortDesc')
             html[idx++] = '</li>'
             html[idx++] = '<li class="select-all">'
-            html[idx++] = '<label><span class="my-checkbox item-checkbox"><input type="checkbox" id="select-all'+id+'"></span></label>'
+            html[idx++] = '<label><div class="my-checkbox item-checkbox"><input type="checkbox" id="select-all'+id+'"></div></label>'
             html[idx++] = i18n.getMessage('label.selectAll')
             html[idx++] = '</li>'
             html[idx++] = '</ul>'
@@ -331,8 +331,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             id = @_mtgId
             tdTmpl = '<td id="mtgC{id}_c{x}r{y}" height="{height}" width="{width}" style="width:{width}px;height:{height}px;display:{display}" class="cell mtgC{id} mtgC{id}_c{x} mtgR{id}_r{y}">'
             icTmpl = '<div id="mtgIC{id}_c{x}r{y}" style="width:{width}px;height:{height}px;text-align:{align}" class="inner-cell mtgIC{id} mtgIC{id}_c{x} mtgIR{id}_r{y}">'
-            checkboxTmpl = '<label><span id="my-checkbox{id}_c{x}r{y}" class="my-checkbox {isSelectable} {checkedClass}"><input name="my-checkbox{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x}" checked="{checked}"></span></label>'
-            radioTmpl = '<label><span id="my-radio{id}_c{x}r{y}" class="my-radio"><input name="{groupName}" type="radio" value="{value}" class="my-radio{id}_c{x}"></span></label>'
+            checkboxTmpl = '<label><div id="my-checkbox{id}_c{x}r{y}" class="my-checkbox {isSelectable} {checkedClass}"><div></div><input name="my-checkbox{id}_c{x}r{y}" type="checkbox" value="{value}" class="mtgInput{id}_c{x}" checked="{checked}"></div></label>'
+            radioTmpl = '<label><div id="my-radio{id}_c{x}r{y}" class="my-radio"><div></div><input name="{groupName}" type="radio" value="{value}" class="my-radio{id}_c{x}"></div></label>'
             actionBtnTmpl = '<div id="{name}{id}_c{x}r{y}" class="mini-button" style="display:{display}"><span class="icon {iconClass}">&nbsp;</span></div>'
             rs = @options.rowStyle # row style handler
             rc = @options.rowClass # row class handler
@@ -379,14 +379,14 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                             trueVal = eval(row[columnId])
                         if row[columnId] == trueVal or selectAllFlg
                             temp = temp.replace(/\{checked\}/, 'checked')
-                            temp = temp.replace(/\{checkedClass\}/, 'my-checkbox-checked')
+                            temp = temp.replace(/\{checkedClass\}/, 'active')
                         else
                             temp = temp.replace(/checked=.*?>/, '>')
                             temp = temp.replace(/\{checkedClass\}/, '')
                     else # When is selectable
                         if cm[j].selectAllFlg
                             temp = temp.replace(/\{checked\}/, 'checked')
-                            temp = temp.replace(/\{checkedClass\}/, 'my-checkbox-checked')
+                            temp = temp.replace(/\{checkedClass\}/, 'active')
                         else
                             temp = temp.replace(/checked=.*?>/, '>')
                             temp = temp.replace(/\{checkedClass\}/, '')
@@ -447,7 +447,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
         _applyCellCallbacks : ->
             cm = @_columnModel
             id = @_mtgId
-            @bodyTable.delegate 'td span.my-checkbox', 'mousedown', (event, data = {fromKeyboard: false}) =>
+            @bodyTable.delegate 'td div.my-checkbox', 'mousedown', (event, data = {fromKeyboard: false}) =>
                 span = $(event.target)
                 elementId = span.attr('id')
                 coords = elementId.match(/_c(\d+.?)r(\-?\d+.?)/)
@@ -460,10 +460,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 input = $('input', span)
                 isChecked = input.is(':checked')
                 unless isChecked
-                    span.addClass('my-checkbox-checked')
+                    span.addClass('active')
                     input.attr('checked', 'checked') if data.fromKeyboard
                 else
-                    span.removeClass('my-checkbox-checked')
+                    span.removeClass('active')
                     input.removeAttr('checked') if data.fromKeyboard
                 unless span.is('.selectable')
                     value = isChecked
@@ -562,9 +562,9 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             for c in cm
                 html[idx++] = '<li>'
                 if c.visible
-                    html[idx++] = '<label><span class="my-checkbox my-checkbox-checked item-checkbox"><input id="'+c.id+'" type="checkbox" checked="checked"></span></label>'
+                    html[idx++] = '<label><div class="my-checkbox active item-checkbox"><div></div><input id="'+c.id+'" type="checkbox" checked="checked"></div></label>'
                 else
-                    html[idx++] = '<label><span class="my-checkbox item-checkbox"><input id="'+c.id+'" type="checkbox"></span></label>'
+                    html[idx++] = '<label><div class="my-checkbox item-checkbox"><input id="'+c.id+'" type="checkbox"></div></label>'
                 html[idx++] = '&nbsp;'+ c.title
                 html[idx++] = '</li>'
 
@@ -605,7 +605,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             $('#mtgSM'+ id + ' :checkbox').on 'click', (event) =>
                 checkbox = $(event.target)
-                checkbox.parent('span').toggleClass('my-checkbox-checked')
+                checkbox.parent('div').toggleClass('active')
                 @_toggleColumnVisibility(checkbox.attr('id'))
 
         ###
@@ -1024,8 +1024,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     input.focus()
                     input.select()
             else if !@editRowFlg
-                span = $('.my-checkbox, .my-radio', innerElement)
-                span.trigger('mousedown', {fromKeyboard : true})
+                div = $('.my-checkbox, .my-radio', innerElement)
+                div.trigger('mousedown', {fromKeyboard : true})
                 @editedCellId = null
                 @keys._isInputFocusedFlg = false
             # end if
@@ -1154,10 +1154,10 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                         selectAllItem.show()
                         if cm[columnIndex].selectAllFlg
                             $('input', selectAllItem).attr('checked', 'checked')
-                            $('.my-checkbox', selectAllItem).addClass('my-checkbox-checked')
+                            $('.my-checkbox', selectAllItem).addClass('active')
 
                         selectAllItem.one 'click', => # onclick handler
-                            $('.my-checkbox', selectAllItem).toggleClass('my-checkbox-checked')
+                            $('.my-checkbox', selectAllItem).toggleClass('active')
                             isChecked = cm[columnIndex].selectAllFlg = $('#select-all' + id).is(':checked')
                             renderedRows = @renderedRows
                             beginAtRow = 0
@@ -1639,16 +1639,16 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                     if !addNewRowsToEndBehaviorFlg
                         for j in [0...newRowsAdded.length]
                             y = -(j + 1)
-                            result.push(y) if $('#my-checkbox'+id+'_c'+idx+'r'+y).is('.my-checkbox-checked')
+                            result.push(y) if $('#my-checkbox'+id+'_c'+idx+'r'+y).is('.active')
                     else
                         for j in [0...newRowsAdded.length]
                             y = j + renderedRows
-                            result.push(y) if $('#my-checkbox'+id+'_c'+idx+'r'+y).is('.my-checkbox-checked')
+                            result.push(y) if $('#my-checkbox'+id+'_c'+idx+'r'+y).is('.active')
 
                 for j in [0...renderedRows]
                     y = j
                     # TODO this is weird
-                    result.push(y) if @deletedRows.indexOf(@getRow(y)) == -1 and $('#my-checkbox'+id+'_c'+idx+'r'+y).size() > 0 and $('#my-checkbox'+id+'_c'+idx+'r'+y).is('.my-checkbox-checked')
+                    result.push(y) if @deletedRows.indexOf(@getRow(y)) == -1 and $('#my-checkbox'+id+'_c'+idx+'r'+y).size() > 0 and $('#my-checkbox'+id+'_c'+idx+'r'+y).is('.active')
 
                 #TODO check this maybe there is a bug
                 if selectAllFlg and renderedRows < @rows.length

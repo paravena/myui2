@@ -14,18 +14,19 @@ define ['jquery'], ($) ->
             @_addBehavior()
 
         _decorate : ->
-            @elements.wrap('<label><span class="my-checkbox"></span></label>')
-            $(element).parent('span').addClass('my-checkbox-checked') for element in @elements when $(element).is(':checked')
+            @elements.wrap('<label><div class="my-checkbox"></div></label>')
+            $(element).parent('div').addClass('active') for element in @elements when $(element).is(':checked')
+            @elements.append('<div></div>')
 
         _addBehavior : ->
-            span = @elements.parent('span')
-            span.on 'mousedown', (event) =>
+            div = @elements.parent('div')
+            div.on 'mousedown', (event) =>
                 element = $(event.target)
                 isChecked = $('input', element).is(':checked')
                 if isChecked
-                    element.removeClass('my-checkbox-checked')
+                    element.removeClass('active')
                 else
-                    element.addClass('my-checkbox-checked')
+                    element.addClass('active')
                 @options.onClick(!isChecked, $(element)) if @options.onClick?
 
     $.fn.myCheckbox = (options = {}) ->

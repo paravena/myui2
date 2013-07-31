@@ -217,7 +217,7 @@ div.my-tablegrid-menu {
       font-weight: bold;
       line-height: 24px;
       label {
-        span {
+        div {
           height: 22px; /* TODO check this is little ugly*/
           &.item-checkbox {
             position : absolute;

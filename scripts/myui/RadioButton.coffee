@@ -12,18 +12,19 @@ define ['jquery'], ($) ->
             @_addBehavior()
 
         _decorate : ->
-            @elements.wrap('<label><span class="my-radio"></span></label>')
-            $(element).parent('span').addClass('my-radio-checked') for element in @elements when $(element).is(':checked')
+            @elements.wrap('<label><div class="my-radio"></div></label>')
+            $(element).parent('div').addClass('active') for element in @elements when $(element).is(':checked')
+            @elements.append('<div></div>')
 
         _addBehavior : ->
-            span = @elements.parent('span')
-            span.on 'mousedown', (event) =>
+            div = @elements.parent('div')
+            div.on 'mousedown', (event) =>
                 element = $(event.target)
                 isChecked = $('input', element).is(':checked')
                 name = $('input', element).attr('name')
                 unless isChecked
-                    $('input[name='+name+']').parent('span').removeClass('my-radio-checked')
-                    element.addClass('my-radio-checked')
+                    $('input[name='+name+']').parent('div').removeClass('active')
+                    element.addClass('active')
                 @options.onClick(!isChecked, $(element)) if @options.onClick?
 
     $.fn.myRadioButton = (options = {}) ->
