@@ -448,8 +448,8 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             cm = @_columnModel
             id = @_mtgId
             @bodyTable.delegate 'td div.my-checkbox', 'mousedown', (event, data = {fromKeyboard: false}) =>
-                span = $(event.target)
-                elementId = span.attr('id')
+                div = $(event.target)
+                elementId = div.attr('id')
                 coords = elementId.match(/_c(\d+.?)r(\-?\d+.?)/)
                 x = parseInt(coords[1])
                 y = parseInt(coords[2])
@@ -457,34 +457,35 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 if typeof(cm[x].editable) is 'function' and !cm[x].editable(x, y)
                     event.preventDefault()
                     return false
-                input = $('input', span)
+                input = $('input', div)
                 isChecked = input.is(':checked')
                 unless isChecked
-                    span.addClass('active')
+                    div.addClass('active')
                     input.attr('checked', 'checked') if data.fromKeyboard
                 else
-                    span.removeClass('active')
+                    div.removeClass('active')
                     input.removeAttr('checked') if data.fromKeyboard
-                unless span.is('.selectable')
+                unless div.is('.selectable')
                     value = isChecked
                     value = editor.getValueOf(isChecked) if editor.getValueOf?
                     @setValueAt(value, x, y, false)
                     # if doesn't exist in the array the row is registered
                     @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1 # TODO a bug here
-                    span.parent('div').addClass('modified-cell') unless y < 0 || y >= @rows.length
-                editor.onClick(span.val(), span.is(':checked')) if editor.onClick?
+                    div.parent('div').addClass('modified-cell') unless y < 0 || y >= @rows.length
+                editor.onClick(div.val(), div.is(':checked')) if editor.onClick?
                 return true
 
             @bodyTable.delegate 'td div.my-radio', 'mousedown', (event, data = {fromKeyboard: false}) =>
-                span = $(event.target)
-                groupName = $('input', span).attr('name')
+                div = $(event.target)
+                groupName = $('input', div).attr('name')
                 $('input[name='+groupName+']', @bodyTable).parent('div').removeClass('active')
-                span.addClass('active')
-                $('input', span).attr('checked', 'checked') if data.fromKeyboard
-                elementId = span.attr('id')
+                div.addClass('active')
+                $('input', div).attr('checked', 'checked') if data.fromKeyboard
+                elementId = div.attr('id')
                 coords = elementId.match(/_c(\d+.?)r(\-?\d+.?)/)
                 x = parseInt(coords[1])
                 y = parseInt(coords[2]) # TODO tomorrow sigo too tired now :-( need to think what to do here
+                return true
 
             @bodyTable.delegate 'td div.mini-button', 'click', (event) =>
                 act = @_actionsColumnToolbar
@@ -513,7 +514,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 proceedFlg = true if proceedFlg is undefined
                 if proceedFlg and act[elementName].afterClick?
                     proceedFlg = act[elementName].afterClick(y, act)
-
+                return true
 
         ###
         # Returns TableGrid id.
