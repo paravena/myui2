@@ -162,6 +162,12 @@ div.tablegrid-body {
                 padding: 0;
                 text-align: center;
               }
+              .my-checkbox {
+                margin-top : 4px;
+              }
+              .my-radio {
+                margin-top : 3px;
+              }
             }
             &.modified-cell {
               background : url(images/m.png) no-repeat 0 0;
