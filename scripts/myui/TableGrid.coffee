@@ -475,11 +475,11 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
                 editor.onClick(span.val(), span.is(':checked')) if editor.onClick?
                 return true
 
-            @bodyTable.delegate 'td span.my-radio', 'mousedown', (event, data = {fromKeyboard: false}) =>
+            @bodyTable.delegate 'td div.my-radio', 'mousedown', (event, data = {fromKeyboard: false}) =>
                 span = $(event.target)
                 groupName = $('input', span).attr('name')
-                $('input[name='+groupName+']', @bodyTable).parent('span').removeClass('my-radio-checked')
-                span.addClass('my-radio-checked')
+                $('input[name='+groupName+']', @bodyTable).parent('div').removeClass('active')
+                span.addClass('active')
                 $('input', span).attr('checked', 'checked') if data.fromKeyboard
                 elementId = span.attr('id')
                 coords = elementId.match(/_c(\d+.?)r(\-?\d+.?)/)

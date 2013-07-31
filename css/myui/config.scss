@@ -20,6 +20,8 @@ $background_color_item_focus : #0081c2;
 $background_color_list : #fff;
 $background_color_list_item_focus : #0081c2;
 $background_color_tooltip : #ddd;
+$background_color_checkbox : #333;
+$background_color_radio : #333;
 
 @mixin font_family($size : 11px,  $color : black, $font_weight: normal) {
   font-family: Arial, Helvetica, sans-serif;
@@ -37,6 +39,7 @@ $background_color_tooltip : #ddd;
 @mixin border_radius($radius : 4px){
   border-radius: $radius;
   -webkit-border-radius: $radius;
+  -khtml-border-radius: $radius;
   -moz-border-radius: $radius;
 }
 

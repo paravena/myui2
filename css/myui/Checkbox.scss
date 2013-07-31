@@ -2,24 +2,41 @@
 
 .my-checkbox {
   display: inline-block;
-  width: 19px;
-  height: 25px;
-  padding: 0;
-  background: url(images/checkbox.png) no-repeat;
+  width: 7px;
+  height: 7px;
+  padding: 2px;
+  border : 1px solid #bcbcbc;
+  background-color: transparent;
   input {
     visibility: hidden;
   }
   &.active {
-    background-position: 0 -50px;
+    div {
+       background-color: $background_color_checkbox;
+    }
+  }
+  div {
+    width: 7px;
+    height: 7px;
   }
 }
 
 
 .my-radio {
   @extend .my-checkbox;
-  background: url(images/radio.png) no-repeat;
+  @include border_radius(10px);
+  width: 5px;
+  height: 5px;
+  padding: 4px;
   &.active {
-    background-position: 0 -50px;
+    div {
+      @include border_radius(5px);
+      background-color: $background_color_radio;
+    }
+  }
+  div {
+    width: 5px;
+    height: 5px;
   }
 }
 
