@@ -449,6 +449,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
             id = @_mtgId
             @bodyTable.delegate 'td div.my-checkbox', 'mousedown', (event, data = {fromKeyboard: false}) =>
                 div = $(event.target)
+                div = div.parent('.my-checkbox') if !div.is('.my-checkbox')
                 elementId = div.attr('id')
                 coords = elementId.match(/_c(\d+.?)r(\-?\d+.?)/)
                 x = parseInt(coords[1])
@@ -477,6 +478,7 @@ define ['jquery', 'jquerypp.custom', 'cs!myui/Util', 'cs!myui/KeyTable', 'cs!myu
 
             @bodyTable.delegate 'td div.my-radio', 'mousedown', (event, data = {fromKeyboard: false}) =>
                 div = $(event.target)
+                div = div.parent('.my-radio') if !div.is('.my-radio')
                 groupName = $('input', div).attr('name')
                 $('input[name='+groupName+']', @bodyTable).parent('div').removeClass('active')
                 div.addClass('active')
