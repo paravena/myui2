@@ -224,11 +224,10 @@ div.my-tablegrid-menu {
       line-height: 24px;
       label {
         div {
-          height: 22px; /* TODO check this is little ugly*/
           &.item-checkbox {
             position : absolute;
-            left : 0;
-            top : 2px;
+            left : 4px;
+            top : 6px;
           }
         }
       }
