@@ -1,4 +1,4 @@
-define ['jquery', 'cs!myui/ToolTip', 'myui/i18n'], ($, ToolTip, i18n) ->
+define ['jquery', 'cs!js/myui/ToolTip', 'js/myui/i18n'], ($, ToolTip, i18n) ->
     class TextField
         constructor : (options = {}) ->
             @baseInitialize(options)

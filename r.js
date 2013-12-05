@@ -957,7 +957,7 @@ var requirejs, require, define;
 
         /**
          * jQuery 1.4.3+ supports ways to hold off calling
-         * calling jQuery ready callbacks until all scripts are loaded. Be sure
+         * calling jQuery ready callbacks until all assets are loaded. Be sure
          * to track it if the capability exists.. Also, since jQuery 1.4.3 does
          * not register as a module, need to do some global inference checking.
          * Even if it does register as a module, not guaranteed to be the precise
@@ -1175,7 +1175,7 @@ var requirejs, require, define;
 
             //If still waiting on loads, and the waiting load is something
             //other than a plugin resource, or there are still outstanding
-            //scripts, then just try back later.
+            //assets, then just try back later.
             if (!expired && (stillLoading || context.scriptCount)) {
                 //Something is still waiting to load. Wait for it, but only
                 //if a timeout is not already in effect.
@@ -1242,7 +1242,7 @@ var requirejs, require, define;
             if (context.scriptCount <= 0) {
                 //Synchronous envs will push the number below zero with the
                 //decrement above, be sure to set it back to zero for good measure.
-                //require() calls that also do not end up loading scripts could
+                //require() calls that also do not end up loading assets could
                 //push the number negative too.
                 context.scriptCount = 0;
             }
@@ -1960,9 +1960,9 @@ var requirejs, require, define;
             node.charset = "utf-8";
             //Use async so Gecko does not block on executing the script if something
             //like a long-polling comet tag is being run first. Gecko likes
-            //to evaluate scripts in DOM order, even for dynamic scripts.
+            //to evaluate assets in DOM order, even for dynamic assets.
             //It will fetch them async, but only evaluate the contents in DOM
-            //order, so a long-polling script tag can delay execution of scripts
+            //order, so a long-polling script tag can delay execution of assets
             //after it. But telling Gecko we expect async gets us the behavior
             //we want -- execute it whenever it is finished downloading. Only
             //Helps Firefox 3.6+
@@ -2097,7 +2097,7 @@ var requirejs, require, define;
     };
 
     /**
-     * Internal function that is triggered whenever all scripts/resources
+     * Internal function that is triggered whenever all assets/resources
      * have been loaded by the loader. Can be overridden by other, for
      * instance the domReady plugin, which wants to know when all resources
      * are loaded.

@@ -1,16 +1,16 @@
 ({
-    baseUrl : 'scripts',
+    baseUrl : 'assets',
     stubModules: ['cs'],
     name : 'myui',
-    //optimize : 'none'
-    out : 'scripts/myui.min.js',
+    optimize : 'none',
+    out : 'assets/myui.min.js',
     paths : {
-        'requireLib' : 'libs/require',
-        'cs' : 'libs/cs',
-        'i18n' : 'libs/i18n',
-        'jquery' : 'libs/jquery',
-        'jquerypp.custom' : 'libs/jquerypp.custom'
+        'requireLib' : 'js/libs/requirejs/require',
+        'cs' : 'js/libs/requirejs/cs',
+        'i18n' : 'js/libs/requirejs/i18n',
+        'jquery' : 'js/libs/jquery/jquery',
+        'jquerypp.custom' : 'js/libs/jquery/jquerypp.custom'
     },
-    exclude : ['jquery', 'jquerypp.custom'],
+    /*exclude : ['jquery', 'jquerypp.custom'],*/
     include : ['requireLib']
 })

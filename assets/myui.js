@@ -1,27 +1,29 @@
 
 require.config({
-    baseUrl : '../../scripts',
+    baseUrl : '/carcenter-web/assets',
     shim : {
         'jquery' : ['myui', 'jquerypp.custom']
     },
     paths : {
-        'jquery' : 'libs/jquery',
-        'jquerypp.custom' : 'libs/jquerypp.custom'
+        'jquery' : 'js/libs/jquery/jquery',
+        'jquerypp.custom' : 'js/libs/jquery/jquerypp.custom'
     }
 });
 
 define([
     'jquery',
     'jquerypp.custom',
-    'cs!myui/TextField',
-    'cs!myui/Autocompleter',
-    'cs!myui/ComboBox',
-    'cs!myui/DatePicker',
-    'cs!myui/Checkbox',
-    'cs!myui/RadioButton',
-    'cs!myui/TableGrid'], function($,
+    'cs!js/myui/TextField',
+    'cs!js/myui/ToolTip',
+    'cs!js/myui/Autocompleter',
+    'cs!js/myui/ComboBox',
+    'cs!js/myui/DatePicker',
+    'cs!js/myui/Checkbox',
+    'cs!js/myui/RadioButton',
+    'cs!js/myui/TableGrid'], function($,
                                    jquerypp,
                                    TextField,
+                                   ToolTip,
                                    Autocompleter,
                                    ComboBox,
                                    DatePicker,
@@ -30,6 +32,7 @@ define([
                                    TableGrid) {
         window.MY = {};
         MY.TextField = TextField;
+        MY.ToolTip = ToolTip;
         MY.Autocompleter = Autocompleter;
         MY.ComboBox = ComboBox;
         MY.DatePicker = DatePicker;

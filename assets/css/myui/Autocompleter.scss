@@ -13,6 +13,7 @@ div.my-autocompleter {
     border: 1px solid $border_color_input;
     outline: none;
     padding: 3px;
+    margin: 0;
   }
   .my-combobox-button {
     position: absolute;
@@ -36,7 +37,7 @@ div.my-autocompleter-list {
   border: 1px solid $border_color_list;
   margin: 0;
   padding: 0;
-  z-index: 999;
+  z-index: 2000;
   .inner-list-container {
     position: relative;
     overflow-y: auto;

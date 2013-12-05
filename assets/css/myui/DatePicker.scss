@@ -8,7 +8,7 @@
   border: $border_color_list 1px solid;
   display: block;
   padding: 3px;
-  z-index: 1000;
+  z-index: 2000;
   .header {
     @include border_radius(3px);
     position: relative;
