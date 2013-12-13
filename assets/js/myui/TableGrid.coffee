@@ -1,4 +1,4 @@
-define ['jquery', 'jquerypp.custom', 'cs!js/myui/Util', 'cs!js/myui/KeyTable', 'cs!js/myui/TextField', 'cs!js/myui/Checkbox', 'cs!js/myui/RadioButton', 'cs!js/myui/BrowseInput', 'cs!js/myui/Autocompleter', 'cs!js/myui/ComboBox', 'cs!js/myui/DatePicker', 'js/myui/i18n'], ($, jquerypp, Util, KeyTable, TextField, Checkbox, RadioButton, BrowseInput, Autocompleter, ComboBox, DatePicker, i18n) ->
+TableGrid = (($) ->
     eventUtil = $.util.event
     template = $.util.template
     arrayUtil = $.util.array
@@ -2152,3 +2152,4 @@ define ['jquery', 'jquerypp.custom', 'cs!js/myui/Util', 'cs!js/myui/KeyTable', '
 
 
     return TableGrid
+) jQuery

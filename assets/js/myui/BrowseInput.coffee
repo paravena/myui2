@@ -1,4 +1,4 @@
-define ['jquery', 'cs!js/myui/TextField'], ($, TextField) ->
+BrowseInput = (($) ->
     class BrowseInput extends TextField
         constructor : (options) -> 
             @baseInitialize(options)
@@ -28,3 +28,4 @@ define ['jquery', 'cs!js/myui/TextField'], ($, TextField) ->
             @afterUpdateCallback = (element, value) =>
                 @afterUpdate(element, value) if @afterUpdate? and !onClickFlg
                 onClickFlg = false
+) jQuery

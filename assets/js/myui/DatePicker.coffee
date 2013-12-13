@@ -1,4 +1,4 @@
-define ['jquery', 'cs!js/myui/Util', 'js/myui/i18n', 'cs!js/myui/TextField', 'cs!js/myui/KeyTable'], ($, Util, i18n, TextField, KeyTable) ->
+DatePicker = (($) ->
     dateUtil = $.util.date
     mathUtil = $.util.math
     eventUtil = $.util.event
@@ -759,3 +759,4 @@ define ['jquery', 'cs!js/myui/Util', 'js/myui/i18n', 'cs!js/myui/TextField', 'cs
 
             selectedCell = $('td.day:first', @_bodyDiv)
             @_dayHover(selectedCell)
+) jQuery

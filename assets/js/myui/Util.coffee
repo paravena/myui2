@@ -1,4 +1,4 @@
-define ['jquery', 'js/myui/i18n'], ($, i18n) ->
+(($) ->
     event =
         KEY_BACKSPACE: 8
         KEY_TAB:       9
@@ -529,3 +529,4 @@ define ['jquery', 'js/myui/i18n'], ($, i18n) ->
         device : device
 
     $.util = util
+) jQuery

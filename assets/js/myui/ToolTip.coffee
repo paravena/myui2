@@ -1,4 +1,4 @@
-define ['jquery'], ($) ->
+ToolTip = (($) ->
     class ToolTip
         constructor: (options = {}) ->
             @message = options.message ? null
@@ -41,3 +41,4 @@ define ['jquery'], ($) ->
                 @tooltip.remove()
             catch e
                 # ignored
+) jQuery

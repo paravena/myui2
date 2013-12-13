@@ -1,4 +1,4 @@
-define ['jquery', 'cs!js/myui/Util'], ($, Util) ->
+KeyTable = (($) ->
 
     eventUtil = $.util.event
 
@@ -385,3 +385,4 @@ define ['jquery', 'cs!js/myui/Util'], ($, Util) ->
                     c.positionIndex = index
                     cm.push(c)
             return cm
+) jQuery

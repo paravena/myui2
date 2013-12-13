@@ -1,4 +1,4 @@
-define ['jquery', 'cs!js/myui/Util', 'cs!js/myui/TextField'], ($, Util, TextField) ->
+Autocompleter = (($) ->
     eventUtil = $.util.event
     deviceUtil = $.util.device
 
@@ -546,3 +546,4 @@ define ['jquery', 'cs!js/myui/Util', 'cs!js/myui/TextField'], ($, Util, TextFiel
                         result = item[listValuePropertyName]
                         break
             return result
+) jQuery

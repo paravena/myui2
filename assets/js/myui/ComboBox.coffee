@@ -1,4 +1,4 @@
-define ['jquery', 'cs!js/myui/Util', 'cs!js/myui/Autocompleter'], ($, Util, Autocompleter) ->
+ComboBox = (($) ->
     eventUtil = $.util.event
     deviceUtil = $.util.device
 
@@ -113,3 +113,4 @@ define ['jquery', 'cs!js/myui/Util', 'cs!js/myui/Autocompleter'], ($, Util, Auto
             comboBoxBtn.on 'click', (event) =>
                 @showAll()
                 event.stopPropagation()
+) jQuery

@@ -1,4 +1,4 @@
-define ['jquery'], ($) ->
+RadioButton = (($) ->
     class RadioButton
         constructor : (options) ->
             @elements = $(options.input)
@@ -31,3 +31,4 @@ define ['jquery'], ($) ->
         options.input = @
         new RadioButton(options)
         return @
+) jQuery

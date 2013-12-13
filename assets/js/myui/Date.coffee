@@ -1,4 +1,4 @@
-define ['jquery'], ($) ->
+(($) ->
     ###
     # Date functions
     # These functions are used to parse, format, and manipulate Date objects.
@@ -388,3 +388,4 @@ define ['jquery'], ($) ->
             return 1 + Math.ceil((firstThursday - target) / 604800000) # 604800000 = 7 * 24 * 3600 * 1000
 
     $.date = date
+) jQuery

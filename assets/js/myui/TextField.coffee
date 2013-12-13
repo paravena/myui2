@@ -1,4 +1,4 @@
-define ['jquery', 'cs!js/myui/ToolTip', 'js/myui/i18n'], ($, ToolTip, i18n) ->
+TextField = (($) ->
     class TextField
         constructor : (options = {}) ->
             @baseInitialize(options)
@@ -90,3 +90,4 @@ define ['jquery', 'cs!js/myui/ToolTip', 'js/myui/i18n'], ($, ToolTip, i18n) ->
                     @tooltip.remove() if (this.tooltip)
 
             return result
+) jQuery

@@ -1,4 +1,4 @@
-define ['jquery'], ($) ->
+Checkbox = (($) ->
     class Checkbox
         constructor : (options) ->
             @elements = $(options.input)
@@ -33,3 +33,4 @@ define ['jquery'], ($) ->
         options.input = @
         new Checkbox(options)
         return @
+) jQuery
