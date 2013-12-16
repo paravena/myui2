@@ -1,0 +1,21 @@
+{
+  "name": "myui",
+  "version": "0.1.0",
+  "description": "A Web UI widget library, implemented in CoffeeScript and JQuery",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paravena/myui2.git"
+  },
+  "author": "Pablo Aravena",
+  "website": "http://pabloaravena.info",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "d9fb95988e735ae9fefaeb9e3c246b9c58c4e06b",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-sass": "~0.6.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.7"
+  }
+}
