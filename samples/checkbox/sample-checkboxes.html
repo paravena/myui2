@@ -2,11 +2,13 @@
 <html>
 	<head>
 		<title>Sample Checkboxs</title>
-		<link type="text/css" href="../../src/css/myui/myui.min.css" rel="stylesheet">
-		<script type="text/javascript" src="../../src/myui.min.js"></script>
+        <link type="text/css" href="../../dist/myui.min.css" rel="stylesheet">
+        <script type="text/javascript" src="../../assets/js/libs/jquery/jquery.js"></script>
+        <script type="text/javascript" src="../../assets/js/libs/jquery/jquerypp.custom.js"></script>
+        <script type="text/javascript" src="../../dist/myui.min.js"></script>
 	</head>
 	<script type="text/javascript">
-        require(['myui'], function () {
+        $(function() {
             $("input[type=checkbox]").myCheckbox();
 		});
 	</script>
