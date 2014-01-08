@@ -8,17 +8,27 @@
     <script type="text/javascript" src="../../dist/myui.min.js"></script>
 </head>
 <script type="text/javascript">
+    var manufacturersList = [
+        {text : 'Fiat', value : 1},
+        {text : 'Peugeot', value : 2},
+        {text : 'Toyota', value : 3}
+    ];
+
 	var comboBox = null;
     $(function () {
 		comboBox = new MY.ComboBox({
 			input : '#manufacturerDesc',
-			url : 'get_manufacturers_list.php',
+			/*url : 'get_manufacturers_list.php',*/
+            items :  manufacturersList,
 			initialText : 'Select a manufacturer',
 			parameters : {},
 			getParameters: function() {
 				var params = {test : 'hello'};
 				return params;
-			}
+			},
+            afterUpdate : function(element, selectedEntry) {
+                alert($(selectedEntry).attr('id'));
+            }
 		});
 	});
 </script>

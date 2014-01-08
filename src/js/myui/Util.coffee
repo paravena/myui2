@@ -1,4 +1,10 @@
 (($) ->
+    # IE8 hack
+    Array::indexOf or= (item) ->
+        for x, i in this
+            return i if x is item
+        return -1
+
     event =
         KEY_BACKSPACE: 8
         KEY_TAB:       9
