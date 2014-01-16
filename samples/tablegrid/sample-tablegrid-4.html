@@ -8,6 +8,7 @@
         <script type="text/javascript" src="../../dist/myui.min.js"></script>
     </head>
 	<script type="text/javascript">
+        var tableGrid = null;
         $(function() {
             var repList = [
                 {value: 'zach', text: 'Zach'},
@@ -133,7 +134,7 @@
                     }
                 ]
             };
-            var tableGrid = null;
+
             tableGrid = new MY.TableGrid(tableModel);
             tableGrid.show('#mytable');
         });

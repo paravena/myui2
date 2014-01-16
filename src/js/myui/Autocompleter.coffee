@@ -413,17 +413,13 @@ Autocompleter = (($) ->
         ###
         _updateElement : (selectedElement) ->
             # if an updateElement method is provided
-            console.log 'step 0'
             if @options.updateElement
                 @options.updateElement(selectedElement)
                 return
-            console.log 'step 1'
 
             value = $(selectedElement).not('informal').text()
 
             bounds = @_getTokenBounds()
-
-            console.log 'step 2'
 
             if bounds[0] isnt -1
                 newValue = @element.val().substr(0, bounds[0])
@@ -434,18 +430,13 @@ Autocompleter = (($) ->
             else
                 @element.val(value)
 
-            console.log 'step 3'
-
             @oldElementValue = @element.val()
             @element.val(value)
             @oldElementValue = @element.val()
             @validate()
             @element.focus()
 
-            console.log 'step 4'
-
             if @options.afterUpdate
-                console.log 'before executing afterUpdate'
                 @options.afterUpdate(@element, selectedElement)
 
         ###
