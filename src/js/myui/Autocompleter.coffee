@@ -178,6 +178,9 @@ Autocompleter = (($) ->
         # Returns item elements.
         ###
         getItems : ->
+            if @options.items is null and @options.url isnt null
+                # retrieving list asynchronously
+                @_retrieveItems()
             return @options.items
 
         ###
@@ -203,11 +206,11 @@ Autocompleter = (($) ->
                     for p of moreParams
                         parameters[p] = moreParams[p]
 
-                @startIndicator()
+                @startIndicator() # TODO maybe this is not the right place
                 $.ajax(@options.url, {
                     complete: (response) =>
                         @options.items = $.parseJSON(response.responseText)
-                        @_stopIndicator()
+                        @_stopIndicator() # TODO maybe this is not the right place
                         @updateChoices @options.selector()
                     ,
                     dataType : 'json',
@@ -216,6 +219,22 @@ Autocompleter = (($) ->
             else
                 @updateChoices @options.selector()
 
+        _retrieveItems : ->
+            parameters = @options.parameters
+            #parameters[@options.finderParamName] = @_getToken() TODO review this in the future
+            if @options.getParameters
+                moreParams = @options.getParameters()
+                for p of moreParams
+                    parameters[p] = moreParams[p]
+            $.ajax(@options.url, {
+                complete: (response) =>
+                    @options.items = $.parseJSON(response.responseText)
+                ,
+                dataType : 'json',
+                async : false,
+                data: parameters
+
+            })
         ###
         # On blur handler.
         ###

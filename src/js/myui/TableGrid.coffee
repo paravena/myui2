@@ -35,7 +35,8 @@ TableGrid = (($) ->
                 beforeEditRow : null,
                 afterEditRow : null,
                 beforeSaveRow : null,
-                afterSaveRow : null
+                afterSaveRow : null,
+                sortInMemory : false
             }, tableModel.options or {})
 
             @pagerHeight = 24
@@ -402,7 +403,7 @@ TableGrid = (($) ->
                             result = value
                             for item in list
                                 if item instanceof Object
-                                    if item[listValuePropertyName] is value
+                                    if item[listValuePropertyName] == value
                                         result = item[listTextPropertyName]
                                         break
                                 else
@@ -467,8 +468,8 @@ TableGrid = (($) ->
                     div.removeClass('active')
                     input.removeAttr('checked') if data.fromKeyboard
                 unless div.is('.selectable')
-                    value = isChecked
-                    value = editor.getValueOf(isChecked) if editor.getValueOf?
+                    value = !isChecked
+                    value = editor.getValueOf(!isChecked) if editor.getValueOf?
                     @setValueAt(value, x, y, false)
                     # if doesn't exist in the array the row is registered
                     @modifiedRows.push(y) if y >= 0 and @modifiedRows.indexOf(y) == -1 # TODO a bug here
@@ -1201,7 +1202,7 @@ TableGrid = (($) ->
             $('#mtgIHC'+id+'_c'+@sortedColumnIndex).css('color', 'dimgray')
             $('#mtgSortIcon'+id+'_c'+idx).css('visibility', 'visible')
             $('#mtgIHC'+id+'_c'+idx).css('color', 'black')
-            if @url
+            if @url and !@options.sortInMemory
                 @request[@options.sortColumnParameter] = cm[idx].id;
                 @request[@options.ascDescFlagParameter] = ascDescFlg;
                 @_retrieveDataFromUrl(1)

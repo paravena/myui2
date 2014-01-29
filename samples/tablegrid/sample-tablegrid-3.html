@@ -182,7 +182,7 @@
                         width: 100,
                         editable: true,
                         editor: new MY.ComboBox({
-                            items : repList,
+                            url : 'people.json',
                             validate : function(value, errors) {
                                 if (value == 'Zach') {
                                     errors.push('Invalid value');

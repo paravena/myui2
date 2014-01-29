@@ -81,5 +81,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-coffee');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.registerTask('default', ['coffee','uglify', 'sass', 'copy']);
+    //grunt.registerTask('default', ['coffee','uglify', 'sass', 'copy']);
+    grunt.registerTask('default', ['coffee','sass', 'copy']);
 };
