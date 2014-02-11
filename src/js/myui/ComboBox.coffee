@@ -60,7 +60,7 @@ ComboBox = (($) ->
             text = ''
             value = ''
             items = []
-            if @options.items
+            if @options.items and !@options.noCache
                 items = @options.items
             else if @options.url
                 parameters = @options.parameters
@@ -68,7 +68,6 @@ ComboBox = (($) ->
                     moreParams = @options.getParameters()
                     for p of moreParams
                         parameters[p] = moreParams[p]
-
                 $.ajax(@options.url, {
                     complete: (response) =>
                         items = @options.items = $.parseJSON(response.responseText)

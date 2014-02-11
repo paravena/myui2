@@ -40,7 +40,8 @@ Autocompleter = (($) ->
                 partialChars : 1,
                 ignoreCase: true,
                 fullSearch: false,
-                getParameters: null
+                getParameters: null,
+                noCache : false
             }, options or {})
 
             unless @options.decorate
@@ -139,6 +140,20 @@ Autocompleter = (($) ->
             if typeof(@options.tokens) is 'string'
                 @options.tokens = new Array(@options.tokens)
 
+            unless @options.getSelectedValue
+                @options.getSelectedValue = (text) ->
+                    items = @options.items
+                    result = text
+                    # only applicable when items is an array of objects
+                    if items isnt null && items[0] instanceof Object
+                        listTextPropertyName = @options.listTextPropertyName
+                        listValuePropertyName = @options.listValuePropertyName
+                        for item in items
+                            if item[listTextPropertyName] == text
+                                result = item[listValuePropertyName]
+                                break
+                    return result
+
             # Force carriage returns as token delimiters anyway
             unless '\n' in @options.tokens
                 @options.tokens.push '\n'
@@ -178,9 +193,9 @@ Autocompleter = (($) ->
         # Returns item elements.
         ###
         getItems : ->
-            if @options.items is null and @options.url isnt null
-                # retrieving list asynchronously
-                @_retrieveItems()
+            #if @options.url isnt null
+            #    # retrieving list asynchronously
+            #    @_retrieveItems()
             return @options.items
 
         ###
@@ -233,7 +248,6 @@ Autocompleter = (($) ->
                 dataType : 'json',
                 async : false,
                 data: parameters
-
             })
         ###
         # On blur handler.
@@ -545,15 +559,5 @@ Autocompleter = (($) ->
         # Returns selected value.
         ###
         getSelectedValue : (text) ->
-            items = @options.items
-            result = text
-            # only applicable when items is an array of objects
-            if items[0] instanceof Object
-                listTextPropertyName = @options.listTextPropertyName
-                listValuePropertyName = @options.listValuePropertyName
-                for item in items
-                    if item[listTextPropertyName] == text
-                        result = item[listValuePropertyName]
-                        break
-            return result
+            return @options.getSelectedValue(text)
 ) jQuery

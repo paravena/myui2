@@ -5,6 +5,10 @@
             return i if x is item
         return -1
 
+    # IE8 hack
+    String::trim or= ->
+        @.replace(/^\s+|\s+$/g, '')
+
     event =
         KEY_BACKSPACE: 8
         KEY_TAB:       9

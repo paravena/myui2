@@ -396,22 +396,24 @@ TableGrid = (($) ->
                     groupName = if editor.groupName? then editor.groupName else 'my-radio'+id+'_c'+j
                     html[idx++] = template(radioTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId], 'groupName' : groupName+rowIdx})
                 else if editor instanceof Autocompleter
-                    unless cm[j].hasOwnProperty('renderer')
-                        listTextPropertyName = cm[j].editor.options.listTextPropertyName
-                        listValuePropertyName = cm[j].editor.options.listValuePropertyName
-                        cm[j].renderer = (value, list) ->
-                            result = value
-                            for item in list
-                                if item instanceof Object
-                                    if item[listValuePropertyName] == value
-                                        result = item[listTextPropertyName]
-                                        break
-                                else
-                                    break # this happen when list is an array of strings
-                            # end for
-                            return result
-                        # end renderer
-                    html[idx++] = cm[j].renderer(row[columnId], editor.getItems(), row)
+                    # TODO I have think deeply about this thing is very complex and I feel like shit now
+                    #unless cm[j].hasOwnProperty('renderer')
+                    #    listTextPropertyName = cm[j].editor.options.listTextPropertyName
+                    #    listValuePropertyName = cm[j].editor.options.listValuePropertyName
+                    #    cm[j].renderer = (value, list) ->
+                    #        result = value
+                    #        for item in list
+                    #            if item instanceof Object
+                    #                if item[listValuePropertyName] == value
+                    #                    result = item[listTextPropertyName]
+                    #                    break
+                    #            else
+                    #                break # this happen when list is an array of strings
+                    #        # end for
+                    #        return result
+                    #    # end renderer
+                    #html[idx++] = cm[j].renderer(row[columnId], editor.getItems(), row)
+                    html[idx++] = row[columnId]
                 else if columnId is 'actions' + id
                     for action in @options.actionsColumnToolbar
                         action['id'] = id
@@ -1010,7 +1012,8 @@ TableGrid = (($) ->
                     'margin': '0'
                 })
                 innerElement.html('')
-                value = cm[x].renderer(value, editor.getItems(), @getRow(y)) if editor instanceof Autocompleter # when is a list
+                value = cm[x].renderer(value, editor.getItems(), @getRow(y)) if editor instanceof Autocompleter and cm[x].renderer # when is a list
+
                 # Creating a normal input
                 inputId = 'mtgInput' + id + '_c' + x + 'r' + y
                 input = $('<input>').attr({'id' : inputId, 'type' : 'text', 'value' : value})
@@ -1071,8 +1074,6 @@ TableGrid = (($) ->
                     'text-align' : alignment
                 }).html(value)
 
-                # I hope I can find a better solution
-                value = editor.getSelectedValue(value) if editor.getSelectedValue?
                 if y >= 0 and y < @rows.length and @rows[y][columnId] != value
                     if isInputFlg or !editor.selectable
                         @rows[y][columnId] = value
