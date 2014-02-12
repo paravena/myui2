@@ -141,15 +141,15 @@ Autocompleter = (($) ->
                 @options.tokens = new Array(@options.tokens)
 
             unless @options.getSelectedValue
-                @options.getSelectedValue = (text) ->
+                @options.getSelectedValue = (text) =>
                     items = @options.items
-                    result = text
+                    result = text.trim()
                     # only applicable when items is an array of objects
                     if items isnt null && items[0] instanceof Object
                         listTextPropertyName = @options.listTextPropertyName
                         listValuePropertyName = @options.listValuePropertyName
                         for item in items
-                            if item[listTextPropertyName] == text
+                            if item[listTextPropertyName].trim() == text.trim()
                                 result = item[listValuePropertyName]
                                 break
                     return result
@@ -558,6 +558,6 @@ Autocompleter = (($) ->
         ###
         # Returns selected value.
         ###
-        getSelectedValue : (text) ->
+        getSelectedValue : (text = @element.val()) ->
             return @options.getSelectedValue(text)
 ) jQuery
