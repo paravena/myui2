@@ -1203,6 +1203,7 @@ TableGrid = (($) ->
             $('#mtgIHC'+id+'_c'+@sortedColumnIndex).css('color', 'dimgray')
             $('#mtgSortIcon'+id+'_c'+idx).css('visibility', 'visible')
             $('#mtgIHC'+id+'_c'+idx).css('color', 'black')
+
             if @url and !@options.sortInMemory
                 @request[@options.sortColumnParameter] = cm[idx].id;
                 @request[@options.ascDescFlagParameter] = ascDescFlg;
@@ -1216,13 +1217,16 @@ TableGrid = (($) ->
                     if hashIndex[word] is undefined
                         hashIndex[word] = []
                     hashIndex[word].push(i++)
+
+                columnValues = arrayUtil.unique(columnValues)
                 columnValues = columnValues.sort()
                 columnValues = columnValues.reverse() if ascDescFlg is 'DESC'
+
                 result = []
                 rows = @rows
                 positions = null
                 pos = null
-                columnValues = arrayUtil.unique(columnValues)
+
                 for word in columnValues
                     positions = hashIndex[word]
                     result.push(rows[pos]) for pos in positions
