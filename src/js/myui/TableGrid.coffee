@@ -394,7 +394,8 @@ TableGrid = (($) ->
                     html[idx++] = temp
                 else if editor instanceof TableGrid.CellRadioButton
                     groupName = if editor.groupName? then editor.groupName else 'my-radio'+id+'_c'+j
-                    html[idx++] = template(radioTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId], 'groupName' : groupName+rowIdx})
+                    groupName += rowIdx if editor.groupByRow
+                    html[idx++] = template(radioTmpl, {'id' : id, 'x' : j, 'y' : rowIdx, 'value' : row[columnId], 'groupName' : groupName})
                 else if editor instanceof Autocompleter
                     # TODO I have think deeply about this thing is very complex and I feel like shit now
                     #unless cm[j].hasOwnProperty('renderer')
@@ -1635,7 +1636,7 @@ TableGrid = (($) ->
             selectAllFlg = false
             if idx == -1
                 for column in cm
-                    if column.editor instanceof TableGrid.CellCheckbox and column.editor.selectable
+                    if (column.editor instanceof TableGrid.CellCheckbox or column.editor instanceof TableGrid.CellRadioButton) and column.editor.selectable
                         idx = column.positionIndex
                         selectAllFlg = column.selectAllFlg
                         break
@@ -1649,15 +1650,18 @@ TableGrid = (($) ->
                         for j in [0...newRowsAdded.length]
                             y = -(j + 1)
                             result.push(y) if $('#my-checkbox'+id+'_c'+idx+'r'+y).is('.active')
+                            result.push(y) if $('#my-radio'+id+'_c'+idx+'r'+y).is('.active')
                     else
                         for j in [0...newRowsAdded.length]
                             y = j + renderedRows
                             result.push(y) if $('#my-checkbox'+id+'_c'+idx+'r'+y).is('.active')
+                            result.push(y) if $('#my-radio'+id+'_c'+idx+'r'+y).is('.active')
 
                 for j in [0...renderedRows]
                     y = j
                     # TODO this is weird
                     result.push(y) if @deletedRows.indexOf(@getRow(y)) == -1 and $('#my-checkbox'+id+'_c'+idx+'r'+y).size() > 0 and $('#my-checkbox'+id+'_c'+idx+'r'+y).is('.active')
+                    result.push(y) if @deletedRows.indexOf(@getRow(y)) == -1 and $('#my-radio'+id+'_c'+idx+'r'+y).size() > 0 and $('#my-radio'+id+'_c'+idx+'r'+y).is('.active')
 
                 #TODO check this maybe there is a bug
                 if selectAllFlg and renderedRows < @rows.length
@@ -1882,7 +1886,8 @@ TableGrid = (($) ->
                 onClick : null,
                 getValueOf : null,
                 selectable : null,
-                groupName : null
+                groupName : null,
+                groupByRow : false
             }, options or {})
             @onClick = options.onClick
             @getValueOf = options.getValueOf
