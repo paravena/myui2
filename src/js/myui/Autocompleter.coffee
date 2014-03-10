@@ -335,7 +335,7 @@ Autocompleter = (($) ->
             @changed = true
             @hasFocus = true
 
-            clearTimeout @observer if @observe?
+            clearTimeout @observer if @observer?
             @observer = setTimeout(( => @onObserverEvent()), @options.frequency * 1000)
             return true
 
