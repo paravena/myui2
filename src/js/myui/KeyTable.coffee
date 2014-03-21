@@ -315,6 +315,7 @@ KeyTable = (($) ->
         # @return [x, y] position of the element
         ###
         getCoordsFromCell : (cell) ->
+            return null unless cell
             id = $(cell).attr('id')
             return null unless id?
             match = id.match(/c(\d*?)r(\-?\d*?)$/)

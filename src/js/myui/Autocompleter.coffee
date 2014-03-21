@@ -49,6 +49,7 @@ Autocompleter = (($) ->
 
             unless @options.onShow
                 @options.onShow = (element, update) =>
+                    return if !element or !update
                     p = $(element).offset()
                     vh = $(window).height() #view port height
                     vst = $(window).scrollTop() # view port scrolling top

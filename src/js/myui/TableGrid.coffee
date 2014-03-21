@@ -756,6 +756,7 @@ TableGrid = (($) ->
 
             $('.mtgIHC' + id).on 'mouseenter', (event) =>
                 column = $(event.target)
+                return unless column
                 leftPos = column.parent('th').position().left
                 dragColumn.css({
                     'top' : (topPos + 15) + 'px',
@@ -764,6 +765,7 @@ TableGrid = (($) ->
 
             $('.mtgIHC' + id).on 'draginit', (event, drag) =>
                 column = $(event.target)
+                return unless column
                 columnIndex = parseInt(column.attr('id').match(/c(\d*)/)[1])
                 dragColumn.find('span').html(column.text()).end().css('visibility', 'visible')
                 drag.representative(dragColumn, dragColumn.width() / 2, 10)
