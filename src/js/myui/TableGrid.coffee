@@ -459,7 +459,7 @@ TableGrid = (($) ->
                 x = parseInt(coords[1])
                 y = parseInt(coords[2])
                 editor = cm[x].editor
-                if typeof(cm[x].editable) is 'function' and !cm[x].editable(x, y)
+                if !cm[x].editable or (typeof(cm[x].editable) is 'function' and !cm[x].editable(x, y))
                     event.preventDefault()
                     return false
                 input = $('input', div)

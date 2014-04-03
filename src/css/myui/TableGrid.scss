@@ -164,9 +164,19 @@ div.tablegrid-body {
               }
               .my-checkbox {
                 margin-top : 4px;
+                input {
+                  margin: 0;
+                  position: absolute;
+                  top: 0;
+                }
               }
               .my-radio {
                 margin-top : 3px;
+                input {
+                  margin: 0;
+                  position: absolute;
+                  top: 0;
+                }
               }
             }
             &.modified-cell {

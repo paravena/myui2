@@ -70,7 +70,14 @@ KeyTable = (($) ->
 
             $(document).on 'click', @_onClickHandler
 
-            @_tableBody.on 'click', (event) =>
+            pageX = null
+            pageY = null
+            @_tableBody.on 'mousedown', (event) =>
+                pageX = event.pageX
+                pageY = event.pageY
+
+            @_tableBody.on 'mouseup', (event) =>
+                return if pageX isnt event.pageX or pageY isnt event.pageY
                 cell = $(event.target).closest('td')
                 if cell isnt @_nCurrentFocus
                     @setFocus(cell)

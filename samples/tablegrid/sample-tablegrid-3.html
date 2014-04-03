@@ -101,6 +101,11 @@
                             act['save-button'].previousRow.hide();
                             act['edit-button'].previousRow.show();
                         }
+                    },
+                    afterRender : function() {
+                        if (tableGrid.rows.length == 0) {
+
+                        }
                     }
                 },
                 columnModel : [
@@ -111,7 +116,10 @@
                         editor : new MY.TableGrid.CellCheckbox({
                             selectable: true
                         }),
-                        sortable : false
+                        sortable : false,
+                        editable : function(x,y) {
+                            return false;
+                        }
                     },
                     {
                         id : 'from_name',
@@ -158,10 +166,7 @@
                     {
                         id: 'read',
                         title : 'Already Read',
-                        editable : function(x, y) {
-                            //return !(y >= 0 && y < tableGrid.rows.length)
-                            return true;
-                        },
+                        editable : true,
                         editor : new MY.TableGrid.CellCheckbox({
                             selectable : false,
                             getValueOf : function(value) {
