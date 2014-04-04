@@ -238,6 +238,10 @@ div.my-tablegrid-menu {
             position : absolute;
             left : 4px;
             top : 6px;
+            input {
+              position: absolute;
+              top : 0;
+            }
           }
         }
       }

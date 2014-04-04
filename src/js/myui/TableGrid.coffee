@@ -29,7 +29,7 @@ TableGrid = (($) ->
                 rowStyle : ( ->  return ''),
                 rowClass : ((rowIdx) ->  return if rowIdx % 2 == 0 then 'hightlight' else ''),
                 addSettingBehavior : true,
-                addDraggingBehavior : true,
+                addDraggingBehavior : false,
                 addLazyRenderingBehavior : true,
                 addNewRowsToEndBehaviour : false,
                 beforeEditRow : null,
@@ -1154,7 +1154,7 @@ TableGrid = (($) ->
                         $('#sort-desc' + id).hide()
                         $('#sort-asc' + id).hide()
 
-                    selectableFlg = editor instanceof TableGrid.CellCheckbox and editor.selectable
+                    selectableFlg = editor instanceof TableGrid.CellCheckbox # and editor.selectable
                     selectAllItem = $('#mtgHBM' + id + ' .select-all:first')
                     if !selectableFlg
                         selectAllItem.hide()
@@ -1638,7 +1638,7 @@ TableGrid = (($) ->
             selectAllFlg = false
             if idx == -1
                 for column in cm
-                    if (column.editor instanceof TableGrid.CellCheckbox or column.editor instanceof TableGrid.CellRadioButton) and column.editor.selectable
+                    if (column.editor instanceof TableGrid.CellCheckbox or column.editor instanceof TableGrid.CellRadioButton) # and column.editor.selectable
                         idx = column.positionIndex
                         selectAllFlg = column.selectAllFlg
                         break
