@@ -28,7 +28,7 @@ TableGrid = (($) ->
                 onFailure : null,
                 rowStyle : ( ->  return ''),
                 rowClass : ((rowIdx) ->  return if rowIdx % 2 == 0 then 'hightlight' else ''),
-                addSettingBehavior : true,
+                addSettingBehavior : false,
                 addDraggingBehavior : false,
                 addLazyRenderingBehavior : true,
                 addNewRowsToEndBehaviour : false,
@@ -1120,7 +1120,8 @@ TableGrid = (($) ->
                 hbHeight = cm[columnIndex].height
                 if sortable or editor instanceof TableGrid.CellCheckbox
                     hc = element.parent('th') # header column
-                    leftPos = hc.position().left + hc.outerWidth()
+                    return unless hc # hope this prevent null pointer condition
+                    leftPos = hc.position().left + hc.outerWidth() # TODO a bug here
                     leftPos = leftPos - 16 - @scrollLeft
                     if leftPos < @bodyDiv[0].clientWidth
                         headerButton.css({
@@ -1311,6 +1312,7 @@ TableGrid = (($) ->
                 url : @url,
                 data : @request,
                 dataType : 'json',
+                cache : false,
                 complete : (response) =>
                     tableModel = $.parseJSON(response.responseText)
                     try
