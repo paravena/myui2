@@ -125,7 +125,8 @@ Autocompleter = (($) ->
                                 break
                             else if entry.length >= @options.partialChars and @options.partialSearch and foundPos isnt -1
                                 if @options.fullSearch or /\s/.test(text.substr(foundPos - 1, 1))
-                                    partial.push('<li>' + text.substr(0, foundPos) + '<strong>' + text.substr(foundPos, entry.length) + '</strong>' + text.substr(foundPos + entry.length) + '</li>')
+                                    #partial.push('<li>' + text.substr(0, foundPos) + '<strong>' + text.substr(foundPos, entry.length) + '</strong>' + text.substr(foundPos + entry.length) + '</li>')
+                                    partial.push('<li id="' + value + '">' + text.substr(0, foundPos) + '<strong>' + text.substr(foundPos, entry.length) + '</strong>' + text.substr(foundPos + entry.length) + '</li>');
                                     break
                             if @options.ignoreCase
                                 foundPos = text.toLowerCase().indexOf(entry.toLowerCase(), foundPos + 1)
