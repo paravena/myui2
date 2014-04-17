@@ -60,6 +60,7 @@ TableGrid = (($) ->
             @editRowFlg = false
             @editRowIdx = -1
             @options.addLazyRenderingBehavior = false if @options.addNewRowsToEndBehaviour
+            @_sortingDataFlg = false
 
             if @options.actionsColumnToolbar?
                 @_columnModel.push {'id' : 'actions' + @_mtgId, 'title' : i18n.getMessage('label.actions')}
@@ -1131,16 +1132,34 @@ TableGrid = (($) ->
                             'visibility' : 'visible'
                         })
 
-                    sortAscMenuItem.on 'click', => @_sortData(columnIndex, 'ASC')
-                    sortDescMenuItem.on 'click', => @_sortData(columnIndex, 'DESC')
+                    sortAscMenuItem.on 'click', =>
+                        try # TODO DRY fix this if it is working
+                            return if @_sortingDataFlg
+                            @_sortingDataFlg = true
+                            @_sortData(columnIndex, 'ASC')
+                        finally
+                            @_sortingDataFlg = false
+
+                    sortDescMenuItem.on 'click', =>
+                        try # TODO DRY fix this if it is working
+                            return if @_sortingDataFlg
+                            @_sortingDataFlg = true
+                            @_sortData(columnIndex, 'DESC')
+                        finally
+                            @_sortingDataFlg = false
 
             # Sorting when click on header column
             $('.mtgIHC' + id).on 'mousedown', (event) =>
-                element = $(event.target)
-                return unless element.attr('id')
-                elementId = element.attr('id')
-                columnIndex = parseInt(elementId.match(/_c(\d*)/)[1]) # extract column number from id
-                @_toggleSortData(columnIndex)
+                try
+                    return if @_sortingDataFlg
+                    @_sortingDataFlg = true
+                    element = $(event.target)
+                    return unless element.attr('id')
+                    elementId = element.attr('id')
+                    columnIndex = parseInt(elementId.match(/_c(\d*)/)[1]) # extract column number from id
+                    @_toggleSortData(columnIndex)
+                finally
+                    @_sortingDataFlg = false
 
             headerButton.on 'mousedown', =>
                 return if columnIndex < 0
