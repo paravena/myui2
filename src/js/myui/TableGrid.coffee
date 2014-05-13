@@ -266,7 +266,7 @@ TableGrid = (($) ->
             html[idx++] = i18n.getMessage('label.sortDesc')
             html[idx++] = '</li>'
             html[idx++] = '<li class="select-all">'
-            html[idx++] = '<label><div class="my-checkbox item-checkbox"><input type="checkbox" id="select-all'+id+'"></div></label>'
+            html[idx++] = '<label><div class="my-checkbox item-checkbox"><div></div><input type="checkbox" id="select-all'+id+'"></div></label>'
             html[idx++] = i18n.getMessage('label.selectAll')
             html[idx++] = '</li>'
             html[idx++] = '</ul>'
@@ -1163,6 +1163,7 @@ TableGrid = (($) ->
 
             headerButton.on 'mousedown', =>
                 return if columnIndex < 0
+                console.log "columnIndex #{columnIndex}"
                 cm = @_columnModel
                 editor = cm[columnIndex].editor
                 selectableFlg = false
@@ -1180,13 +1181,18 @@ TableGrid = (($) ->
                         selectAllItem.hide()
                     else
                         selectAllItem.show()
+                        console.log "columnIndex #{columnIndex} is #{cm[columnIndex].selectAllFlg}"
+
                         if cm[columnIndex].selectAllFlg
+                            console.log "entering in checked block"
                             $('input', selectAllItem).attr('checked', 'checked')
                             $('.my-checkbox', selectAllItem).addClass('active')
 
                         selectAllItem.one 'click', => # onclick handler
                             $('.my-checkbox', selectAllItem).toggleClass('active')
-                            isChecked = cm[columnIndex].selectAllFlg = $('#select-all' + id).is(':checked')
+                            console.log "is checked #{!$('#select-all' + id).is(':checked')}"
+                            isChecked = !$('#select-all' + id).is(':checked')
+                            console.log "isChecked : #{isChecked}"
                             renderedRows = @renderedRows
                             beginAtRow = 0
                             beginAtRow = -@newRowsAdded.length if @newRowsAdded.length > 0
@@ -1194,7 +1200,8 @@ TableGrid = (($) ->
                             for y in [beginAtRow...renderedRows]
                                 span = $('#my-checkbox' + id + '_c' + x + 'r' + y)
                                 span.trigger('mousedown', {fromKeyboard : true})
-                            headerButtonMenu.css('visibility', 'hidden')
+                            #headerButtonMenu.css('visibility', 'hidden')
+                            cm[columnIndex].selectAllFlg = isChecked
 
                     leftPos = parseInt(headerButton.css('left'))
                     headerButtonMenu.css({
