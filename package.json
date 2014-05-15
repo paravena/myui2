@@ -12,10 +12,10 @@
   "readmeFilename": "README.md",
   "gitHead": "d9fb95988e735ae9fefaeb9e3c246b9c58c4e06b",
   "devDependencies": {
-    "grunt": "~0.4.2",
-    "grunt-contrib-coffee": "~0.7.0",
-    "grunt-contrib-sass": "~0.6.0",
-    "grunt-contrib-copy": "~0.4.1",
-    "grunt-contrib-uglify": "~0.2.7"
+    "grunt": "^0.4.2",
+    "grunt-contrib-coffee": "^0.10.1",
+    "grunt-contrib-sass": "^0.7.2",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-uglify": "^0.4.0"
   }
 }
