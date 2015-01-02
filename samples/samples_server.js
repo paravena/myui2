@@ -8,7 +8,8 @@ http.createServer(function(req, res) {
         return res.end();
     }
     res.writeHead(200, {'Content-Type': 'application/json'});
-    filePath = filePath.replace('/', path.sep);
+    filePath = filePath.replace(/\//g, path.sep);
+    console.log('filePath: ' + filePath);
     filePath = filePath.replace(/\?.*$/, ''); // remove query string
     setTimeout(function() {
         var pathToFile = __dirname + filePath;
