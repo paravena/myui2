@@ -19,7 +19,8 @@
 			{value: 'IT', text: 'Italy'},
 			{value: 'DE', text: 'Germany'},
 			{value: 'KR', text: 'Korea'},
-			{value: 'JP', text: 'Japan'}
+			{value: 'JP', text: 'Japan'},
+			{value: 'SW', text: 'Sweden'}
 		];
 
 		var defaultToolbar = [
@@ -136,7 +137,7 @@
 					})
 				}
 			],
-			url: 'get_all_cars.php'
+			url: 'http://localhost:3000/tablegrid/all_cars.json'
 		};
 		tableGrid1 = new MY.TableGrid(tableModel);
 		tableGrid1.render('#mytable1');

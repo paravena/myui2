@@ -1,0 +1,28 @@
+{
+    "options" : {
+
+    },
+    "rows" : [
+        {"carId" : 1, "manufacturer" : "Audi", "model" : "A3", "year" : "2011", "price" : 5000, "dateAcquired" : "03/01/2011", "origCountry" : "DE"},
+        {"carId" : 2, "manufacturer" : "Mercedes Benz", "model" : "C180", "year" : "2010", "price" : 16000, "dateAcquired" : "04/02/2010", "origCountry" : "DE"},
+        {"carId" : 3, "manufacturer" : "Volvo", "model" : "C30", "year" : "2013", "price" : 10000, "dateAcquired" : "04/07/2014", "origCountry" : "SW"},
+        {"carId" : 4, "manufacturer" : "Toyota", "model" : "Yaris", "year" : "2011", "price" : 4000, "dateAcquired" : "06/05/2013", "origCountry" : "JP"},
+        {"carId" : 5, "manufacturer" : "Volkswagen", "model" : "Beetle", "year" : "1998", "price" : 8000, "dateAcquired" : "06/05/2013", "origCountry" : "DE"},
+        {"carId" : 6, "manufacturer" : "Volkswagen", "model" : "Golf", "year" : "1981", "price" : 3000, "dateAcquired" : "06/05/2013", "origCountry" : "DE"},
+        {"carId" : 7, "manufacturer" : "Fiat", "model" : "147", "year" : "1982", "price" : 4000, "dateAcquired" : "06/05/2013", "origCountry" : "IT"},
+        {"carId" : 8, "manufacturer" : "Fiat", "model" : "Linea", "year" : "2012", "price" : 8500, "dateAcquired" : "06/05/2013", "origCountry" : "IT"},
+        {"carId" : 9, "manufacturer" : "Alfa Romeo", "model" : "Mito", "year" : "2011", "price" : 14500, "dateAcquired" : "06/05/2013", "origCountry" : "IT"},
+        {"carId" : 10, "manufacturer" : "Renault", "model" : "18", "year" : "1984", "price" : 3000, "dateAcquired" : "06/05/2013", "origCountry" : "FR"},
+        {"carId" : 11, "manufacturer" : "Renault", "model" : "Fuego", "year" : "1982", "price" : 5000, "dateAcquired" : "06/05/2013", "origCountry" : "FR"},
+        {"carId" : 12, "manufacturer" : "Fiat", "model" : "Ritmo", "year" : "1986", "price" : 4600, "dateAcquired" : "06/05/2013", "origCountry" : "IT"},
+        {"carId" : 13, "manufacturer" : "Peugeot", "model" : "504", "year" : "2000", "price" : 8000, "dateAcquired" : "06/05/2013", "origCountry" : "FR"},
+        {"carId" : 14, "manufacturer" : "Nissan", "model" : "X-Trail", "year" : "2000", "price" : 7000, "dateAcquired" : "06/05/2013", "origCountry" : "JP"},
+        {"carId" : 15, "manufacturer" : "Nissan", "model" : "Pathfinder", "year" : "2006", "price" : 10000, "dateAcquired" : "06/05/2013", "origCountry" : "JP"},
+        {"carId" : 16, "manufacturer" : "Mitsubishi", "model" : "Eclipse", "year" : "2012", "price" : 20000, "dateAcquired" : "06/05/2013", "origCountry" : "JP"},
+        {"carId" : 17, "manufacturer" : "Mitsubishi", "model" : "Lancer", "year" : "2010", "price" : 4000, "dateAcquired" : "06/05/2013", "origCountry" : "JP"},
+        {"carId" : 18, "manufacturer" : "Volkswagen", "model" : "Golf", "year" : "2001", "price" : 4500, "dateAcquired" : "06/05/2013", "origCountry" : "DE"},
+        {"carId" : 19, "manufacturer" : "BMW", "model" : "640", "year" : "2012", "price" : 26000, "dateAcquired" : "06/05/2013", "origCountry" : "DE"},
+        {"carId" : 20, "manufacturer" : "Alfa Romeo", "model" : "Giulietta", "year" : "2008", "price" : 12000, "dateAcquired" : "06/05/2013", "origCountry" : "IT"}
+
+    ]
+}

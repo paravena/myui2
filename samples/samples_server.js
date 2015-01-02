@@ -9,6 +9,7 @@ http.createServer(function(req, res) {
     }
     res.writeHead(200, {'Content-Type': 'application/json'});
     filePath = filePath.replace('/', path.sep);
+    filePath = filePath.replace(/\?.*$/, ''); // remove query string
     setTimeout(function() {
         var pathToFile = __dirname + filePath;
         console.log('reading file ' + pathToFile);
@@ -23,5 +24,5 @@ http.createServer(function(req, res) {
                 res.end(content);
             }
         });
-    }, 5000);
+    }, 0);
 }).listen(3000);
