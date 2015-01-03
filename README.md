@@ -74,5 +74,7 @@ grunt
 </code>
 <br>
 <br>
-* And you can open one of the samples in samples folder, as you can see in the picture.
+* Now you can open one of the samples in samples folder, and you will see something like the following picture.
+<br>
+<br>
 
