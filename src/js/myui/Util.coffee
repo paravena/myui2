@@ -102,8 +102,6 @@
         str = str.replace(new RegExp('{'+p+'}','g'), params[p]) for p of params
         return str
 
-    preferAmericanFormat = true # TODO check this
-
     date =
         ###
         # Returns AM/PM time.
@@ -244,15 +242,12 @@
             if typeof(format) == "undefined" or format == null or format == ""
                 generalFormats = ['y-M-d', 'MMM d, y', 'MMM d,y', 'y-MMM-d', 'd-MMM-y', 'MMM d', 'MMM-d', 'd-MMM']
                 monthFirst = ['M/d/y', 'M-d-y', 'M.d.y', 'M/d', 'M-d']
-                dateFirst = ['d/M/y', 'd-M-y', 'd.M.y', 'd/M', 'd-M']
-                if preferAmericanFormat
-                    checkList = [generalFormats, monthFirst, dateFirst]
-                else
-                    checkList = [generalFormats, dateFirst, monthFirst]
-                for l in checkList
-                    for k in l
-                        d = $.parseString(val, k)
-                        return d if d != null
+                dayFirst = ['d/M/y', 'd-M-y', 'd.M.y', 'd/M', 'd-M']
+                checkFormatList = [generalFormats, monthFirst, dayFirst]
+                for formats in checkFormatList
+                    for f in formats
+                        dt = $.parseString(val, f)
+                        return dt if dt != null
                 return null
 
             val = val + ''
@@ -261,7 +256,6 @@
             i_format = 0
             c = ''
             token = ''
-            token2 = ''
             year = new Date().getFullYear()
             month = 1
             date = 1

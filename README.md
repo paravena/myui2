@@ -13,8 +13,7 @@ Soon I will finish the migration from old Prototype to CoffeeScript and JQuery. 
 Steps to build the project
 --------------------------------------
 
-* Download <a href="http://nodejs.org">node</a>, then install some plugins, like coffee-script and sass.
-
+* Firstly install <a href="http://nodejs.org">node</a>, then install some nodejs modules:.
 <code>
 npm install -g coffee-script
 </code>
@@ -22,22 +21,29 @@ npm install -g coffee-script
 <code>
 npm install -g node-sass
 </code>
-* execute the following commands:
-<br>
+* Note : This is not clear yet it happens that I have installed ruby and Sass on my system maybe those are also necessary
 <br>
 <code>
-node r.js -o build.scripts.js
+npm install -g grunt-cli
 </code>
 <br>
 <code>
-node r.js -o build.css.js
+npm install -g grunt-init
 </code>
-
-
-Samples
---------
-* This is a first sample, you can review it <a href="http://jsfiddle.net/paravena/Cysu8/embedded/result,js,html/">here</a>
-
-* Second sample showing nested header columns, you can review it <a href="http://jsfiddle.net/paravena/3raSc/4/embedded/result,js,html/">here</a>
+* After installing this global node modules, go to myui2 folder and continue installing local nodejs modules:
+<br>
+<br>
+<code>
+npm install grunt
+</code>
+<br>
+<code>
+npm install
+</code>
+* After this you will be able to build the project just by running "grunt" command:
+<br>
+<code>
+grunt
+</code>
 
 
