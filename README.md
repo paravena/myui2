@@ -72,9 +72,9 @@ npm install
 <code>
 grunt
 </code>
-<br>
+<br>
 <br>
 * Now you can open one of the samples in samples folder, and you will see something like the following picture.
 <br>
 <br>
-
+![](http://pabloaravena.info/myui2/images/myui01.png)
