@@ -12,10 +12,26 @@ Soon I will finish the migration from old Prototype to CoffeeScript and JQuery. 
 
 ##Steps to build the project
 
-* Firstly install <a href="http://nodejs.org">node</a>, then install some nodejs modules:.
+* Firstly Make sure you have installed Ruby language in your computer, which will be available by default if you have Mac
+<br>
+* After this install sass gem, as follows:
+<br>
+<code>
+gem install sass
+</code>
+<br>
+* Now install <a href="http://nodejs.org">NodeJS</a>:.
 <br>
 <br>
-+ Begin installing coffee script
+* Then execute command npm install, which will install the modules defined in package.json file
+<br>
+<br>
+<code>
+npm install
+</code>
+<br>
+<br>
+* Install the following modules globally using npm command (sometime you need to prepend sudo command):
 <br>
 <br>
 <code>
@@ -23,46 +39,8 @@ npm install -g coffee-script
 </code>
 <br>
 <br>
-+ Install sass
-<br>
-<br>
-<code>
-npm install -g node-sass
-</code>
-<br>
-<br>
-**Note:** This is not clear yet, it happens that I have installed Ruby and Sass on my system maybe those are also necessary, will see after
-<br>
-<br>
-+ Now you need to install grunt, the building tool
-<br>
-<br>
 <code>
 npm install -g grunt-cli
-</code>
-<br>
-<br>
-<code>
-npm install -g grunt-init
-</code>
-<br>
-<br>
-* After installing this global node modules, go to myui2 folder and continue installing local nodejs modules:
-<br>
-<br>
-+ Install local grunt modules
-<br>
-<br>
-<code>
-npm install grunt
-</code>
-<br>
-<br>
-+ And finally other modules listed in package.json file
-<br>
-<br>
-<code>
-npm install
 </code>
 <br>
 <br>
@@ -72,7 +50,7 @@ npm install
 <code>
 grunt
 </code>
-<br>
+<br>
 <br>
 * Now you can open one of the examples in samples folder, and you will see something like the following picture.
 <br>
