@@ -6,6 +6,9 @@
     "type": "git",
     "url": "https://github.com/paravena/myui2.git"
   },
+  "scripts": {
+    "start": "node ./bin/www"
+  },
   "author": "Pablo Aravena",
   "website": "http://pabloaravena.info",
   "license": "MIT",
@@ -20,6 +23,7 @@
     "grunt-contrib-uglify": "^0.4.0"
   },
   "dependencies": {
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "morgan": "^1.6.1"
   }
 }
