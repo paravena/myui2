@@ -36,11 +36,37 @@ module.exports = function(grunt) {
             }
         },
         copy : {
-            main: {
-                cwd: 'src/css/myui/images/',
-                src : '*',
-                dest: 'dist/images/',
-                expand : true
+            cssImages: {
+                files : [
+                    {
+                        cwd : 'src/css/myui/images/',
+                        src : '*',
+                        dest : 'dist/images/',
+                        expand : true
+                    },
+                    {
+                        cwd : 'src/css/myui/images/',
+                        src : '*',
+                        dest : 'public/assets/css/images',
+                        expand : true
+                    }
+                ]
+            },
+            libs : {
+                files : [
+                    {
+                        cwd : 'dist',
+                        src : 'myui.min.js',
+                        dest : 'public/assets/js',
+                        expand : true
+                    },
+                    {
+                        cwd : 'dist',
+                        src : 'myui.min.css',
+                        dest : 'public/assets/css',
+                        expand : true
+                    }
+                ]
             }
         },
         uglify : {

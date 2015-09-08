@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>TableGrid Sample</title>
+        <link type="text/css" href="/assets/css/myui.min.css" rel="stylesheet">
+        <script type="text/javascript" src="/assets/js/libs/jquery/jquery.js"></script>
+        <script type="text/javascript" src="/assets/js/libs/jquery/jquerypp.custom.js"></script>
+        <script type="text/javascript" src="/assets/js/myui.min.js"></script>
+    </head>
+	<script type="text/javascript">
+        var tableGrid = null;
+        $(function() {
+            var repList = [
+                {value: 'zach', text: 'Zach'},
+                {value: 'claire', text: 'Claire'},
+                {value: 'ann', text: 'Ann'},
+                {value: 'john', text: 'John'},
+                {value: 'claudia', text: 'Claudia'},
+                {value: 'pablo', text: 'Pablo'},
+                {value: 'Juan', text: 'Juan'},
+                {value: 'Peter', text: 'Peter'}
+            ];
+
+            var defaultToolbar = [
+                {
+                    iconClass : 'save-button',
+                    text : 'Save',
+                    beforeClick : null,
+                    onClick : null,
+                    afterClick : null
+                },
+                {
+                    iconClass : 'add-button',
+                    text : 'Add',
+                    beforeClick : null,
+                    onClick : function() {
+                        tableGrid.addNewRow();
+                    },
+                    afterClick : null
+                },
+                {
+                    iconClass : 'delete-button',
+                    text : 'Delete',
+                    beforeClick : null,
+                    onClick : null,
+                    afterClick : null
+                }
+            ];
+
+            var actionsColumnToolbar = [
+                {
+                    iconClass : 'edit-button',
+                    text : 'Edit',
+                    beforeClick : null,
+                    onClick : function(y, act) {
+                        tableGrid.editRow(y);
+                    },
+                    afterClick : function(y, act) {
+                        act['edit-button'].hide();
+                        act['save-button'].show();
+                    }
+                },
+                {
+                    iconClass : 'save-button',
+                    text : 'Save',
+                    beforeClick : null,
+                    onClick : function(y) {
+                        tableGrid.saveRow(y);
+                    },
+                    afterClick : function(y, act) {
+                        act['save-button'].hide();
+                        act['edit-button'].show();
+                    },
+                    visible : false
+                },
+                {
+                    iconClass : 'delete-button',
+                    text : 'Delete',
+                    beforeClick : null,
+                    onClick : null,
+                    afterClick : null
+                }
+            ];
+
+            var tableModel = {
+                options : {
+                    title: 'Survey'
+                },
+                columnModel : [
+                    {
+                        id : 'question',
+                        title : 'Question',
+                        width : 170
+                    },
+                    {
+                        id : 'value1',
+                        title : 'Very Good',
+                        width : 80,
+                        editor : new MY.TableGrid.CellRadioButton({groupName : 'question'})
+                    },
+                    {
+                        id : 'value2',
+                        title : 'Good',
+                        width : 80,
+                        editor : new MY.TableGrid.CellRadioButton({groupName : 'question'})
+                    },
+                    {
+                        id : 'value3',
+                        title : 'Bad',
+                        width : 80,
+                        editor : new MY.TableGrid.CellRadioButton({groupName : 'question'})
+                    },
+                    {
+                        id : 'value4',
+                        title : 'Too Bad',
+                        width : 80,
+                        editor : new MY.TableGrid.CellRadioButton({groupName : 'question'})
+                    }
+                ],
+                rows : [
+                    {
+                        'question' : 'Do you think Java is a good programming language',
+                        'value1' : 'vg',
+                        'value2' : 'g',
+                        'value3' : 'b',
+                        'value4' : 'vb'
+                    },
+                    {
+                        'question' : 'Do you think Ruby is a good programming language',
+                        'value1' : 'vg',
+                        'value2' : 'g',
+                        'value3' : 'b',
+                        'value4' : 'vb'
+                    }
+                ]
+            };
+
+            tableGrid = new MY.TableGrid(tableModel);
+            tableGrid.show('#mytable');
+        });
+	</script>
+	<body style="margin:20px">
+        <h1>TableGrid Survey Sample</h1>
+        <div id="mytable" style="position:relative; width: 90%; height: 350px;"></div>
+	</body>
+</html>

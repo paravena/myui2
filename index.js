@@ -7,8 +7,6 @@ var app = express();
 
 app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'assets')));
-
 
 app.get('/test', function(req, res) {
     res.send('test response');
