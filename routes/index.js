@@ -7,6 +7,7 @@ var router = express.Router();
 var vehiclesFilePath = path.join(__dirname, 'vehicles.json');
 var peopleFilePath = path.join(__dirname, 'people.json');
 var manufacturersFilePath = path.join(__dirname, 'manufacturers.json');
+var manufListFilePath = path.join(__dirname, 'manuf_list.json');
 
 router.get('/vehicles', function(req, res) {
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -23,6 +24,12 @@ router.get('/people', function(req, res) {
 router.get('/manufacturers', function(req, res) {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     var readable = fs.createReadStream(manufacturersFilePath);
+    readable.pipe(res);
+});
+
+router.get('/manuflist', function(req, res) {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    var readable = fs.createReadStream(manufListFilePath);
     readable.pipe(res);
 });
 

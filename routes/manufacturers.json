@@ -1,5 +1,8 @@
-[
-    {"text": "Fiat", "value": 1},
-    {"text": "Peugeot", "value": 2},
-    {"text": "Toyota", "value": 3}
-]
+{
+    "options" : {
+
+    },
+    "rows" : [
+        {"manufId" : 1, "manufName" : "Audi", "manufDesc" : "From germany"}
+    ]
+}

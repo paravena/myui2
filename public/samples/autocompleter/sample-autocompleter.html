@@ -18,8 +18,7 @@
     $(function () {
 		comboBox = new MY.ComboBox({
 			input : '#manufacturerDesc',
-			/*url : 'get_manufacturers_list.php',*/
-            url : 'file:manufacturers.json',
+            url : 'http://localhost:3000/manuflist',
             /*items :  manufacturersList,*/
 			initialText : 'Select a manufacturer',
 			parameters : {},
