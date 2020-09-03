@@ -15,7 +15,7 @@
   "readmeFilename": "README.md",
   "gitHead": "d9fb95988e735ae9fefaeb9e3c246b9c58c4e06b",
   "devDependencies": {
-    "node-sass": "^3.2.0",
+    "node-sass": "^4.14.1",
     "grunt": "~0.4.5",
     "grunt-contrib-coffee": "^0.10.1",
     "grunt-contrib-sass": "^0.7.2",
