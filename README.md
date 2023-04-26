@@ -52,7 +52,7 @@ grunt
 </code>
 <br>
 <br>
-* Now you can open one of the examples in samples folder, and you will see something like the following picture.
+* Now you can see a live sample of this on https://paravena.github.io/myui2
 <br>
 <br>
-![](http://pabloaravena.info/myui2/images/myui01.png)
+
